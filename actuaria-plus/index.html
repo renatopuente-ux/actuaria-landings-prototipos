@@ -1,594 +1,1668 @@
-<!doctype html>
-<html lang="es-EC">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>actuaria+ · Control financiero de la nómina (prototipo)</title>
-<meta name="description" content="Registra tu nómina gratis, calcula cada salida y ten tu provisión NIC 19 lista para el auditor. Plan Free para siempre, sin tarjeta de crédito.">
-<meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Prompt:wght@300;400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>
-/* neu/glass/bento (actuaria+ redesign language): every shadow and light carries the surface tint, never pure
-   white or black; raised or glass = actionable, sunken = static data; emphasis by relief, never dark rings. */
-:root {
-  --bg: #e8ecf4; --navy: #151f47; --navy-2: #1e2a5c; --indigo: #4c64d9; --indigo-text: #2f5fcc;
-  --orange: #df5e2d; --orange-text: #a8431c; --orange-dark-bg: #ffbba1; --muted: #4d5775; --line: rgba(163, 177, 198, .45);
-  --ok-text: #1b5e20; --ok-bg: #e3f1e4;
-  --sd: rgba(163, 177, 198, .70); --sl: rgba(245, 248, 255, .93);
-  --neu-out: 6px 6px 16px var(--sd), -6px -6px 16px var(--sl);
-  --neu-out-lg: 12px 12px 30px var(--sd), -10px -10px 28px var(--sl);
-  --neu-in: inset 4px 4px 10px var(--sd), inset -4px -4px 10px var(--sl);
-  --glass: rgba(255, 255, 255, .58);
-  --f-head: Nunito, sans-serif; --f-body: Prompt, sans-serif; --f-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --r: 26px; --r-sm: 16px;
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
-body { margin: 0; background: var(--bg); color: var(--navy); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-/* Bubbles behind the glass: without movement behind it, frosted glass reads as flat white */
-body::before, body::after { content: ""; position: fixed; z-index: -1; border-radius: 50%; filter: blur(70px); opacity: .55; pointer-events: none; }
-body::before { width: 520px; height: 520px; background: #b9c6f2; top: -140px; right: -120px; animation: flota 22s ease-in-out infinite alternate; }
-body::after { width: 420px; height: 420px; background: #f6c9b4; bottom: -160px; left: -140px; animation: flota 26s ease-in-out infinite alternate-reverse; }
-@keyframes flota { to { transform: translate(-80px, 60px) scale(1.12); } }
-img { max-width: 100%; display: block; }
-a { color: var(--orange-text); }
-button, input, select { font-family: var(--f-body); font-size: 16px; }
-.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
-h1, h2, h3 { font-family: var(--f-head); margin: 0; letter-spacing: -.3px; }
-h1 { font-weight: 900; font-size: clamp(34px, 5vw, 58px); line-height: 1.05; }
-h2 { font-weight: 900; font-size: clamp(27px, 3.4vw, 40px); line-height: 1.12; }
-h3 { font-weight: 800; font-size: 19px; line-height: 1.3; }
-h1 em, h2 em { font-style: normal; color: var(--orange-text); }
-.chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--bg); box-shadow: var(--neu-in); font: 800 13px/1 var(--f-head); color: var(--navy); }
-.chip i { color: var(--ok-text); }
-.kicker { font: 800 13px/1 var(--f-head); letter-spacing: .1em; text-transform: uppercase; color: var(--orange-text); margin: 0 0 12px; }
-.lead { font-size: clamp(16px, 1.6vw, 19px); color: var(--muted); }
-.sec { padding: clamp(44px, 6vw, 76px) 0; }
-.sec_head { max-width: 760px; margin-bottom: 36px; }
-.sec_head p { margin: 14px 0 0; }
-.center { text-align: center; margin-inline: auto; }
-.card { background: var(--bg); border-radius: var(--r); box-shadow: var(--neu-out); padding: 26px; }
-.glass { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, .55); border-radius: var(--r); box-shadow: var(--neu-out-lg); }
-
-/* Buttons: text, then icon */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none; font: 800 16px/1 var(--f-head); transition: transform .15s ease, box-shadow .15s ease; }
-.btn:hover { transform: translateY(-1px); }
-.btn:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--indigo); outline-offset: 2px; }
-.btn--primary { background: var(--orange); color: #fff; box-shadow: 0 10px 24px rgba(223, 94, 45, .35); }
-.btn--navy { background: var(--navy); color: #fff; box-shadow: 0 10px 22px rgba(21, 31, 71, .28); }
-.btn--neu { background: var(--bg); color: var(--navy); box-shadow: var(--neu-out); }
-.btn--block { width: 100%; }
-
-/* Top bar: navy chrome, minimal navigation (existing users need «Iniciar sesión») */
-.top { position: sticky; top: 0; z-index: 30; background: var(--navy); }
-.top .wrap { display: flex; align-items: center; gap: 20px; min-height: 70px; }
-.top_logo img { height: 28px; width: auto; }
-.top nav { display: flex; gap: 24px; margin-left: 28px; }
-.top nav a, .top_login { color: #e4e8f5; text-decoration: none; font: 700 15px/1 var(--f-head); }
-.top nav a:hover, .top_login:hover { color: #fff; }
-.top_acc { margin-left: auto; display: flex; align-items: center; gap: 18px; }
-.top .btn { min-height: 42px; padding: 0 18px; font-size: 15px; }
-
-/* Hero */
-.hero { padding: clamp(40px, 6vw, 80px) 0 40px; }
-.hero_grid { display: grid; grid-template-columns: 1.02fr .98fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
-.hero h1 { margin: 20px 0 18px; }
-.hero_ctas { display: flex; flex-wrap: wrap; gap: 14px; margin: 28px 0 16px; }
-.micro { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; color: var(--muted); margin: 0; padding: 0; list-style: none; }
-.micro i { color: var(--ok-text); margin-right: 6px; }
-
-/* Product mock */
-.mock { padding: 20px; }
-.mock_bar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-.mock_bar span { width: 10px; height: 10px; border-radius: 50%; background: rgba(163, 177, 198, .9); }
-.mock_bar b { margin-left: 8px; font: 700 13px/1 var(--f-head); color: var(--muted); }
-.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.kpi { background: var(--bg); border-radius: var(--r-sm); box-shadow: var(--neu-in); padding: 14px; }
-.kpi small { display: block; font: 700 12px/1.3 var(--f-head); color: var(--muted); }
-.kpi b { display: block; font: 500 clamp(17px, 1.8vw, 22px)/1.2 var(--f-mono); margin-top: 6px; }
-.kpi em { font-style: normal; font-size: 12px; color: var(--ok-text); }
-.chart { margin-top: 14px; background: var(--bg); border-radius: var(--r-sm); box-shadow: var(--neu-in); padding: 16px; }
-.chart_head { display: flex; justify-content: space-between; font: 700 13px/1 var(--f-head); color: var(--muted); margin-bottom: 14px; }
-.bars { display: grid; grid-template-columns: repeat(9, 1fr); gap: 8px; align-items: end; height: 120px; }
-.bars span { border-radius: 8px 8px 4px 4px; background: linear-gradient(180deg, var(--indigo), var(--navy)); }
-.bars span:last-child { background: linear-gradient(180deg, #f08a5d, var(--orange)); }
-.years { display: grid; grid-template-columns: repeat(9, 1fr); gap: 8px; margin-top: 6px; font: 500 11px/1 var(--f-mono); color: var(--muted); text-align: center; }
-.mock_note { font-size: 12px; color: var(--muted); margin: 12px 2px 0; }
-
-/* Proof */
-.proof { padding: 24px 0 10px; }
-.proof_title { text-align: center; font: 800 13px/1 var(--f-head); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 22px; }
-.logos { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
-.logos div { background: var(--bg); border-radius: 14px; box-shadow: var(--neu-out); display: grid; place-items: center; height: 70px; padding: 10px 14px; }
-.logos img { max-height: 40px; max-width: 100%; width: auto; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
-.stat { text-align: center; padding: 22px; }
-.stat b { display: block; font: 900 clamp(30px, 4vw, 44px)/1 var(--f-head); }
-.stat span { display: block; margin-top: 8px; color: var(--muted); font-size: 15px; }
-
-/* Pains */
-.pains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.pain_n { font: 500 13px/1 var(--f-mono); color: var(--orange-text); margin-bottom: 14px; display: block; }
-.pains p { color: var(--muted); font-size: 15px; margin: 10px 0 0; }
-.bridge { text-align: center; font: 800 18px/1.4 var(--f-head); margin: 30px auto 0; max-width: 640px; }
-
-/* Free plan */
-.free { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 48px); align-items: center; }
-.free ul { list-style: none; padding: 0; margin: 22px 0 28px; display: grid; gap: 14px; }
-.free li { display: flex; gap: 14px; }
-.free li i { color: var(--ok-text); margin-top: 5px; }
-.free li b { font-family: var(--f-head); }
-.calcs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.calcs span { background: var(--bg); border-radius: 12px; box-shadow: var(--neu-in); padding: 12px; font: 700 13px/1.3 var(--f-head); display: flex; gap: 8px; align-items: center; }
-.calcs i { color: var(--indigo); width: 16px; text-align: center; }
-
-/* Modules bento */
-.tabs { display: inline-flex; gap: 6px; padding: 6px; border-radius: 999px; background: var(--bg); box-shadow: var(--neu-in); margin-bottom: 26px; flex-wrap: wrap; }
-.tabs button { border: 0; background: transparent; color: var(--navy); font: 800 14px/1 var(--f-head); padding: 11px 18px; border-radius: 999px; cursor: pointer; }
-.tabs button[aria-selected="true"] { background: var(--navy); color: #fff; box-shadow: 0 6px 14px rgba(21, 31, 71, .25); }
-.panel { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 22px; }
-.panel[hidden] { display: none; }
-.panel_intro h3 { font-size: 24px; font-weight: 900; }
-.panel_intro p { color: var(--muted); margin: 12px 0 20px; }
-.mod .tag { display: inline-block; font: 800 11px/1 var(--f-head); letter-spacing: .08em; text-transform: uppercase; padding: 7px 10px; border-radius: 999px; background: var(--bg); box-shadow: var(--neu-in); color: var(--indigo-text); margin-bottom: 14px; }
-.mod .tag.free { color: var(--ok-text); }
-.mod p { color: var(--muted); font-size: 15px; margin: 10px 0 0; }
-.mod .price { display: block; margin-top: 14px; font: 500 14px/1 var(--f-mono); color: var(--navy); }
-.actas { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; justify-content: space-between; }
-.actas p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
-
-/* Steps */
-.steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.step_n { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--navy); color: #fff; font: 900 18px/1 var(--f-head); margin-bottom: 16px; }
-.steps3 p { color: var(--muted); font-size: 15px; margin: 10px 0 0; }
-
-/* Pricing teaser */
-.plans { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-width: 900px; margin: 0 auto; }
-.plan { display: flex; flex-direction: column; }
-.plan .tag { align-self: flex-start; font: 800 12px/1 var(--f-head); letter-spacing: .08em; text-transform: uppercase; padding: 8px 12px; border-radius: 999px; box-shadow: var(--neu-in); }
-.plan h3 { font-size: 26px; font-weight: 900; margin-top: 16px; }
-.plan .amount { font: 900 40px/1 var(--f-head); margin: 16px 0 4px; }
-.plan .amount small { font: 600 15px/1 var(--f-body); color: var(--muted); }
-.plan .note { font-size: 14px; color: var(--muted); margin: 0 0 18px; }
-.plan ul { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 10px; font-size: 15px; }
-.plan li i { color: var(--ok-text); margin-right: 8px; }
-.plan .btn { margin-top: auto; }
-.plan--top { position: relative; }
-.plan--top::before { content: "El 100 % de actuaria+"; position: absolute; top: -13px; right: 22px; background: var(--orange); color: #fff; font: 800 12px/1 var(--f-head); padding: 8px 12px; border-radius: 999px; }
-.plans_foot { text-align: center; margin: 22px 0 0; color: var(--muted); font-size: 15px; }
-
-/* Security */
-.sec_grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.sec_item { display: flex; gap: 14px; align-items: flex-start; }
-.sec_item .ico { flex: none; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--bg); box-shadow: var(--neu-out); color: var(--indigo); font-size: 19px; }
-.sec_item p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
-.sec_item h3 { font-size: 16px; }
-
-/* FAQ */
-.faq { max-width: 860px; margin: 0 auto; display: grid; gap: 14px; }
-.faq details { background: var(--bg); border-radius: var(--r-sm); box-shadow: var(--neu-out); padding: 0 22px; }
-.faq summary { list-style: none; cursor: pointer; padding: 20px 0; font: 800 17px/1.35 var(--f-head); display: flex; justify-content: space-between; gap: 16px; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary i { color: var(--indigo); transition: transform .2s ease; margin-top: 3px; }
-.faq details[open] summary i { transform: rotate(45deg); }
-.faq details p { margin: 0 0 20px; color: var(--muted); }
-
-/* Demo */
-.demo { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 48px); align-items: center; }
-.demo ul { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 12px; }
-.demo li i { color: var(--indigo); margin-right: 10px; width: 18px; }
-.form { padding: 28px; }
-.field { display: grid; gap: 6px; margin-bottom: 14px; }
-.field label { font: 700 14px/1.2 var(--f-head); }
-.field label small { font-weight: 600; color: var(--muted); }
-.field input, .field select { min-height: 48px; border: 0; border-radius: 12px; background: var(--bg); box-shadow: var(--neu-in); padding: 0 14px; color: var(--navy); width: 100%; }
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form_foot { display: flex; align-items: center; gap: 8px; justify-content: center; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
-.err { color: #5f2120; background: #fdeded; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0 0 14px; display: none; }
-.err.on { display: block; }
-.done { text-align: center; padding: 10px 0; }
-.done_ico { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px; background: var(--ok-bg); color: var(--ok-text); font-size: 28px; }
-[hidden] { display: none !important; }
-
-/* Final CTA */
-.final { text-align: center; padding: clamp(32px, 5vw, 56px); }
-.final .hero_ctas { justify-content: center; }
-.final .micro { justify-content: center; }
-
-/* Footer */
-.foot { background: var(--navy); color: #c7cfe0; padding: 44px 0 110px; font-size: 14px; margin-top: 30px; }
-.foot .wrap { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 24px; }
-.foot h4 { color: #fff; font: 800 14px/1 var(--f-head); margin: 0 0 14px; }
-.foot a { color: #c7cfe0; text-decoration: none; display: block; margin-bottom: 8px; }
-.foot a:hover { color: #fff; }
-.foot img { height: 26px; width: auto; margin-bottom: 12px; }
-.proto { background: #fff4e5; color: #663c00; text-align: center; font-size: 13px; padding: 8px 16px; }
-
-/* Mobile bar */
-.mbar { display: none; }
-@media (max-width: 991px) {
-  .top nav { display: none; }
-  .hero_grid, .free, .demo { grid-template-columns: 1fr; }
-  .panel { grid-template-columns: 1fr 1fr; }
-  .panel_intro { grid-column: 1 / -1; }
-  .logos { grid-template-columns: repeat(4, 1fr); }
-  .pains, .steps3, .sec_grid { grid-template-columns: 1fr; }
-  .foot .wrap { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 767px) {
-  .top_login { display: none; }
-  .top .btn { display: none; }
-  .logos { grid-template-columns: repeat(3, 1fr); }
-  .stats { grid-template-columns: 1fr; gap: 12px; }
-  .panel, .plans { grid-template-columns: 1fr; }
-  .calcs { grid-template-columns: 1fr 1fr; }
-  .kpis { grid-template-columns: 1fr 1fr; }
-  .kpis .kpi:last-child { grid-column: 1 / -1; }
-  .two { grid-template-columns: 1fr; gap: 0; }
-  .tabs { display: grid; grid-template-columns: 1fr 1fr; border-radius: 22px; width: 100%; }
-  .mbar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(232, 236, 244, .94); backdrop-filter: blur(12px); box-shadow: 0 -6px 18px var(--sd); transform: translateY(110%); transition: transform .25s ease; }
-  .mbar.on { transform: none; }
-  .mbar .btn { min-height: 48px; padding: 0 12px; font-size: 15px; }
-  .card, .form { padding: 22px; }
-}
+<!DOCTYPE html>
+<html data-wf-domain="actuaria.com" data-wf-page="6aac66615825ece9fcd53b04" data-wf-site="6967c96e0fba2ea4f94d3c69" lang="es-EC"><head><meta charset="utf-8"><link href="https://cdn.prod.website-files.com" rel="preconnect" crossorigin="anonymous"><title>actuaria+ · Control financiero de la nómina | Actuaria (prototipo)</title><meta content="Registra tu nómina gratis, calcula cada salida y ten tu provisión NIC 19 lista para el auditor. Plan Free para siempre, sin tarjeta de crédito." name="description"><meta content="width=device-width, initial-scale=1" name="viewport"><meta content="Webflow" name="generator"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/css/actuaweb.webflow.shared.62b5a4775.min.css" rel="stylesheet" type="text/css" integrity="sha384-YrWkd1sjp4VEnbwispHnnECOQC5n37zTNcdJj8cD93QNUavLffkdSA7q7rRyPMcE" crossorigin="anonymous"><script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9883c0a48926ccd2c2e1f4_Light.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: light)"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9883cc97ffda7be3a54f64_Dark.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9883c076eed4db7d98e70d_Light.png" rel="icon" type="image/png" sizes="48x48"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9882a02dbfacbe94a2e2c6_icon.png" rel="apple-touch-icon" sizes="180x180"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9882a010a3e286c71b7d8b_icon.png" rel="icon" type="image/png" sizes="192x192"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9882a010a3e286c71b7d88_icon.png" rel="icon" type="image/png" sizes="512x512"><script>
+(function () {
+  var d = document.documentElement, n = navigator, q = location.search, forzado = null;
+  var completo = /[?&]completo(=|&|$)/.test(q), pedido = /[?&]ligero(=|&|$)/.test(q);
+  try {
+    if (completo) sessionStorage.setItem('actuaria-ligero', '0');
+    else if (pedido) sessionStorage.setItem('actuaria-ligero', '1');
+    forzado = sessionStorage.getItem('actuaria-ligero');
+  } catch (e) { forzado = completo ? '0' : pedido ? '1' : null; }
+  var mm = window.matchMedia;
+  function cumple(c) { try { return !!(mm && mm.call(window, c).matches); } catch (e) { return false; } }
+  var c = n.connection;
+  var auto = /FBAN|FBAV|FB_IAB|Instagram/.test(n.userAgent || '') ||
+    (n.deviceMemory > 0 && n.deviceMemory <= 2) || !!(c && c.saveData);
+  var ligero = forzado === '1' || (forzado !== '0' && auto);
+  var quieto = ligero || cumple('(prefers-reduced-motion: reduce)');
+  if (ligero) d.classList.add('es-ligero');
+  if (!quieto) return;
+  d.classList.add('sin-movimiento');
+  if (ligero && mm) window.matchMedia = function (consulta) {
+    var real = mm.apply(window, arguments), s = String(consulta).replace(/\s+/g, '').toLowerCase(), si;
+    if (s.indexOf('prefers-reduced-motion:reduce') > -1) si = true;
+    else if (s.indexOf('prefers-reduced-motion:no-preference') > -1 || s.indexOf('hover:hover') > -1 || s.indexOf('pointer:fine') > -1) si = false;
+    else return real;
+    var nada = function () {};
+    return { matches: si, media: real.media, onchange: null, addListener: nada, removeListener: nada, addEventListener: nada, removeEventListener: nada, dispatchEvent: function () { return false; } };
+  };
+  document.addEventListener('animationstart', function (e) {
+    var t = e.target;
+    if (t === d || t === document.body || !t.getAnimations) return;
+    t.getAnimations({ subtree: true }).forEach(function (a) {
+      var ef = a.effect;
+      if (ef && ef.target === t && a.animationName === e.animationName && (ef.pseudoElement || '') === (e.pseudoElement || '') &&
+        ef.getTiming().iterations === Infinity) a.cancel();
+    });
+  }, true);
+  function ix2() {
+    var k = 0, visto = 0;
+    (function mirar() {
+      var ix, st;
+      try { ix = window.Webflow && Webflow.require && Webflow.require('ix2'); st = ix && ix.store && ix.store.getState(); } catch (e) { return; }
+      if (!st || !st.ixSession || !st.ixSession.active) { if (++k < 80) setTimeout(mirar, 250); return; }
+      var ev = (st.ixData && st.ixData.events) || {}, bucle = false, id;
+      for (id in ev) {
+        if (!/^(PAGE_START|PAGE_FINISH|MOUSE_OVER|MOUSE_OUT)$/.test(ev[id].eventTypeId)) return;
+        if (ev[id].config && ev[id].config.loop) bucle = true;
+      }
+      if (!bucle) return;
+      var vivas = 0, ins = st.ixInstances || {};
+      for (id in ins) { var e2 = ev[ins[id].eventId]; if (!(e2 && e2.config && e2.config.loop)) vivas++; }
+      if ((vivas || ++visto < 4) && ++k < 80) { setTimeout(mirar, 250); return; }
+      if (!vivas) ix.destroy();
+    })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ix2); else ix2();
+})();
+</script>
+<style>html.es-ligero *, html.es-ligero *::before, html.es-ligero *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.sin-movimiento .credentials_grid.is-marquee,
+html.sin-movimiento .logos_container,
+html.sin-movimiento .logos_container_b,
+html.sin-movimiento .typing_caret,
+html.sin-movimiento .calc_menu-flota,
+html.sin-movimiento .gradient_ball_a,
+html.sin-movimiento .gradient_ball_b,
+html.sin-movimiento .gradient_ball_c { animation: none !important; }
+html.sin-movimiento .logos_container,
+html.sin-movimiento .logos_container_b,
+html.sin-movimiento .gradient_ball_a,
+html.sin-movimiento .gradient_ball_b { transform: none !important; }
+html.sin-movimiento .gradient_ball_c { transform: translate3d(0, 32vh, 0) !important; }
+html.sin-movimiento .process_section .card_wrapper.is-step .beneficio_ico,
+html.sin-movimiento .features_right .icon_div_card::after,
+html.sin-movimiento .card_wrapper.is-esencia .beneficio_ico::after,
+html.sin-movimiento .nos_beneficios-intro + .nos_grid > .card_wrapper.is-glass .beneficio_ico::after,
+html.sin-movimiento .ct_cell .beneficio_ico::after,
+html.sin-movimiento .blog-bento_cta-ico { animation: none !important; background-position: 30% 30%, 50% 50% !important; }
+html.sin-movimiento .button-ring::after,
+html.sin-movimiento .button-ring-form::after,
+html.sin-movimiento .cta_section .cta_content > .secondbutton.is-flat::after,
+html.sin-movimiento .dir_card::after { animation: none !important; background-position: 0 0, 30% 30%, 50% 50% !important; }
+html.sin-movimiento .main_hero .background-video,
+html.sin-movimiento .blog-article_summary::before { animation: none !important; background-position: 0 0, 30% 30%, 50% 50%, 0 0 !important; }
+html.sin-movimiento .team_grid .card_wrapper.is-member .team_photo,
+html.sin-movimiento .nos_grid.is-4 .card_wrapper.is-member .team_photo,
+html.sin-movimiento .blog-aside_cta { animation: none !important; background-position: 0 0, 0 0, 30% 30%, 50% 50%, 0 0 !important; }
+html.sin-movimiento .nos_beneficios-intro + .nos_grid > .card_wrapper.is-glass,
+html.sin-movimiento .ct_cell[data-tornasol] { animation: none !important; background-position: 0 0, 0 0, 0 0, 30% 30%, 50% 50%, 0 0 !important; }
+html.sin-movimiento .radar_sweep { animation: none !important; transform: rotate(45deg); }
+html.sin-movimiento .radar_blip { animation: none !important; opacity: .8; }
+html.sin-movimiento .radar_ping { animation: none !important; opacity: 0; }
+html.sin-movimiento.pl-logo body::after { animation: pl-logo-in .3s ease-out both; }
+html.sin-movimiento.pl-logo.pl-out body::after { animation: pl-logo-fade .3s ease-in forwards; }
+html.sin-movimiento.pl-enter .navbar-logo-left,
+html.sin-movimiento.pl-enter .hero_main,
+html.sin-movimiento.pl-enter .hero_blog_preview,
+html.sin-movimiento.pl-enter .features { animation: none; }
 </style>
-</head>
-<body>
-<div class="proto">Prototipo de rediseño · el formulario no envía datos</div>
-
-<header class="top">
-  <div class="wrap">
-    <a class="top_logo" href="https://plus.actuaria.com/" aria-label="actuaria+, inicio"><img src="logo-actuaria-plus-negativo.svg" alt="actuaria+" width="144" height="28"></a>
-    <nav aria-label="Principal">
-      <a href="#modulos">Módulos</a>
-      <a href="#precios">Precios</a>
-      <a href="#seguridad">Seguridad</a>
-    </nav>
-    <div class="top_acc">
-      <a class="top_login" href="https://plus.actuaria.com/auth/login" data-evento="login_cabecera">Iniciar sesión</a>
-      <a class="btn btn--primary" href="https://plus.actuaria.com/auth/registro" data-evento="registro_cabecera">Comenzar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a>
-    </div>
-  </div>
-</header>
-
-<main>
-  <!-- Hero: the free plan is the hook, so it goes in the first screen -->
-  <section class="hero">
-    <div class="wrap hero_grid">
-      <div>
-        <span class="chip"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Plan Free · gratis para siempre</span>
-        <h1>Toma el control financiero de tu <em>nómina</em></h1>
-        <p class="lead">La nómina es el mayor costo de tu empresa y suele ser el que menos control tiene. Con actuaria+ sabes cuánto cuesta hoy y cuánto costará mañana, con respaldo actuarial y alineado a las NIIF.</p>
-        <div class="hero_ctas">
-          <a class="btn btn--primary" href="https://plus.actuaria.com/auth/registro" data-evento="registro_hero">Comenzar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a>
-          <a class="btn btn--neu" href="#demo" data-evento="demo_hero">Ver una demostración <i class="fa-solid fa-calendar-check" aria-hidden="true"></i></a>
-        </div>
-        <ul class="micro">
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i>Sin tarjeta de crédito</li>
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i>Usuarios ilimitados</li>
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i>Seguridad ISO/IEC 27001</li>
-        </ul>
-      </div>
-      <div class="glass mock" aria-label="Ejemplo del panel de actuaria+">
-        <div class="mock_bar"><span></span><span></span><span></span><b>plus.actuaria.com</b></div>
-        <div class="kpis">
-          <div class="kpi"><small>Costo mensual de nómina</small><b>$128.400</b></div>
-          <div class="kpi"><small>Provisión NIC 19</small><b>$312.900</b></div>
-          <div class="kpi"><small>Trabajadores</small><b>87</b><em>3 salidas este mes</em></div>
-        </div>
-        <div class="chart">
-          <div class="chart_head"><span>Provisión proyectada</span><span>2026 – 2034</span></div>
-          <div class="bars" aria-hidden="true"><span style="height:38%"></span><span style="height:44%"></span><span style="height:49%"></span><span style="height:55%"></span><span style="height:61%"></span><span style="height:68%"></span><span style="height:76%"></span><span style="height:85%"></span><span style="height:96%"></span></div>
-          <div class="years" aria-hidden="true"><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span></div>
-        </div>
-        <p class="mock_note">Datos de ejemplo.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="proof" aria-label="Clientes">
-    <div class="wrap">
-      <p class="proof_title">Más de 5.000 empresas usan actuaria+</p>
-      <div class="logos">
-        <div><img src="https://plus.actuaria.com/logos/clientes/BancoPichincha_Gris.png" alt="Banco Pichincha" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/Pronaca_Gris.png" alt="Pronaca" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/ArcaContinental_Gris.png" alt="Arca Continental" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/Unilever_Gris.png" alt="Unilever" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/McDonalds_Gris.png" alt="McDonald's" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/DinersClub_Gris.png" alt="Diners Club" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/KimberlyClark_Gris.png" alt="Kimberly-Clark" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/Produbanco_Gris.png" alt="Produbanco" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/Hilton_Gris.png" alt="Hilton" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/Zurich_Gris.png" alt="Zurich" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/Chubb_Gris.png" alt="Chubb" loading="lazy"></div>
-        <div><img src="https://plus.actuaria.com/logos/clientes/Tia_Gris.png" alt="Tía" loading="lazy"></div>
-      </div>
-      <div class="stats">
-        <div class="card stat"><b>+40</b><span>años de práctica actuarial detrás de cada cálculo</span></div>
-        <div class="card stat"><b>+5.000</b><span>empresas ya usan actuaria+</span></div>
-        <div class="card stat"><b>+600 mil</b><span>trabajadores registrados</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head">
-        <p class="kicker">¿Te suena familiar?</p>
-        <h2>Tres señales de que tu nómina te controla a ti</h2>
-      </div>
-      <div class="pains">
-        <div class="card"><span class="pain_n">/ 01</span><h3>El pasivo laboral es una caja negra</h3><p>Sabes que existe la obligación por jubilación patronal y desahucio, pero no cuánto es, cómo crece ni qué parte es deducible.</p></div>
-        <div class="card"><span class="pain_n">/ 02</span><h3>Cada salida se calcula desde cero</h3><p>Alguien renuncia o se jubila y el cálculo empieza de nuevo: buscar datos, armar fórmulas y confiar en que nada quedó fuera.</p></div>
-        <div class="card"><span class="pain_n">/ 03</span><h3>Decides sueldos y beneficios a ciegas</h3><p>Ajustas la nómina sin saber cómo se compara con tu mercado ni cuánto costará dentro de cinco años.</p></div>
-      </div>
-      <p class="bridge">Detrás de las tres está lo mismo: tu mayor costo, sin control financiero.</p>
-    </div>
-  </section>
-
-  <!-- The free plan, concrete: what you get the day you sign up -->
-  <section class="sec">
-    <div class="wrap free">
-      <div>
-        <p class="kicker">Plan Free</p>
-        <h2>Tu nómina registrada y bajo control, <em>desde el día uno</em></h2>
-        <p class="lead" style="margin-top:14px">Gratis para cualquier empresa, para siempre. No es un software de nómina: es el registro y control financiero de la tuya.</p>
-        <ul>
-          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><div><b>Toda tu nómina en un solo registro</b><br>Regístrala una vez y consulta su información financiera siempre.</div></li>
-          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><div><b>Cada salida, calculada al instante</b><br>Desahucio, despido o jubilación: el cálculo es automático, validado y con respaldo técnico.</div></li>
-          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><div><b>12 calculadoras especializadas</b><br>Cada concepto de la nómina calculado en segundos y con la normativa vigente.</div></li>
-        </ul>
-        <a class="btn btn--primary" href="https://plus.actuaria.com/auth/registro" data-evento="registro_free">Crear mi cuenta gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a>
-      </div>
-      <div class="card">
-        <h3 style="margin-bottom:16px">Incluidas en el plan Free</h3>
-        <div class="calcs">
-          <span><i class="fa-solid fa-umbrella" aria-hidden="true"></i>Jubilación patronal</span>
-          <span><i class="fa-solid fa-door-open" aria-hidden="true"></i>Desahucio</span>
-          <span><i class="fa-solid fa-user-xmark" aria-hidden="true"></i>Despido intempestivo</span>
-          <span><i class="fa-solid fa-gift" aria-hidden="true"></i>Décimo tercero</span>
-          <span><i class="fa-solid fa-gift" aria-hidden="true"></i>Décimo cuarto</span>
-          <span><i class="fa-solid fa-plane" aria-hidden="true"></i>Vacaciones</span>
-          <span><i class="fa-solid fa-piggy-bank" aria-hidden="true"></i>Fondos de reserva</span>
-          <span><i class="fa-solid fa-building-columns" aria-hidden="true"></i>Aportes al IESS</span>
-          <span><i class="fa-solid fa-person-cane" aria-hidden="true"></i>Jubilación por vejez IESS</span>
-          <span><i class="fa-solid fa-chart-pie" aria-hidden="true"></i>Fondo de pensiones IESS</span>
-          <span><i class="fa-solid fa-coins" aria-hidden="true"></i>Ahorro programado</span>
-          <span><i class="fa-solid fa-receipt" aria-hidden="true"></i>Impuesto a la renta</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Modules: four fronts instead of eight loose cards -->
-  <section class="sec" id="modulos">
-    <div class="wrap">
-      <div class="sec_head">
-        <p class="kicker">Módulos</p>
-        <h2>Una sola plataforma para el costo de tu nómina</h2>
-        <p class="lead">Cuatro frentes y ocho módulos. Sumas solo lo que necesitas.</p>
-      </div>
-      <div class="tabs" role="tablist" aria-label="Frentes de actuaria+">
-        <button role="tab" aria-selected="true" aria-controls="p-cumple" id="t-cumple">Cumple</button>
-        <button role="tab" aria-selected="false" aria-controls="p-optimiza" id="t-optimiza">Optimiza</button>
-        <button role="tab" aria-selected="false" aria-controls="p-compara" id="t-compara">Compara</button>
-        <button role="tab" aria-selected="false" aria-controls="p-registra" id="t-registra">Registra</button>
-      </div>
-      <div class="panel" role="tabpanel" id="p-cumple" aria-labelledby="t-cumple">
-        <div class="card panel_intro"><h3>Cumple la NIC 19 y pasa auditorías sin sustos</h3><p>El pasivo laboral que tu auditor va a pedir, calculado, explicado y listo desde el día uno.</p><a class="btn btn--navy" href="https://plus.actuaria.com/auth/registro" data-evento="registro_cumple">Empezar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a></div>
-        <div class="card mod"><span class="tag">Estudio actuarial</span><h3>El número que tu auditor va a pedir, listo a tiempo</h3><p>Cuánto provisionar por jubilación patronal y desahucio conforme a la NIC 19, con un informe técnico transparente: el número, el porqué y las hipótesis detrás.</p><span class="price">desde USD 260/año</span></div>
-        <div class="card mod"><span class="tag">Simulador post-empleo</span><h3>Anticipa hoy el costo de mañana</h3><p>¿Qué pasa con tu provisión si crece la nómina, suben los sueldos o alguien se jubila antes? Proyecta escenarios claros para planificar.</p><span class="price">desde USD 78/año</span></div>
-      </div>
-      <div class="panel" role="tabpanel" id="p-optimiza" aria-labelledby="t-optimiza" hidden>
-        <div class="card panel_intro"><h3>Convierte provisiones en beneficio tributario</h3><p>La provisión no es solo un gasto: bien tratada fiscalmente, es un beneficio que muchas empresas dejan sobre la mesa.</p><a class="btn btn--navy" href="https://plus.actuaria.com/auth/registro" data-evento="registro_optimiza">Empezar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a></div>
-        <div class="card mod"><span class="tag">Impuestos diferidos</span><h3>Refleja tu situación fiscal real, y aprovéchala</h3><p>El impuesto diferido de tus provisiones conforme a la NIC 12, para no perder el beneficio tributario al que tienes derecho.</p><span class="price">desde USD 78/año</span></div>
-        <div class="card mod"><span class="tag">Control tributario</span><h3>Cada provisión, conciliada y sin fricciones</h3><p>Qué es deducible, qué salió en el período y qué reportar al cierre. Todo organizado y trazable, en menos tiempo.</p><span class="price">desde USD 78/año</span></div>
-      </div>
-      <div class="panel" role="tabpanel" id="p-compara" aria-labelledby="t-compara" hidden>
-        <div class="card panel_intro"><h3>Decide sueldos y beneficios con datos</h3><p>Tu nómina comparada con tu industria, para retener talento sin inflar el costo.</p><a class="btn btn--navy" href="https://plus.actuaria.com/auth/registro" data-evento="registro_compara">Empezar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a></div>
-        <div class="card mod"><span class="tag">Benchmark salarial</span><h3>Sabe si pagas como tu mercado</h3><p>Descubre dónde pagas de más y dónde estás en riesgo de perder gente por pagar de menos.</p><span class="price">desde USD 78/año</span></div>
-        <div class="card mod"><span class="tag">Análisis del mercado</span><h3>Tu costo laboral, frente a tu sector</h3><p>Con la información pública de la Superintendencia de Compañías, ubica tu posición y presupuesta con contexto.</p><span class="price">desde USD 78/año</span></div>
-      </div>
-      <div class="panel" role="tabpanel" id="p-registra" aria-labelledby="t-registra" hidden>
-        <div class="card panel_intro"><h3>Tu nómina registrada y bajo control</h3><p>La base de todo lo demás, gratis para siempre.</p><a class="btn btn--navy" href="https://plus.actuaria.com/auth/registro" data-evento="registro_registra">Empezar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a></div>
-        <div class="card mod"><span class="tag free">Gratis</span><h3>Control de nómina</h3><p>Registro de tu nómina y de las salidas de personal, con el cálculo automático de cada una.</p></div>
-        <div class="card mod"><span class="tag free">Gratis</span><h3>12 calculadoras especializadas</h3><p>Jubilación, despido, décimos, IESS y más, con la normativa vigente.</p></div>
-      </div>
-      <div class="card actas">
-        <div><h3>Actas de jubilación patronal</h3><p>Disponibles en todos los planes, incluso el Free. Se facturan por acta emitida, solo cuando la necesitas.</p></div>
-        <a class="btn btn--neu" href="https://plus.actuaria.com/precios" data-evento="precios_actas">Ver precios <i class="fa-solid fa-tag" aria-hidden="true"></i></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="kicker">Cómo funciona</p>
-        <h2>De la nómina al control, en tres pasos</h2>
-      </div>
-      <div class="steps3">
-        <div class="card"><div class="step_n">1</div><h3>Registra tu nómina</h3><p>Cárgala o impórtala una sola vez. Desde ese momento tienes su información financiera al día, gratis.</p></div>
-        <div class="card"><div class="step_n">2</div><h3>Activa tu estudio actuarial</h3><p>Calculamos tus provisiones por jubilación patronal y desahucio conforme a la NIC 19, con un informe listo para tu auditor.</p></div>
-        <div class="card"><div class="step_n">3</div><h3>Decide con el panorama completo</h3><p>Proyecta el costo futuro, optimiza el tratamiento fiscal y compárate con tu mercado, todo en el mismo lugar.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Price transparency: hiding it is the main source of doubt on a SaaS page -->
-  <section class="sec" id="precios">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="kicker">Precios</p>
-        <h2>Precios claros, según el tamaño de tu empresa</h2>
-        <p class="lead">Comienza gratis, lleva todo actuaria+ con Enterprise o arma tu plan producto a producto.</p>
-      </div>
-      <div class="plans">
-        <div class="card plan">
-          <span class="tag" style="color:var(--ok-text)">Free</span>
-          <h3>El registro y control de tu nómina</h3>
-          <p class="amount">Gratis</p>
-          <p class="note">Para siempre · sin tarjeta de crédito</p>
-          <ul>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>Control de nómina</li>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>12 calculadoras especializadas</li>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>Actas de jubilación patronal, por acta emitida</li>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>Usuarios ilimitados</li>
-          </ul>
-          <a class="btn btn--primary btn--block" href="https://plus.actuaria.com/auth/registro" data-evento="registro_precios">Comenzar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a>
-        </div>
-        <div class="card plan plan--top">
-          <span class="tag" style="color:var(--indigo-text)">Enterprise</span>
-          <h3>Todo actuaria+, con todo incluido</h3>
-          <p class="amount">USD 480 <small>/año</small></p>
-          <p class="note">Para 1 a 10 trabajadores · USD 600/año de 11 a 99 · más IVA</p>
-          <ul>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>Todo lo del plan Free</li>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>Estudio actuarial NIC 19 y simulador post-empleo</li>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>Impuestos diferidos y control tributario</li>
-            <li><i class="fa-solid fa-check" aria-hidden="true"></i>Benchmark salarial y análisis del mercado</li>
-          </ul>
-          <a class="btn btn--navy btn--block" href="https://plus.actuaria.com/precios" data-evento="precios_enterprise">Ver planes y precios <i class="fa-solid fa-tag" aria-hidden="true"></i></a>
-        </div>
-      </div>
-      <p class="plans_foot">¿Solo necesitas el estudio actuarial? Desde USD 260 al año. <a href="https://plus.actuaria.com/precios">Arma tu plan producto a producto</a>.</p>
-    </div>
-  </section>
-
-  <section class="sec" id="seguridad">
-    <div class="wrap">
-      <div class="sec_head">
-        <p class="kicker">Seguridad</p>
-        <h2>Tu nómina son datos sensibles. Los cuidamos con estándares certificados</h2>
-        <p style="margin-top:14px"><a href="https://actuaria.com/seguridad-de-la-informacion">Ver la política de seguridad <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></p>
-      </div>
-      <div class="sec_grid">
-        <div class="card sec_item"><span class="ico"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span><div><h3>ISO/IEC 27001:2022</h3><p>Sistema de gestión certificado para la confidencialidad, integridad y disponibilidad de tus datos.</p></div></div>
-        <div class="card sec_item"><span class="ico"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><div><h3>ISO 9001:2015</h3><p>Procesos auditados y trazables, del registro de la nómina al informe actuarial.</p></div></div>
-        <div class="card sec_item"><span class="ico"><i class="fa-solid fa-user-lock" aria-hidden="true"></i></span><div><h3>Prevención de fuga de datos</h3><p>Sistema activo de prevención de fuga de datos.</p></div></div>
-        <div class="card sec_item"><span class="ico"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i></span><div><h3>Monitoreo permanente</h3><p>Monitoreo de seguridad permanente de la plataforma.</p></div></div>
-        <div class="card sec_item"><span class="ico"><i class="fa-solid fa-cloud" aria-hidden="true"></i></span><div><h3>Nube con estándar de pagos</h3><p>Infraestructura conforme al estándar de la industria de pagos para datos sensibles.</p></div></div>
-        <div class="card sec_item"><span class="ico"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i></span><div><h3>RGPD</h3><p>Cumplimiento del reglamento europeo de protección de datos personales.</p></div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="kicker">Preguntas frecuentes</p>
-        <h2>Lo que preguntan antes de empezar</h2>
-      </div>
-      <div class="faq">
-        <details open><summary>¿Es un software de nómina?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>No. actuaria+ no reemplaza tu sistema de nómina: es el registro y control financiero de la tuya. Calcula lo que tu nómina cuesta hoy y lo que costará mañana, con respaldo actuarial.</p></details>
-        <details><summary>¿Qué incluye el plan Free?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>El control de nómina (registro de tu nómina y cálculo de las salidas de personal), las 12 calculadoras especializadas y las actas de jubilación patronal, que se pagan por acta emitida. Es gratis para siempre y no pide tarjeta de crédito.</p></details>
-        <details><summary>¿Cómo se determina el precio?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Solo por el tamaño de tu empresa, en número de trabajadores. Puedes llevar Enterprise, con todo incluido, o armar tu plan producto a producto: el descuento crece con cada producto que sumas.</p></details>
-        <details><summary>¿El precio es por usuario?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>No. Todos los planes incluyen usuarios ilimitados.</p></details>
-        <details><summary>¿Puedo pagar mes a mes?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Sí, Enterprise se puede pagar mensualmente con tarjeta de crédito. Los planes se contratan por 12 meses.</p></details>
-        <details><summary>¿Cumple con las NIIF?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Sí. El estudio actuarial se calcula conforme a la NIC 19 y los impuestos diferidos conforme a la NIC 12, con el respaldo técnico de Actuaria Consultores.</p></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- Demo for larger companies: 4 required fields instead of 6 -->
-  <section class="sec" id="demo">
-    <div class="wrap demo">
-      <div>
-        <p class="kicker">Demostración · 30 min</p>
-        <h2>Te mostramos actuaria+ con un ejemplo cercano a tu empresa</h2>
-        <ul>
-          <li><i class="fa-solid fa-display" aria-hidden="true"></i>Recorrido por los módulos que tu empresa necesita</li>
-          <li><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>Cómo cumplir la NIC 19 sin complicaciones</li>
-          <li><i class="fa-solid fa-calculator" aria-hidden="true"></i>Una propuesta según tu número de trabajadores</li>
-        </ul>
-      </div>
-      <div class="glass form">
-        <form id="form-demo" novalidate>
-          <div data-estado="form">
-            <div class="field"><label for="d-correo">Correo corporativo</label><input id="d-correo" name="Correo" type="email" autocomplete="email" required placeholder="nombre@empresa.com"></div>
-            <div class="two">
-              <div class="field"><label for="d-nombre">Tu nombre</label><input id="d-nombre" name="Nombre" autocomplete="name" required></div>
-              <div class="field"><label for="d-ruc">RUC de tu empresa</label><input id="d-ruc" name="RUC" inputmode="numeric" maxlength="13" required placeholder="13 dígitos"></div>
-            </div>
-            <div class="two">
-              <div class="field"><label for="d-trab">Trabajadores</label><select id="d-trab" name="Trabajadores" required><option value="">Elige</option><option>1 a 10</option><option>11 a 99</option><option>100 o más</option></select></div>
-              <div class="field"><label for="d-cel">Celular <small>(opcional)</small></label><input id="d-cel" name="Celular" type="tel" autocomplete="tel"></div>
-            </div>
-            <p class="err" role="alert">Revisa el correo, tu nombre, el RUC de 13 dígitos y el número de trabajadores.</p>
-            <button class="btn btn--primary btn--block" type="submit">Solicitar demostración <i class="fa-solid fa-calendar-check" aria-hidden="true"></i></button>
-            <p class="form_foot"><i class="fa-regular fa-clock" aria-hidden="true"></i>Respuesta en un día hábil. Sin compromiso.</p>
-          </div>
-          <div class="done" data-estado="listo" hidden aria-live="polite">
-            <div class="done_ico"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
-            <h3 style="font-size:22px">¡Listo! Te escribimos en un día hábil</h3>
-            <p style="color:var(--muted)">Mientras tanto, ya puedes crear tu cuenta gratis y registrar tu nómina.</p>
-            <a class="btn btn--neu btn--block" href="https://plus.actuaria.com/auth/registro">Comenzar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec" style="padding-top:0">
-    <div class="wrap">
-      <div class="glass final">
-        <p class="kicker">Plan Free · sin tarjeta de crédito</p>
-        <h2>Empieza hoy con el control de tu nómina, gratis</h2>
-        <p class="lead" style="max-width:640px;margin:14px auto 0">El control de nómina y las 12 calculadoras son gratis para siempre. Cuando necesites el estudio actuarial, ya tendrás todo listo.</p>
-        <div class="hero_ctas">
-          <a class="btn btn--primary" href="https://plus.actuaria.com/auth/registro" data-evento="registro_final">Comenzar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a>
-          <a class="btn btn--neu" href="https://plus.actuaria.com/precios" data-evento="precios_final">Ver planes y precios <i class="fa-solid fa-tag" aria-hidden="true"></i></a>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer class="foot">
-  <div class="wrap">
-    <div><img src="logo-actuaria-plus-negativo.svg" alt="actuaria+" width="134" height="26"><p style="margin:0">Control financiero de la nómina, técnico y alineado a las NIIF. Una herramienta de Actuaria Consultores.</p></div>
-    <div><h4>Producto</h4><a href="#modulos">Módulos</a><a href="https://plus.actuaria.com/precios">Precios</a><a href="#seguridad">Seguridad</a></div>
-    <div><h4>Recursos</h4><a href="https://actuaria.com/blog">Blog</a><a href="https://actuaria.com/12-calculadoras-especializadas">Calculadoras</a></div>
-    <div><h4>Compañía</h4><a href="https://actuaria.com/nosotros">Acerca de</a><a href="#demo">Contacto</a><a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df6459360730d2f79e4_politica-privacidad-proteccion-datos.pdf" target="_blank" rel="noopener">Aviso de privacidad</a></div>
-  </div>
-</footer>
-
-<div class="mbar" id="mbar">
-  <a class="btn btn--primary" href="https://plus.actuaria.com/auth/registro" data-evento="registro_barra_movil">Comenzar gratis <i class="fa-solid fa-user-plus" aria-hidden="true"></i></a>
-  <a class="btn btn--neu" href="https://plus.actuaria.com/auth/login" data-evento="login_barra_movil">Iniciar sesión <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i></a>
-</div>
 
 <script>
 (function () {
-  // Tabs (keyboard: left/right arrows)
-  var tabs = [].slice.call(document.querySelectorAll('[role="tab"]'));
-  function elegir(t) {
-    tabs.forEach(function (x) { var on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on; });
-  }
-  tabs.forEach(function (t, i) {
-    t.tabIndex = i ? -1 : 0;
-    t.addEventListener('click', function () { elegir(t); });
-    t.addEventListener('keydown', function (e) {
-      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-      if (d) { var n = tabs[(i + d + tabs.length) % tabs.length]; elegir(n); n.focus(); }
-    });
-  });
-  // Demo form (prototype: validates and shows the success state, sends nothing)
-  var f = document.getElementById('form-demo');
-  f.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.elements.Correo.value.trim()) && f.elements.Nombre.value.trim() && /^\d{13}$/.test(f.elements.RUC.value.trim()) && f.elements.Trabajadores.value;
-    f.querySelector('.err').classList.toggle('on', !ok);
-    if (ok) { f.querySelector('[data-estado="form"]').hidden = true; f.querySelector('[data-estado="listo"]').hidden = false; }
-  });
-  // Mobile bar after the hero
-  var bar = document.getElementById('mbar'), hero = document.querySelector('.hero');
-  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { bar.classList.toggle('on', !es[0].isIntersecting); }).observe(hero);
+  if (!/(^|\.)actuaria\.com$/.test(location.hostname)) return;
+  // Google Tag Manager
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WVB8ND3W');
 })();
 </script>
-</body>
-</html>
+<meta name="google-site-verification" content="FB-ZCm5pwxqKdojfdiJiHx7qF-XwOpjeXjBLeHBlrRY">
+<meta name="google-site-verification" content="Gm4rQlQGGQbmbDyH2LnCH21shQzxdn-pgwS29IiM9nM">
+
+<style>
+  @media (min-width: 992px) {
+    .nav-dropdown-list {
+      display: block;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 250ms ease, transform 350ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .nav-dropdown-list.w--open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-dropdown-list { transition: none; transform: none; }
+  }
+</style>
+
+<style>
+  html { scroll-behavior: smooth; }
+  #soluciones, #form { scroll-margin-top: 132px; }
+  @media (max-width: 991px) {
+    #soluciones, #form { scroll-margin-top: 92px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<style>
+  .card_wrapper.is-member a.card_link[href="#"] { display: none; }
+</style>
+
+<style>
+.w-form input[type="submit"].actuariaplus-button,
+.w-form input[type="submit"].cv_boton { font-family: Nunito, "Fa Solid 900", sans-serif; }
+.w-form input[type="submit"].f_submit { font-family: Arial, "Fa Solid 900", sans-serif; }
+</style>
+
+<link rel="preconnect" href="https://webflow-files-prod.global.ssl.fastly.net" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20a26b8682f7f2c72bd-fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20ad22246a98cfc173b-fa-brands-400.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6ad264bea12f1ddbf17a666a-Nunito-variable.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6ad264be63bb68d78ae9c40e-Prompt-400.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20aeaadc3f75487f9b9-lemon-milk-pro-500.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20ae9d18b17fe9e2840-lemon-milk-pro-400.woff2" as="font" type="font/woff2" crossorigin=""><style>
+
+  .credentials_section { overflow-x: clip; }
+
+  .credentials_marquee {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    position: relative;
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+  }
+  .credentials_marquee::before,
+  .credentials_marquee::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .credentials_marquee::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(245,247,252,0.95) 0%, rgba(245,247,252,0) 100%);
+  }
+  .credentials_marquee::after {
+    right: 0;
+    background: linear-gradient(270deg, rgba(245,247,252,0.95) 0%, rgba(245,247,252,0) 100%);
+  }
+  .credentials_grid.is-marquee {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    animation: carousel-creds-left 32s linear infinite;
+    will-change: transform;
+    min-width: max-content;
+    max-width: none;
+    justify-content: flex-start;
+  }
+  .credentials_marquee:hover .credentials_grid.is-marquee { animation-play-state: paused; }
+  @keyframes carousel-creds-left {
+    from { transform: translateX(0%); }
+    to   { transform: translateX(-100%); }
+  }
+  @media (max-width: 767px) {
+    .credentials_marquee::before,
+    .credentials_marquee::after { width: 56px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .credentials_grid.is-marquee { animation: none; }
+  }
+
+  .testimonial_section { overflow-x: clip; }
+  .testimonial_container {
+    display: block;
+    position: relative;
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--testi-inset, 24px);
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .testimonial_container::-webkit-scrollbar { display: none; }
+  .testimonial_container:focus-visible { outline: 2px solid #4c64d9; outline-offset: -2px; }
+  .testimonial_container > .testimonial_carusel {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 28px;
+    width: max-content;
+    max-width: none;
+    min-width: 0;
+    padding: 16px var(--testi-inset, 24px) 24px;
+    animation: none;
+  }
+  .testimonial_carusel > .card_testimonial {
+    width: 440px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    scroll-snap-align: start;
+    background: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.75);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+  }
+  .testimonial_carusel .card_base { box-shadow: none; }
+  .card_testimonial > .card_base { flex: 1; height: 100%; display: flex; flex-direction: column; }
+  .card_base > .bottom_card_testimonial { margin-top: auto; }
+  .testimonial_controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0 var(--testi-inset, 24px);
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    box-sizing: border-box;
+  }
+  .testimonial_controls[hidden] { display: none; }
+  .testimonial_arrow {
+    appearance: none;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(21,31,71,0.05);
+    border-radius: 50%;
+    background: #e8ecf4;
+    color: #151f47;
+    font: 900 16px "Fa Solid 900", "Font Awesome 6 Free";
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 10px rgba(15,23,42,0.12), -4px -4px 10px rgba(255,255,255,0.9);
+    transition: color .2s, box-shadow .2s, opacity .2s;
+  }
+  .testimonial_arrow:hover:not(:disabled) { color: #4c64d9; }
+  .testimonial_arrow:active:not(:disabled) { box-shadow: inset 3px 3px 8px rgba(15,23,42,0.10), inset -3px -3px 8px rgba(255,255,255,0.9); }
+  .testimonial_arrow:focus-visible { outline: 2px solid #4c64d9; outline-offset: 3px; }
+  .testimonial_arrow:disabled { opacity: .4; cursor: default; }
+  @media (max-width: 767px) {
+    .testimonial_carusel > .card_testimonial { width: 320px; }
+    .testimonial_controls { justify-content: center; }
+  }
+  @media (max-width: 479px) {
+    .testimonial_carusel > .card_testimonial { width: 280px; }
+    .testimonial_container > .testimonial_carusel { gap: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .testimonial_container { scroll-behavior: auto; }
+  }
+
+.process_section .card_wrapper.is-step::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  width: 120px;
+  height: 120px;
+  border-top-right-radius: 20px;
+  background-image: radial-gradient(rgba(76,100,217,.45) 1.3px, transparent 1.7px);
+  background-size: 11px 11px;
+  -webkit-mask-image: radial-gradient(circle at 100% 0, #000 0, rgba(0,0,0,.55) 40%, transparent 75%);
+  mask-image: radial-gradient(circle at 100% 0, #000 0, rgba(0,0,0,.55) 40%, transparent 75%);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .team_grid .glass_frame:hover { z-index: 2; }
+  .team_grid .card_wrapper.is-member .card_link {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--holo-nb, 150px) - 2px);
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    transform: translate3d(-50%, 0, 0);
+    transition: opacity .2s ease, transform .7s cubic-bezier(.2, .8, .2, 1);
+  }
+  .team_grid .card_wrapper.is-member.is-holo .card_link,
+  .team_grid .card_wrapper.is-member:focus-within .card_link {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate3d(calc(-50% + var(--holo-x, 0) * 5px), calc(var(--holo-y, 0) * 5px), 26px);
+    transition: opacity .3s ease .08s, transform .25s ease-out;
+  }
+}
+
+.process_section .card_wrapper.is-step {
+  overflow: hidden;
+  overflow: clip;
+}
+.process_section .card_wrapper.is-step .beneficio_ico {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+  border-radius: 12px;
+  color: #151f47;
+  background-color: rgba(21, 31, 71, .07);
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .28) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(125deg, rgba(76, 100, 217, 0) 15%, rgba(76, 100, 217, .21) 30%, rgba(126, 192, 229, .19) 43%, rgba(219, 84, 31, .17) 56%, rgba(255, 187, 161, .17) 69%, rgba(76, 100, 217, 0) 85%);
+  background-size: 200% 200%, 260% 260%;
+  background-position: 20% 20%, 0% 0%;
+  animation: pasos-tornasol 12s linear infinite;
+}
+@keyframes pasos-tornasol {
+  0%, 100% { background-position: 20% 20%, 0% 0%; }
+  25% { background-position: 80% 20%, 100% 0%; }
+  50% { background-position: 80% 80%, 100% 100%; }
+  75% { background-position: 20% 80%, 0% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .process_section .card_wrapper.is-step .beneficio_ico { animation: none; background-position: 30% 30%, 50% 50%; }
+}
+.process_section .card_wrapper.is-step .beneficio_ico::after {
+  content: attr(data-glyph);
+  position: absolute;
+  right: -30px;
+  bottom: -36px;
+  z-index: -1;
+  font-size: 150px;
+  line-height: 1;
+  color: #4c64d9;
+  opacity: .055;
+  pointer-events: none;
+}
+@supports (grid-template-rows: subgrid) {
+  .process_grid > .card_wrapper.is-step {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+  }
+  .process_grid > .card_wrapper.is-step:has(> .beneficio_ico) { grid-row: span 4; }
+}
+
+.testimonial_carusel .card_base { z-index: 0; }
+.testimonial_carusel .card_base::after {
+  content: "\f10e";
+  content: "\f10e" / "";
+  position: absolute;
+  right: -6px;
+  bottom: -22px;
+  z-index: -1;
+  font-family: "Fa Solid 900";
+  font-size: 170px;
+  line-height: 1;
+  color: #4c64d9;
+  opacity: .055;
+  pointer-events: none;
+}
+
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+.bridge_grid .card_wrapper.is-bridge{position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1),box-shadow .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge:hover{z-index:2}
+.bridge_grid .card_wrapper.is-bridge .bridge_media{position:relative;transition:transform .7s cubic-bezier(.2,.8,.2,1),box-shadow .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge>:not(.bridge_media){transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge.is-holo{transform:perspective(800px) rotateX(var(--holo-rx)) rotateY(var(--holo-ry)) rotateZ(var(--holo-rz)) scale(1.02);transition:transform .2s ease-out,box-shadow .4s ease;box-shadow:calc(var(--holo-x)*-14px) calc(12px + var(--holo-y)*-14px) 26px -9px rgba(15,23,42,.3),-6px -6px 16px rgba(255,255,255,.9)}
+.bridge_grid .card_wrapper.is-bridge.is-holo .bridge_media{transform:translate3d(calc(var(--holo-x)*12px),calc(var(--holo-y)*12px),50px) rotateX(var(--holo-prx)) rotateY(var(--holo-pry));box-shadow:0 0 0 3px #fff,0 16px 24px -8px rgba(15,23,42,.45);transition:transform .3s ease-out,box-shadow .4s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo .card_title{transform:translate3d(calc(var(--holo-x)*6px),calc(var(--holo-y)*6px),28px);transition:transform .3s ease-out}
+.bridge_grid .card_wrapper.is-bridge.is-holo>:not(.bridge_media):not(.card_title){transform:translate3d(calc(var(--holo-x)*4px),calc(var(--holo-y)*4px),16px);transition:transform .3s ease-out}
+.bridge_grid .card_wrapper.is-bridge::before{content:'';position:absolute;left:var(--holo-pl,24px);top:var(--holo-pt,24px);width:var(--holo-pw,calc(100% - 48px));height:var(--holo-ph,232px);border-radius:16px;background:rgba(15,23,42,.6);filter:blur(14px);opacity:0;pointer-events:none;transform:translate3d(calc(var(--holo-x,0)*-22px),calc(16px + var(--holo-y,0)*-22px),0) scale(.9);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge.is-holo::before{opacity:.45;transition:opacity .5s ease,transform .3s ease-out}
+.bridge_grid .card_wrapper.is-bridge .bridge_media::after{content:'';position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(circle at var(--holo-px,50%) var(--holo-py,50%),rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 45%),linear-gradient(125deg,rgba(76,100,217,0) 15%,rgba(76,100,217,.42) 30%,rgba(0,196,255,.38) 43%,rgba(255,70,200,.34) 56%,rgba(255,196,40,.34) 69%,rgba(76,100,217,0) 85%);background-size:100% 100%,260% 260%;background-position:0 0,var(--holo-px,50%) var(--holo-py,50%);mix-blend-mode:overlay;transition:opacity .5s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo .bridge_media::after{opacity:.5}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in{transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in .bridge_media{transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in>:not(.bridge_media){transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in::before{transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+}
+
+.products_section .solution_card.is-product,
+.bridge_grid .card_wrapper.is-bridge,
+.process_section .card_wrapper.is-step {
+  --aro: 8px;
+  --radio-int: 24px;
+  border: var(--aro) solid transparent;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  background-color: transparent;
+  background-image:
+    linear-gradient(#fff, #fff),
+    linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px),
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(rgba(255, 255, 255, .3), rgba(255, 255, 255, .3));
+  background-origin: padding-box, border-box, border-box, border-box;
+  background-clip: padding-box, border-box, border-box, border-box;
+  background-repeat: no-repeat;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.products_section .solution_card.is-product {
+  position: relative;
+  overflow: visible;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.bridge_grid .card_wrapper.is-bridge {
+  box-shadow: 0 1px 8px rgba(15, 23, 42, .32);
+}
+.process_section .card_wrapper.is-step {
+  --radio-int: 20px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), 0 1px 8px rgba(15, 23, 42, .32);
+}
+
+.products_section .solution_card.is-product::before,
+.bridge_grid .card_wrapper.is-bridge::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--aro));
+  z-index: 0;
+  padding: 1px;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.team_grid .glass_frame,
+body:has(.main_hero) .testimonial_carusel > .card_testimonial,
+body:has(.main_hero) .credentials_section .cert_frame {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+body:has(.main_hero) .credentials_section .cert_frame .cert_cell {
+  border: 0;
+  box-shadow: none;
+}
+
+.team_grid .glass_frame::after,
+body:has(.main_hero) .testimonial_carusel > .card_testimonial::after,
+body:has(.main_hero) .credentials_section .cert_frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    rgba(255, 255, 255, .3);
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+
+.team_grid .glass_frame::before,
+body:has(.main_hero) .testimonial_carusel > .card_testimonial::before,
+body:has(.main_hero) .credentials_section .cert_frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .team_grid .card_wrapper.is-member {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), box-shadow .7s cubic-bezier(.2, .8, .2, 1);
+  }
+  .team_grid .card_wrapper.is-member.is-holo {
+    z-index: 2;
+    transform: perspective(700px) rotateX(var(--holo-rx)) rotateY(var(--holo-ry)) rotateZ(var(--holo-rz)) scale(1.02);
+    transition: transform .15s ease-out, box-shadow .4s ease;
+    box-shadow: calc(var(--holo-x) * -14px) calc(12px + var(--holo-y) * -14px) 26px -9px rgba(15, 23, 42, .3),
+      -6px -6px 16px rgba(255, 255, 255, .9);
+  }
+  .team_grid .card_wrapper.is-member .team_photo,
+  .team_grid .card_wrapper.is-member .team_name,
+  .team_grid .card_wrapper.is-member .team_role {
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), box-shadow .7s cubic-bezier(.2, .8, .2, 1);
+  }
+
+  .team_grid .card_wrapper.is-member.is-holo .team_photo,
+  .team_grid .card_wrapper.is-member.is-holo .team_name,
+  .team_grid .card_wrapper.is-member.is-holo .team_role {
+    transition: transform .25s ease-out, box-shadow .4s ease;
+  }
+
+  .team_grid .card_wrapper.is-member.is-holo .team_photo {
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px), 60px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+    box-shadow: 0 0 0 3px #fff, 0 12px 20px -6px rgba(15, 23, 42, .45);
+  }
+  .team_grid .card_wrapper.is-member.is-holo .team_name {
+    transform: translate3d(calc(var(--holo-x) * 6px), calc(var(--holo-y) * 6px), 32px);
+  }
+  .team_grid .card_wrapper.is-member.is-holo .team_role {
+    transform: translate3d(calc(var(--holo-x) * 4px), calc(var(--holo-y) * 4px), 20px);
+  }
+
+  .team_grid .card_wrapper.is-member::before,
+  .team_grid .card_wrapper.is-member::after {
+    content: '';
+    position: absolute;
+    top: var(--holo-pt, 24px);
+    left: var(--holo-pl, calc(50% - 36px));
+    width: var(--holo-ps, 72px);
+    height: var(--holo-ps, 72px);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .team_grid .card_wrapper.is-member::before {
+    background: rgba(15, 23, 42, .6);
+    filter: blur(12px);
+    transform: translate3d(calc(var(--holo-x, 0) * -24px), calc(15px + var(--holo-y, 0) * -24px), 0) scale(.85);
+    transition: opacity .5s ease, transform .7s cubic-bezier(.2, .8, .2, 1);
+  }
+  .team_grid .card_wrapper.is-member.is-holo::before { opacity: .55; transition: opacity .5s ease, transform .25s ease-out; }
+  .team_grid .card_wrapper.is-member::after {
+    background:
+      radial-gradient(circle at var(--holo-px, 50%) var(--holo-py, 50%), rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 45%),
+      linear-gradient(125deg, rgba(76, 100, 217, 0) 15%, rgba(76, 100, 217, .42) 30%, rgba(0, 196, 255, .38) 43%,
+        rgba(255, 70, 200, .34) 56%, rgba(255, 196, 40, .34) 69%, rgba(76, 100, 217, 0) 85%);
+    background-size: 100% 100%, 260% 260%;
+    background-position: 0 0, var(--holo-px, 50%) var(--holo-py, 50%);
+    mix-blend-mode: overlay;
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), opacity .5s ease;
+  }
+
+  .team_grid .card_wrapper.is-member.is-holo::after {
+    opacity: .5;
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px), 60.5px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+    transition: transform .25s ease-out, opacity .5s ease;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+
+  .team_grid .card_wrapper.is-member.has-link.is-holo .team_photo {
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px - 7px), 60px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo::after {
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px - 7px), 60.5px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo::before {
+    transform: translate3d(calc(var(--holo-x, 0) * -24px), calc(8px + var(--holo-y, 0) * -24px), 0) scale(.85);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo .team_name {
+    transform: translate3d(calc(var(--holo-x) * 6px), calc(var(--holo-y) * 6px - 7px), 32px);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo .team_role {
+    transform: translate3d(calc(var(--holo-x) * 4px), calc(var(--holo-y) * 4px + 14px), 20px);
+  }
+
+  .team_grid .card_wrapper.is-member.has-link:focus-within:not(.is-holo) .team_photo,
+  .team_grid .card_wrapper.is-member.has-link:focus-within:not(.is-holo) .team_name {
+    transform: translate3d(0, -7px, 0);
+  }
+  .team_grid .card_wrapper.is-member.has-link:focus-within:not(.is-holo) .team_role {
+    transform: translate3d(0, 14px, 0);
+  }
+}
+
+.process_section .card_wrapper.is-step .beneficio_ico {
+  box-shadow:
+    inset 0 0 0 4px rgba(255, 255, 255, .62),
+    inset -5px 5px 10px -5px rgba(255, 255, 255, 1),
+    inset 5px -5px 10px -5px rgba(160, 168, 186, .3),
+    0 1px 5px rgba(15, 23, 42, .18);
+}
+
+.main_hero .background-video {
+  --aro: 16px;
+  --radio-int: 24px;
+  border: var(--aro) solid transparent;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  background-color: rgba(255, 255, 255, .3);
+  background-image:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .275) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(125deg, rgba(76, 100, 217, 0) 15%, rgba(76, 100, 217, .21) 30%, rgba(126, 192, 229, .19) 43%, rgba(219, 84, 31, .17) 56%, rgba(255, 187, 161, .17) 69%, rgba(76, 100, 217, 0) 85%),
+    linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px);
+  background-size: auto, 200% 200%, 260% 260%, auto;
+  background-position: 0 0, 20% 20%, 0% 0%, 0 0;
+  background-blend-mode: normal, normal, multiply, normal;
+  background-origin: border-box;
+  background-clip: border-box;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  isolation: isolate;
+  overflow: visible;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+  animation: hero-tornasol 21.6s linear infinite;
+}
+.main_hero .background-video > video { border-radius: var(--radio-int); }
+
+.main_hero .background-video::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--aro));
+  z-index: 1;
+  padding: 1px;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+@keyframes hero-tornasol {
+  0%, 100% { background-position: 0 0, 20% 20%, 0% 0%, 0 0; }
+  25% { background-position: 0 0, 80% 20%, 100% 0%, 0 0; }
+  50% { background-position: 0 0, 80% 80%, 100% 100%, 0 0; }
+  75% { background-position: 0 0, 20% 80%, 0% 100%, 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .main_hero .background-video { animation: none; background-position: 0 0, 30% 30%, 50% 50%, 0 0; }
+}
+@media screen and (max-width: 767px) {
+  .main_hero .background-video { --aro: 12px; }
+}
+
+.team_grid .card_wrapper.is-member { --aro: 6px; }
+.team_grid .card_wrapper.is-member .team_photo {
+  --tornasol: 0;
+  box-sizing: content-box;
+  border: var(--aro) solid transparent;
+  margin: calc(-1 * var(--aro)) calc(-1 * var(--aro)) calc(4px - var(--aro));
+  background-color: transparent;
+  background-image:
+    linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px),
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 50%, rgb(255 255 255 / calc(var(--tornasol) * 1.1)) 0%, rgb(255 255 255 / 0) 22%),
+    linear-gradient(125deg, rgb(76 100 217 / 0) 15%, rgb(76 100 217 / calc(var(--tornasol) * .84)) 30%, rgb(126 192 229 / calc(var(--tornasol) * .76)) 43%, rgb(219 84 31 / calc(var(--tornasol) * .68)) 56%, rgb(255 187 161 / calc(var(--tornasol) * .68)) 69%, rgb(76 100 217 / 0) 85%),
+    linear-gradient(rgba(255, 255, 255, .3), rgba(255, 255, 255, .3));
+  background-origin: border-box;
+  background-clip: border-box;
+  background-size: auto, auto, 200% 200%, 260% 260%, auto;
+  background-position: 0 0, 0 0, 20% 20%, 0% 0%, 0 0;
+  background-blend-mode: normal, normal, normal, multiply, normal;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .75);
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+  animation: equipo-aro-tornasol 21.6s linear infinite;
+  transition: --tornasol .3s ease;
+}
+.team_grid .card_wrapper.is-member:hover .team_photo,
+.team_grid .card_wrapper.is-member.is-holo .team_photo { --tornasol: .25; }
+@keyframes equipo-aro-tornasol {
+  0%, 100% { background-position: 0 0, 0 0, 20% 20%, 0% 0%, 0 0; }
+  25% { background-position: 0 0, 0 0, 80% 20%, 100% 0%, 0 0; }
+  50% { background-position: 0 0, 0 0, 80% 80%, 100% 100%, 0 0; }
+  75% { background-position: 0 0, 0 0, 20% 80%, 0% 100%, 0 0; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+
+  .team_grid .card_wrapper.is-member .team_photo {
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), box-shadow .7s cubic-bezier(.2, .8, .2, 1), --tornasol .3s ease;
+  }
+  .team_grid .card_wrapper.is-member.is-holo .team_photo {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .85), 0 12px 20px -6px rgba(15, 23, 42, .45);
+    transition: transform .25s ease-out, box-shadow .4s ease, --tornasol .3s ease;
+  }
+
+  .team_grid .card_wrapper.is-member::before,
+  .team_grid .card_wrapper.is-member::after {
+    top: calc(var(--holo-pt, 18px) + var(--aro));
+    left: calc(var(--holo-pl, calc(50% - 42px)) + var(--aro));
+    width: calc(var(--holo-ps, 84px) - 2 * var(--aro));
+    height: calc(var(--holo-ps, 84px) - 2 * var(--aro));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team_grid .card_wrapper.is-member .team_photo { animation: none; background-position: 0 0, 0 0, 30% 30%, 50% 50%, 0 0; }
+}
+</style>
+<meta name="robots" content="noindex"><style id="lp-estilos">/* Landing pieces that the site does not have yet. Everything else on the page is the site's own CSS.
+   Prefix lp_ = new class to create in Webflow (or as an embed block of the landing page head). */
+
+/* Prototype banner (not for Webflow) */
+.lp_proto { position: fixed; right: 16px; bottom: 96px; z-index: 1000; max-width: calc(100% - 32px); background: #fff4e5; color: #663c00; font: 400 12px/1.35 var(--_🔤-typography---font-family--body), sans-serif; padding: 8px 14px; border-radius: 999px; box-shadow: 0 4px 14px rgba(15, 23, 42, .15); pointer-events: none; }
+@media (max-width: 767px) { .lp_proto { bottom: 150px; right: 12px; } }
+
+/* Hero: primary (Glass CTA ring) + secondary side by side */
+.lp_hero_ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+
+/* Hero figures in the info cell */
+.info_hero_template { gap: 16px; align-items: stretch; }
+.lp_stat { flex: 1 1 0; min-width: 0; }
+.lp_stat .process_number { font-size: 28px; line-height: 32px; }
+.lp_stat .card_desc { margin-top: 4px; }
+
+/* Quote card: Glass Base, same recipe as .products_section .solution_card.is-product (ring 12 / inner radius 24) */
+.lp_quote { --aro: 12px; --radio-int: 24px; position: relative; width: 100%; border: var(--aro) solid transparent; border-radius: calc(var(--radio-int) + var(--aro));
+  background-color: transparent;
+  background-image: linear-gradient(#fff, #fff), linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px), radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%), linear-gradient(rgba(255, 255, 255, .3), rgba(255, 255, 255, .3));
+  background-origin: padding-box, border-box, border-box, border-box; background-clip: padding-box, border-box, border-box, border-box; background-repeat: no-repeat;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32)); }
+.lp_quote::before { content: ""; position: absolute; inset: calc(-1 * var(--aro)); z-index: 0; padding: 1px; border-radius: calc(var(--radio-int) + var(--aro)); pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.lp_quote_form { position: relative; z-index: 1; padding: 28px; }
+.lp_quote_head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin-bottom: 6px; }
+.lp_quote_head .chip { white-space: nowrap; }
+.lp_quote_title { font-size: 22px; line-height: 28px; }
+.lp_steps { display: flex; gap: 8px; margin: 16px 0 20px; }
+.lp_steps span { flex: 1; height: 6px; border-radius: 99px; background: #e6e9f0; }
+.lp_steps span.is-on { background: var(--_🏷️-colours-semantic---fill--brand-strong); }
+.lp_q { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
+.lp_q legend { padding: 0; margin-bottom: 10px; }
+.lp_options { display: flex; flex-wrap: wrap; gap: 8px; }
+.lp_option { position: relative; margin: 0; font-weight: 400; }
+.lp_option input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.lp_option span { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid #ccc; border-radius: 32px; background: #fff; cursor: pointer;
+  font: 700 14px/1 var(--_🔤-typography---font-family--heading), sans-serif; color: var(--_🏷️-colours-semantic---text--strong); transition: background-color .15s ease, color .15s ease; }
+.lp_option input:checked + span { background: var(--_🏷️-colours-semantic---fill--brand-strong); border-color: var(--_🏷️-colours-semantic---fill--brand-strong); color: #fff; }
+.lp_option input:focus-visible + span { outline: 3px solid #4c64d9; outline-offset: 2px; }
+.lp_two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.lp_field label small, .lp_extras_title small { font-weight: 400; color: #000933a6; }
+.lp_field .text-field { width: 100%; }
+.lp_extras_title { margin: 6px 0 8px; }
+.lp_extras { display: grid; gap: 8px; margin-bottom: 14px; }
+.lp_extras label, .lp_consent { display: flex; gap: 10px; align-items: flex-start; font: 400 14px/1.45 var(--_🔤-typography---font-family--body), sans-serif; color: #000933a6; margin: 0; cursor: pointer; }
+.lp_extras input, .lp_consent input { width: 18px; height: 18px; margin-top: 2px; flex: none; accent-color: #151f47; }
+.lp_err { display: none; color: #5f2120; background: #fdeded; border-radius: 12px; padding: 10px 12px; font: 400 14px/1.4 var(--_🔤-typography---font-family--body), sans-serif; margin: 12px 0 0; }
+.lp_err.is-on { display: block; }
+.lp_full { display: flex; width: 100%; }
+.button-ring-form.lp_full { margin-top: 16px; }
+.lp_btn { border: 0; width: 100%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.lp_note { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+.lp_back { background: none; border: 0; padding: 12px 0 0; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; font: 700 14px/1 var(--_🔤-typography---font-family--heading), sans-serif; color: var(--_🏷️-colours-semantic---fill--brand-alternate); }
+.lp_done { text-align: center; }
+.lp_done_ico { margin: 4px auto 14px; }
+.lp_done_list { text-align: left; padding-left: 20px; margin: 14px 0 18px; }
+.lp_done_list li + li { margin-top: 6px; }
+.lp_done .secondbutton { justify-content: center; }
+[hidden] { display: none !important; }
+
+/* Content helpers */
+.lp_list { padding-left: 18px; margin: 10px 0 12px; }
+.lp_list li + li { margin-top: 6px; }
+.lp_more { display: inline-flex; gap: 8px; align-items: center; margin-top: 14px; font: 700 14px/1 var(--_🔤-typography---font-family--heading), sans-serif; }
+@media (min-width: 1200px) { .products_grid.lp_grid_4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; } }
+
+@media (max-width: 767px) {
+  .lp_two { grid-template-columns: 1fr; }
+  .lp_quote { --aro: 8px; }
+  .lp_quote_form { padding: 20px; }
+  .info_hero_template { flex-wrap: wrap; }
+  .lp_stat { flex: 1 1 30%; }
+  .lp_stat .process_number { font-size: 22px; line-height: 26px; }
+}
+/* actuaria+ landing pieces (on top of lp-estilos.css). Prefix lp_ = new class to create in Webflow. */
+.lp_micro { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.lp_micro li { display: inline-flex; gap: 8px; align-items: center; }
+.lp_micro .text-span-3, .lp_checks .text-span-3 { color: #1b5e20; }
+
+/* Hero product panel: Glass Base frame (from .lp_quote) with site typography inside */
+.lp_panel_in { position: relative; z-index: 1; padding: 22px; }
+.lp_panel_bar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.lp_panel_bar > span { width: 10px; height: 10px; border-radius: 50%; background: #dfe3ec; }
+.lp_panel_bar .chip { margin-left: 8px; }
+.lp_kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.lp_kpi { background: #f6f8fc; border-radius: 16px; padding: 14px; display: grid; gap: 6px; align-content: start; }
+.lp_num { font-size: 22px; line-height: 26px; color: #151f47; }
+.lp_kpi .chip { font-size: 11px; line-height: 16px; }
+.lp_chart { margin-top: 12px; background: #f6f8fc; border-radius: 16px; padding: 14px 14px 10px; }
+.lp_chart_head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.lp_chart svg { width: 100%; height: 140px; display: block; }
+.lp_legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 6px; }
+.lp_dot { display: inline-block; width: 18px; height: 3px; border-radius: 2px; background: #151f47; }
+.lp_dot.is-dash { background: repeating-linear-gradient(90deg, #df5e2d 0 6px, transparent 6px 10px); margin-left: 8px; }
+
+/* Grids */
+.beneficios_grid.lp_grid_3, .process_grid.lp_grid_3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-width: 992px) { .products_grid.lp_grid_3c { grid-template-columns: repeat(3, minmax(0, 1fr)); } .products_grid.lp_grid_2c { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 960px; margin-inline: auto; } }
+.lp_modulos .section_head, .lp_planes .section_head { margin-bottom: 36px; }
+.lp_modulos .products_plus { margin-top: 32px; }
+
+/* Free plan */
+.lp_chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.lp_checks { list-style: none; padding: 0; margin: 16px 0 24px; display: grid; gap: 12px; }
+.lp_checks li { display: flex; gap: 10px; align-items: flex-start; }
+.lp_checks li .text-span-3 { margin-top: 3px; flex: none; }
+.lp_checks_lg { font-size: 16px; line-height: 24px; }
+.lp_checks_lg .text-span-3 { color: #151f47 !important; width: 20px; }
+.lp_mt { margin-top: 14px; }
+
+/* Pricing */
+.lp_price { margin-top: 14px; color: #a8431c; }
+.lp_amount { font-size: 34px; line-height: 40px; margin: 16px 0 4px; color: #151f47; }
+.lp_amount small { font: 600 15px/1 var(--_🔤-typography---font-family--body), sans-serif; color: #000933a6; letter-spacing: 0; }
+.lp_planes .card_content { height: 100%; display: flex; flex-direction: column; }
+.lp_planes .lp_checks { flex: 1; }
+.lp_btn_full { width: 100%; justify-content: center; }
+.lp_center { text-align: center; margin-top: 28px; }
+
+/* Demo */
+.lp_demo .beneficios_grid { align-items: center; }
+
+@media (max-width: 991px) {
+  .beneficios_grid.lp_grid_3, .process_grid.lp_grid_3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 767px) {
+  .lp_kpis { grid-template-columns: 1fr 1fr; }
+  .lp_kpis .lp_kpi:last-child { grid-column: 1 / -1; }
+  .lp_demo .beneficios_grid, .lp_free .beneficios_grid { grid-template-columns: 1fr; }
+}
+</style></head><body class="body_soluciones"><div data-wf--navbar-main--variant="base" class="navbar-logo-left"><div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="navbar-logo-left-container shadow-three w-nav"><div class="container-2"><div class="navbar-wrapper"><a href="https://actuaria.com/" class="navbar-brand w-nav-brand"><img width="220" loading="lazy" alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbec17f7fc765c2ea5d9_logo-actuaria.svg" class="image"></a><nav role="navigation" class="nav-menu-wrapper w-nav-menu"><ul role="list" class="nav-menu-two w-list-unstyled"><li><div data-delay="0" data-hover="false" class="nav-dropdown w-dropdown"><div class="nav-dropdown-toggle w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="link_navbar">Soluciones</div></div><nav class="nav-dropdown-list shadow-three mobile-shadow-hide w-dropdown-list"><a href="https://actuaria.com/beneficios-laborales" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Beneficios Laborales</h6></a><a href="https://actuaria.com/seguros-y-medicina" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Seguros y Salud</h6></a><a href="https://actuaria.com/analisis-de-datos" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Análisis de Datos</h6></a><a href="https://actuaria.com/riesgos-y-finanzas" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Riesgos y Finanzas</h6></a></nav></div></li><li><div data-delay="0" data-hover="false" class="nav-dropdown w-dropdown"><div class="nav-dropdown-toggle w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="link_navbar">Recursos</div></div><nav class="nav-dropdown-list shadow-three mobile-shadow-hide w-dropdown-list"><div data-hover="false" data-delay="0" data-calc-menu="1" class="w-dropdown"><div class="nav_link_drop w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="icon_chip_nav"></div><div class="nav_link_drop_text">Calculadoras</div></div><nav data-calc-panel="1" class="w-dropdown-list"><div data-calc-cols="1"><div data-calc-col="beneficios"><details data-calc-grupo="beneficios" name="calc-grupos"><summary><div data-calc-titulo="1">Beneficios post empleo</div></summary><a href="https://actuaria.com/calculadoras/jubilacion-patronal" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Jubilación patronal</h6></a><a href="https://actuaria.com/calculadoras/despido-intempestivo" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Despido intempestivo</h6></a><a href="https://actuaria.com/calculadoras/desahucio" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Desahucio</h6></a><a href="https://actuaria.com/calculadoras/jubilacion-vejez-iess" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Jubilación por vejez IESS</h6></a><a href="https://actuaria.com/calculadoras/fondo-pensiones-iess" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Fondo de pensiones IESS</h6></a><a href="https://actuaria.com/calculadoras/aportes-iess" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Aportes al IESS</h6></a></details></div><div data-calc-col="ahorros"><details data-calc-grupo="ahorros" name="calc-grupos"><summary><div data-calc-titulo="1">Ahorros e impuestos</div></summary><a href="https://actuaria.com/calculadoras/decimo-tercer-sueldo" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Décimo tercer sueldo</h6></a><a href="https://actuaria.com/calculadoras/decimo-cuarto-sueldo" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Décimo cuarto sueldo</h6></a><a href="https://actuaria.com/calculadoras/vacaciones" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Vacaciones</h6></a><a href="https://actuaria.com/calculadoras/fondos-de-reserva" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Fondos de reserva</h6></a><a href="https://actuaria.com/calculadoras/ahorro-programado" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Ahorro programado</h6></a><a href="https://actuaria.com/calculadoras/impuesto-a-la-renta" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Impuesto a la renta</h6></a></details></div></div></nav></div><a href="https://actuaria.com/coeficientes-jp-am99" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"><span></span></div><h6 class="nav_link_drop_text">Coeficientes JP-AM99</h6></a></nav></div></li><li><div data-delay="0" data-hover="false" class="nav-dropdown w-dropdown"><div class="nav-dropdown-toggle w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="link_navbar">Nosotros</div></div><nav class="nav-dropdown-list shadow-three mobile-shadow-hide w-dropdown-list"><a href="https://actuaria.com/nosotros" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Nuestro equipo</h6></a><a href="https://actuaria.com/nosotros#trabaja-con-nosotros" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Trabaja con nosotros</h6></a></nav></div></li><li class="list-item"><a href="https://actuaria.com/blog" class="link_navbar-blog">Blog</a><div class="w-locales-list"><div role="list" class="w-locales-items"><div role="listitem" class="w-locales-item"><a hreflang="es-EC" href="https://actuaria.com/estudio-actuarial-jubilacion-patronal" aria-current="page" class="w--current">ES</a></div><div role="listitem" class="w-locales-item"><a hreflang="en" href="https://actuaria.com/en/estudio-actuarial-jubilacion-patronal">EN</a></div></div></div></li><li class="list-item-2"><div class="nav-divider"></div></li><li class="mobile-margin-top-10"><a href="https://actuaria.com/contacto" class="secondary-button-neo">Contacto <span class="text-span-4"></span></a><a href="https://actuaria.com/contacto" class="secondary-button-neo-back">Cotizar</a><div class="button-ring"><a href="https://plus.actuaria.com/auth/login" target="_blank" class="actuariaplus-button is-nav-app w-inline-block"><img width="50" loading="lazy" alt="actuaria+" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbeccb6a40ca56c13c67_logo-actuaria-plus.svg" class="nav_app-logo"></a></div></li></ul></nav><div class="menu-button w-nav-button"><div class="w-icon-nav-menu"></div></div></div></div></div><div class="w-embed"><style>
+.navbar-logo-left .list-item { display: flex; align-items: center; gap: 12px; }
+.navbar-logo-left .w-locales-items { display: flex; align-items: center; gap: 2px; margin: 0; padding: 3px; border-radius: 999px; background: #eef0f6; box-shadow: inset 2px 2px 5px rgba(15, 23, 42, .11), inset -2px -2px 4px #fff; }
+.navbar-logo-left .w-locales-item a { display: flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: .3px; color: #4a5268; text-decoration: none; transition: background-color .2s, color .2s, box-shadow .2s; }
+.navbar-logo-left .w-locales-item a::before { content: ""; flex: none; width: 16px; height: 12px; border-radius: 2px; background: center / cover no-repeat; box-shadow: 0 0 0 1px rgba(21, 31, 71, .1); }
+.navbar-logo-left .w-locales-item a[hreflang^="es"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30'%3E%3Crect width='40' height='30' fill='%23AA151B'/%3E%3Crect y='7.5' width='40' height='15' fill='%23F1BF00'/%3E%3C/svg%3E"); }
+.navbar-logo-left .w-locales-item a[hreflang^="en"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30'%3E%3CclipPath id='t'%3E%3Cpath d='M20,15h20v15zv15h-20zh-20v-15zv-15h20z'/%3E%3C/clipPath%3E%3Crect width='40' height='30' fill='%23012169'/%3E%3Cpath d='M0,0L40,30M40,0L0,30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0,0L40,30M40,0L0,30' clip-path='url(%23t)' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M20,0v30M0,15h40' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M20,0v30M0,15h40' stroke='%23C8102E' stroke-width='6'/%3E%3C/svg%3E"); }
+.navbar-logo-left .w-locales-item a:hover { color: #4c64d9; background: rgba(255, 255, 255, .6); }
+.navbar-logo-left .w-locales-item a.w--current { background: linear-gradient(145deg, #fff, #eceff5); color: #151f47; box-shadow: 2px 2px 5px rgba(15, 23, 42, .26), -2px -2px 4px #fff; }
+.navbar-logo-left .w-locales-item a:focus-visible { outline: 2px solid #4c64d9; outline-offset: 2px; }
+@media (min-width: 992px) {
+  .navbar-logo-left .list-item { gap: 8px; }
+  .navbar-logo-left .w-locales-items { padding: 2px; }
+  .navbar-logo-left .w-locales-item a { gap: 0; padding: 6px 7px; font-size: 0; letter-spacing: 0; }
+}
+
+@media (min-width: 1280px) {
+  .navbar-logo-left .secondary-button-neo { padding-left: 16px; padding-right: 16px; }
+  .navbar-logo-left .actuariaplus-button.is-nav-app { padding-left: 20px; padding-right: 20px; }
+}
+@media (min-width: 992px) and (max-width: 1279.98px) {
+  .navbar-logo-left .nav-dropdown { margin-left: 1px; margin-right: 1px; }
+  .navbar-logo-left .nav-dropdown .w-dropdown-toggle { padding-right: 26px; }
+  .navbar-logo-left .secondary-button-neo { padding-left: 8px; padding-right: 8px; }
+  .navbar-logo-left .actuariaplus-button.is-nav-app { padding-left: 24px; padding-right: 24px; }
+  .navbar-logo-left .nav-divider { margin-left: 6px; margin-right: 6px; }
+}
+@media (min-width: 992px) and (max-width: 1099.98px) {
+  .navbar-logo-left .navbar-brand img { width: 114px; min-width: 0; height: auto; }
+  .navbar-logo-left .link_navbar-blog { padding-left: 6px; padding-right: 6px; font-size: 16px; }
+  .navbar-logo-left .list-item { gap: 2px; margin-right: 8px; }
+  .navbar-logo-left .w-locales-item a { padding: 6px; }
+  .navbar-logo-left .nav-divider { display: none; }
+  .navbar-logo-left .secondary-button-neo { padding-left: 8px; padding-right: 8px; }
+  .navbar-logo-left .actuariaplus-button.is-nav-app { padding-left: 16px; padding-right: 16px; }
+  .navbar-logo-left .button-ring { padding: 5px; }
+}
+@media (max-width: 991px) {
+  .navbar-logo-left .list-item { flex-direction: column; gap: 10px; }
+}
+</style></div><div class="w-embed w-script"><script>
+(function () {
+  if (!/^en\b/i.test(document.documentElement.lang)) return;
+  var CAT = {
+    'Beneficios Laborales y Actuariales': 'Labor and Actuarial Benefits',
+    'Seguros y Medicina Prepagada': 'Insurance and Prepaid Healthcare',
+    'Análisis de Datos para Negocios': 'Business Data Analytics',
+    'Riesgo y Finanzas Corporativas': 'Risk and Corporate Finance',
+    'Beneficios post empleo': 'Post-employment benefits',
+    'Ahorros e impuestos': 'Savings and taxes'
+  };
+  var RUTAS = ['/post/', '/calculadoras/', '/nosotros#', '/ods5-appporlaequidad', '/ods15-nftree'];
+  var MES = { ene: 'Jan', feb: 'Feb', mar: 'Mar', abr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', ago: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dic: 'Dec' };
+  function run() {
+    document.querySelectorAll('.chip, .heading-7').forEach(function (el) {
+      var t = el.textContent.trim();
+      if (!el.children.length && CAT[t]) el.textContent = CAT[t];
+    });
+    document.querySelectorAll('[data-fecha]').forEach(function (el) {
+      var m = el.textContent.trim().match(/^(\d{1,2}) ([a-z]{3}) (\d{4})$/);
+      if (m && MES[m[2]]) el.textContent = MES[m[2]] + ' ' + m[1] + ', ' + m[3];
+    });
+    document.querySelectorAll(RUTAS.map(function (r) { return 'a[href^="' + r + '"]:not([hreflang])'; }).join(', ')).forEach(function (a) {
+      a.setAttribute('href', '/en' + a.getAttribute('href'));
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function () { setTimeout(run, 0); });
+})();
+</script>
+</div><div class="w-embed"><style>
+[data-calc-menu]{display:block;margin:0;z-index:auto}
+[data-calc-menu]>.w-dropdown-toggle{display:flex;width:100%;padding:0 40px 0 16px;white-space:normal}
+[data-calc-menu]>.w-dropdown-toggle .nav_link_drop_text{font-weight:800}
+[data-calc-menu]>.w-dropdown-toggle .w-icon-dropdown-toggle{transition:transform .2s ease}
+[data-calc-menu]>.w-dropdown-toggle.w--open .w-icon-dropdown-toggle{transform:rotate(180deg)}
+[data-calc-menu]>[data-calc-panel]{position:static;min-width:0;background:none;padding:0 0 6px}
+[data-calc-cols]{display:block}
+[data-calc-grupo]>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px 10px 24px;border-radius:8px;list-style:none;cursor:pointer}
+[data-calc-grupo]>summary::-webkit-details-marker{display:none}
+[data-calc-grupo]>summary::after{content:"\f078";flex:none;font-family:"Fa Solid 900";font-size:10px;color:rgba(21,31,71,.55);transition:transform .2s ease}
+[data-calc-grupo][open]>summary::after{transform:rotate(180deg)}
+[data-calc-grupo]>summary:hover{background-color:rgba(21,31,71,.05)}
+[data-calc-grupo]>summary:focus-visible{outline:2px solid #4c64d9;outline-offset:-2px}
+[data-calc-titulo]{font:800 11px/1.4 Nunito,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:rgba(21,31,71,.6)}
+[data-calc-grupo] .nav_link_drop{padding-left:32px}
+[data-calc-panel] .nav_link_drop_text{font-size:15px;line-height:38px}
+[data-calc-menu]+.nav_link_drop{margin-top:4px;border-top:1px solid rgba(21,31,71,.08)}
+@media (prefers-reduced-motion:reduce){[data-calc-menu] .w-icon-dropdown-toggle,[data-calc-grupo]>summary::after{transition:none}}
+@media (min-width:992px){.nav-dropdown-list.shadow-three.mobile-shadow-hide.w--open:has([data-calc-menu]){width:290px}}
+@media (max-width:991px){.nav-dropdown-list.shadow-three.mobile-shadow-hide.w--open:has([data-calc-menu]){width:270px}.w-nav-overlay [data-nav-menu-open]{max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain}}
+</style>
+</div></div><section class="main_hero"><div class="w-layout-blockcontainer conatiner_main_hero_template w-container"><div id="w-node-_28e4e536-ad51-ebce-a065-a60e2e5ae772-fcd53b04" class="w-layout-layout bento_grid_templates wf-layout-layout"><div class="w-layout-cell"><div class="chipset_cards"><h4 class="text_chip_cards">Plan Free · gratis para siempre</h4><div class="icon_chip"></div></div><h1 class="text-displaymedium">Toma el control financiero de tu nómina</h1><p class="paragraph_template">La nómina es el mayor costo de tu empresa y suele ser el que menos control tiene. Con <a href="https://plus.actuaria.com/auth/login" class="link">actuaria+</a> sabes cuánto cuesta hoy y cuánto costará mañana, con respaldo actuarial y alineado a las NIIF.</p><div class="lp_hero_ctas">
+      <div class="button-ring"><a href="https://plus.actuaria.com/auth/registro" class="main_button is-hero-primary" data-evento="registro_hero">Comenzar gratis<span aria-hidden="true" class="text-span-3"></span></a></div>
+      <a href="#demo" class="secondbutton is-flat" data-evento="demo_hero">Ver una demostración<span aria-hidden="true" class="text-span-3"></span></a>
+    </div>
+    <ul class="lp_micro card_desc"><li><span aria-hidden="true" class="text-span-3"></span>Sin tarjeta de crédito</li><li><span aria-hidden="true" class="text-span-3"></span>Usuarios ilimitados</li><li><span aria-hidden="true" class="text-span-3"></span>Seguridad ISO/IEC 27001</li></ul></div><div id="w-node-feafaf96-6a1e-5c47-2fd2-1990b3a0474b-fcd53b04" class="w-layout-cell">
+    <div class="lp_quote lp_panel" aria-label="Ejemplo del panel de actuaria+">
+      <div class="lp_panel_in">
+        <div class="lp_panel_bar"><span></span><span></span><span></span><div class="chip">plus.actuaria.com</div></div>
+        <div class="lp_kpis">
+          <div class="lp_kpi"><p class="card_desc">Costo mensual de nómina</p><div class="process_number lp_num">$128.400</div></div>
+          <div class="lp_kpi"><p class="card_desc">Provisión NIC 19</p><div class="process_number lp_num">$312.900</div><div class="chip is-resultado">Conforme a la norma</div></div>
+          <div class="lp_kpi"><p class="card_desc">Trabajadores</p><div class="process_number lp_num">87</div><p class="card_desc">3 salidas este mes</p></div>
+        </div>
+        <div class="lp_chart">
+          <div class="lp_chart_head"><h3 class="faq_question">Provisión proyectada</h3><p class="card_desc">2026 – 2034</p></div>
+          <svg viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="lp-area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4c64d9" stop-opacity=".22"></stop><stop offset="1" stop-color="#4c64d9" stop-opacity="0"></stop></linearGradient></defs>
+            <path d="M0 118 L50 112 L100 104 L150 95 L200 84 L250 71 L300 56 L350 40 L400 22 L400 140 L0 140 Z" fill="url(#lp-area)"></path>
+            <path d="M0 118 L50 112 L100 104 L150 95 L200 84 L250 71 L300 56 L350 40 L400 22" fill="none" stroke="#151f47" stroke-width="3"></path>
+            <path d="M0 120 L100 112 L200 100 L300 86 L400 70" fill="none" stroke="#df5e2d" stroke-width="2" stroke-dasharray="6 6"></path>
+          </svg>
+          <p class="card_desc lp_legend"><span class="lp_dot"></span>Proyección con tu nómina <span class="lp_dot is-dash"></span>Sin planificar</p>
+        </div>
+        <p class="card_desc lp_note">Datos de ejemplo.</p>
+      </div>
+    </div></div><div class="w-layout-cell"><div class="w-layout-hflex info_hero_template"><div class="lp_stat"><div class="process_number">+40</div><p class="card_desc">años de práctica actuarial detrás de cada cálculo</p></div><div class="lp_stat"><div class="process_number">+5.000</div><p class="card_desc">empresas ya usan actuaria+</p></div><div class="lp_stat"><div class="process_number">+600 mil</div><p class="card_desc">trabajadores registrados</p></div></div></div></div></div></section><section class="brands_section"><div class="w-layout-blockcontainer container_brands w-container"><div class="w-layout-hflex brands"><div class="w-layout-vflex heading_frame"><h2 class="heading-section">Más de 5.000 empresas usan actuaria+</h2><h2 class="subheading-section">Bancos, aseguradoras, industria, retail y servicios.</h2></div></div></div><div class="carousel_container_alfa"><div class="gradient_div_logos"></div><div class="gradient_div_logos_end"></div><div class="logos_container"><img src="https://plus.actuaria.com/logos/clientes/BancoPichincha_Gris.png" loading="lazy" alt="BancoPichincha" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Pronaca_Gris.png" loading="lazy" alt="Pronaca" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/ArcaContinental_Gris.png" loading="lazy" alt="ArcaContinental" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Unilever_Gris.png" loading="lazy" alt="Unilever" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/McDonalds_Gris.png" loading="lazy" alt="McDonalds" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/DinersClub_Gris.png" loading="lazy" alt="DinersClub" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/KimberlyClark_Gris.png" loading="lazy" alt="KimberlyClark" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Produbanco_Gris.png" loading="lazy" alt="Produbanco" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Adelca_Gris.png" loading="lazy" alt="Adelca" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/GrupoElRosado_Gris.png" loading="lazy" alt="GrupoElRosado" class="logo_stone"></div><div class="logos_container"><img src="https://plus.actuaria.com/logos/clientes/BancoPichincha_Gris.png" loading="lazy" alt="BancoPichincha" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Pronaca_Gris.png" loading="lazy" alt="Pronaca" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/ArcaContinental_Gris.png" loading="lazy" alt="ArcaContinental" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Unilever_Gris.png" loading="lazy" alt="Unilever" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/McDonalds_Gris.png" loading="lazy" alt="McDonalds" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/DinersClub_Gris.png" loading="lazy" alt="DinersClub" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/KimberlyClark_Gris.png" loading="lazy" alt="KimberlyClark" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Produbanco_Gris.png" loading="lazy" alt="Produbanco" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Adelca_Gris.png" loading="lazy" alt="Adelca" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/GrupoElRosado_Gris.png" loading="lazy" alt="GrupoElRosado" class="logo_stone"></div></div><div class="carousel_container_beta"><div class="gradient_div_logos-_start"></div><div class="gradient_div_logos_end"></div><div class="logos_container_b"><img src="https://plus.actuaria.com/logos/clientes/Hilton_Gris.png" loading="lazy" alt="Hilton" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Zurich_Gris.png" loading="lazy" alt="Zurich" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Nirsa_Gris.png" loading="lazy" alt="Nirsa" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Chubb_Gris.png" loading="lazy" alt="Chubb" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Tia_Gris.png" loading="lazy" alt="Tia" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/DPWORLD_Gris.png" loading="lazy" alt="DPWORLD" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/BancoBolivariano_Gris.png" loading="lazy" alt="BancoBolivariano" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Colgate_Gris.png" loading="lazy" alt="Colgate" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Saludsa_Gris.png" loading="lazy" alt="Saludsa" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/BMI_Gris.png" loading="lazy" alt="BMI" class="logo_stone"></div><div class="logos_container_b"><img src="https://plus.actuaria.com/logos/clientes/Hilton_Gris.png" loading="lazy" alt="Hilton" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Zurich_Gris.png" loading="lazy" alt="Zurich" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Nirsa_Gris.png" loading="lazy" alt="Nirsa" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Chubb_Gris.png" loading="lazy" alt="Chubb" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Tia_Gris.png" loading="lazy" alt="Tia" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/DPWORLD_Gris.png" loading="lazy" alt="DPWORLD" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/BancoBolivariano_Gris.png" loading="lazy" alt="BancoBolivariano" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Colgate_Gris.png" loading="lazy" alt="Colgate" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/Saludsa_Gris.png" loading="lazy" alt="Saludsa" class="logo_stone"><img src="https://plus.actuaria.com/logos/clientes/BMI_Gris.png" loading="lazy" alt="BMI" class="logo_stone"></div></div></section><section class="beneficios_section lp_dolores"><div class="container_beneficios"><div class="section_head"><h2 class="section_title">Tres señales de que tu nómina te controla a ti</h2><p class="section_sub">Detrás de las tres está lo mismo: tu mayor costo, sin control financiero.</p></div><div class="beneficios_grid lp_grid_3">
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">El pasivo laboral es una caja negra</h3><p class="card_desc">Sabes que existe la obligación por jubilación patronal y desahucio, pero no cuánto es, cómo crece ni qué parte es deducible.</p></div>
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">Cada salida se calcula desde cero</h3><p class="card_desc">Alguien renuncia o se jubila y el cálculo empieza de nuevo: buscar datos, armar fórmulas y confiar en que nada quedó fuera.</p></div>
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">Decides sueldos y beneficios a ciegas</h3><p class="card_desc">Ajustas la nómina sin saber cómo se compara con tu mercado ni cuánto costará dentro de cinco años.</p></div></div></div></section><section class="beneficios_section lp_free"><div class="container_beneficios"><div class="section_head"><h2 class="section_title">Tu nómina registrada y bajo control, desde el día uno</h2><p class="section_sub">Gratis para cualquier empresa, para siempre. No es un software de nómina: es el registro y control financiero de la tuya.</p></div><div class="beneficios_grid">
+    <div class="beneficio_card"><div class="chip is-resultado">Plan Free</div><h3 class="card_title lp_mt">Lo que tienes desde que creas tu cuenta</h3>
+      <ul class="card_desc lp_checks"><li><span aria-hidden="true" class="text-span-3"></span><span><b>Toda tu nómina en un solo registro.</b> Regístrala una vez y consulta su información financiera siempre.</span></li>
+      <li><span aria-hidden="true" class="text-span-3"></span><span><b>Cada salida, calculada al instante.</b> Desahucio, despido o jubilación: automático, validado y con respaldo técnico.</span></li>
+      <li><span aria-hidden="true" class="text-span-3"></span><span><b>12 calculadoras especializadas</b> con la normativa vigente.</span></li></ul>
+      <div class="button-ring"><a href="https://plus.actuaria.com/auth/registro" class="main_button is-hero-primary" data-evento="registro_free">Crear mi cuenta gratis<span aria-hidden="true" class="text-span-3"></span></a></div></div>
+    <div class="beneficio_card"><h3 class="card_title">Incluidas en el plan Free</h3><div class="lp_chips"><div class="chip">Jubilación patronal</div><div class="chip">Desahucio</div><div class="chip">Despido intempestivo</div><div class="chip">Décimo tercero</div><div class="chip">Décimo cuarto</div><div class="chip">Vacaciones</div><div class="chip">Fondos de reserva</div><div class="chip">Aportes al IESS</div><div class="chip">Jubilación por vejez IESS</div><div class="chip">Fondo de pensiones IESS</div><div class="chip">Ahorro programado</div><div class="chip">Impuesto a la renta</div></div></div></div></div></section><section class="products_section lp_modulos" id="modulos"><div class="container_products">
+    <div class="section_head"><h2 class="section_title is-product">Una sola plataforma para el costo de tu nómina</h2><p class="section_sub">Cumple, optimiza y compara: suma solo los módulos que necesitas.</p></div>
+    <div class="products_grid lp_grid_3c"><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Cumple</div><h3 class="card_title">Estudio actuarial</h3><p class="card_desc">El número que tu auditor va a pedir, conforme a la NIC 19: la provisión, el porqué y las hipótesis detrás.</p><p class="faq_question lp_price">desde USD 260/año</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Cumple</div><h3 class="card_title">Simulador post-empleo</h3><p class="card_desc">¿Qué pasa con tu provisión si crece la nómina, suben los sueldos o alguien se jubila antes? Escenarios para planificar.</p><p class="faq_question lp_price">desde USD 78/año</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Optimiza</div><h3 class="card_title">Impuestos diferidos</h3><p class="card_desc">El impuesto diferido de tus provisiones conforme a la NIC 12, para no perder el beneficio tributario al que tienes derecho.</p><p class="faq_question lp_price">desde USD 78/año</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Optimiza</div><h3 class="card_title">Control tributario</h3><p class="card_desc">Qué es deducible, qué salió en el período y qué reportar al cierre. Organizado y trazable, en menos tiempo.</p><p class="faq_question lp_price">desde USD 78/año</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Compara</div><h3 class="card_title">Benchmark salarial</h3><p class="card_desc">Descubre dónde pagas de más y dónde estás en riesgo de perder gente por pagar de menos.</p><p class="faq_question lp_price">desde USD 78/año</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Compara</div><h3 class="card_title">Análisis del mercado</h3><p class="card_desc">Tu costo laboral frente a tu sector, con la información pública de la Superintendencia de Compañías.</p><p class="faq_question lp_price">desde USD 78/año</p></div></div></div>
+    <div class="products_plus"><div class="products_plus_body"><div class="chip is-resultado">Todos los planes</div><h3 class="card_title">Actas de jubilación patronal</h3><p class="card_desc">Disponibles en cualquier plan, incluso el Free. Se facturan por acta emitida, solo cuando la necesitas.</p></div>
+      <div class="button-ring"><a href="https://plus.actuaria.com/precios" class="main_button is-hero-primary" data-evento="precios_actas">Ver precios<span aria-hidden="true" class="text-span-3"></span></a></div></div></div></section><section class="process_section"><div class="container_process"><div class="process_head"><h2 class="section_title">De la nómina al control, en tres pasos</h2><p class="section_sub">Empiezas gratis y sumas el estudio actuarial cuando lo necesites.</p></div><div class="process_grid lp_grid_3"><div class="card_wrapper is-step"><div class="process_number">01</div><h3 class="card_title">Registra tu nómina</h3><p class="card_desc">Cárgala o impórtala una sola vez. Desde ese momento tienes su información financiera al día, gratis.</p></div><div class="card_wrapper is-step"><div class="process_number">02</div><h3 class="card_title">Activa tu estudio actuarial</h3><p class="card_desc">Calculamos tus provisiones por jubilación patronal y desahucio conforme a la NIC 19, con un informe listo para tu auditor.</p></div><div class="card_wrapper is-step"><div class="process_number">03</div><h3 class="card_title">Decide con el panorama completo</h3><p class="card_desc">Proyecta el costo futuro, optimiza el tratamiento fiscal y compárate con tu mercado, todo en el mismo lugar.</p></div></div><div class="process_cta"><div class="button-ring"><a href="https://plus.actuaria.com/auth/registro" class="main_button is-hero-primary">Comenzar gratis<span aria-hidden="true" class="text-span-3"></span></a></div></div></div></section><section class="products_section lp_planes" id="precios"><div class="container_products">
+    <div class="section_head"><h2 class="section_title is-product">Precios claros, según el tamaño de tu empresa</h2><p class="section_sub">Comienza gratis, lleva todo actuaria+ con Enterprise o arma tu plan producto a producto.</p></div>
+    <div class="products_grid lp_grid_2c">
+      <div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Free</div><h3 class="card_title">El registro y control de tu nómina</h3>
+        <div class="process_number lp_amount">Gratis</div><p class="card_desc">Para siempre · sin tarjeta de crédito</p>
+        <ul class="card_desc lp_checks"><li><span aria-hidden="true" class="text-span-3"></span><span>Control de nómina</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>12 calculadoras especializadas</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>Actas de jubilación patronal, por acta emitida</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>Usuarios ilimitados</span></li></ul>
+        <div class="button-ring lp_full"><a href="https://plus.actuaria.com/auth/registro" class="main_button is-hero-primary lp_btn_full" data-evento="registro_precios">Comenzar gratis<span aria-hidden="true" class="text-span-3"></span></a></div></div></div>
+      <div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Enterprise · el 100 % de actuaria+</div><h3 class="card_title">Todo actuaria+, con todo incluido</h3>
+        <div class="process_number lp_amount">USD 480<small>/año</small></div><p class="card_desc">Para 1 a 10 trabajadores · USD 600/año de 11 a 99 · más IVA</p>
+        <ul class="card_desc lp_checks"><li><span aria-hidden="true" class="text-span-3"></span><span>Todo lo del plan Free</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>Estudio actuarial NIC 19 y simulador post-empleo</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>Impuestos diferidos y control tributario</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>Benchmark salarial y análisis del mercado</span></li></ul>
+        <a href="https://plus.actuaria.com/precios" class="secondbutton is-flat lp_btn_full" data-evento="precios_enterprise">Ver planes y precios<span aria-hidden="true" class="text-span-3"></span></a></div></div>
+    </div>
+    <p class="section_sub lp_center">¿Solo necesitas el estudio actuarial? Desde USD 260 al año. <a href="https://plus.actuaria.com/precios" class="link">Arma tu plan producto a producto</a>.</p></div></section><section class="beneficios_section lp_seguridad"><div class="container_beneficios"><div class="section_head"><h2 class="section_title">Tu nómina son datos sensibles. Los cuidamos con estándares certificados</h2><p class="section_sub"><a href="https://actuaria.com/seguridad-de-la-informacion" class="link">Ver la política de seguridad</a></p></div><div class="beneficios_grid lp_grid_3">
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">ISO/IEC 27001:2022</h3><p class="card_desc">Sistema de gestión certificado para la confidencialidad, integridad y disponibilidad de tus datos.</p></div>
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">ISO 9001:2015</h3><p class="card_desc">Procesos auditados y trazables, del registro de la nómina al informe actuarial.</p></div>
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">Prevención de fuga de datos</h3><p class="card_desc">Sistema activo de prevención de fuga de datos.</p></div>
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">Monitoreo permanente</h3><p class="card_desc">Monitoreo de seguridad permanente de la plataforma.</p></div>
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">Nube con estándar de pagos</h3><p class="card_desc">Infraestructura conforme al estándar de la industria de pagos para datos sensibles.</p></div>
+    <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">RGPD</h3><p class="card_desc">Cumplimiento del reglamento europeo de protección de datos personales.</p></div></div></div></section><section class="credentials_section"><div class="w-layout-blockcontainer container_credentials w-container"><div class="w-layout-hflex credentials"><div class="w-layout-vflex heading_frame is-credentials"><h2 class="heading-section">Respaldados por certificaciones nacionales e internacionales</h2><h2 class="subheading-section">Operamos bajo las más estrictas normativas nacionales e internacionales para garantizar la precisión, seguridad y confidencialidad de su información.</h2></div><div class="credentials_marquee"><div class="credentials_grid is-marquee"><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d488c10f86bbf0592a5_cert-supercias.png" loading="lazy" alt="Superintendencia de Compañías, Valores y Seguros del Ecuador" class="cert_logo"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d484378fbb4caf1022a_cert-iso-9001-imq.png" loading="lazy" alt="Certificación IMQ ISO 9001:2015" class="cert_logo is-iso-9001"></div></div><a rel="noopener" target="_blank" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df8abae1f93dd1f54ed_certificacion-iso-9001-2015.pdf" class="cert_link">Ver credencial</a></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d48bdf88084c6799bc6_cert-iso-27001-imq.svg" loading="lazy" alt="Certificación IMQ ISO/IEC 27001:2022" class="cert_logo is-iso-27001"></div></div><a rel="noopener" target="_blank" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf" class="cert_link">Ver credencial</a><link rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf"></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f11beeb8c078e46_cert-sello-actuarial.png" loading="lazy" alt="Sello Actuarial" class="cert_logo"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22cca_cert-iaa.png" loading="lazy" alt="International Actuarial Association" class="cert_logo is-iaa"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d48517c214a11c6f978_cert-pbss.png" loading="lazy" alt="Pensions, Benefits and Social Security Section" class="cert_logo is-pbss"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22d19_cert-superbancos.png" loading="lazy" alt="Superintendencia de Bancos del Ecuador" class="cert_logo"></div></div></div></div></div></div></div></section><section class="beneficios_section lp_demo" id="demo"><div class="container_beneficios"><div class="beneficios_grid">
+    <div class="lp_demo_copy"><div class="chip is-resultado">Demostración · 30 min</div><h2 class="section_title lp_mt">Te mostramos actuaria+ con un ejemplo cercano a tu empresa</h2>
+      <ul class="card_desc lp_checks lp_checks_lg"><li><span aria-hidden="true" class="text-span-3"></span><span>Recorrido por los módulos que tu empresa necesita</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>Cómo cumplir la NIC 19 sin complicaciones</span></li><li><span aria-hidden="true" class="text-span-3"></span><span>Una propuesta según tu número de trabajadores</span></li></ul></div>
+    <div class="lp_quote"><form class="lp_quote_form" id="form-demo" novalidate=""><div data-estado="form">
+      <div class="lp_field"><label for="d-correo">Correo corporativo</label><input class="text-field w-input" id="d-correo" name="Correo" type="email" autocomplete="email" required="" placeholder="nombre@empresa.com"></div>
+      <div class="lp_two"><div class="lp_field"><label for="d-nombre">Tu nombre</label><input class="text-field w-input" id="d-nombre" name="Nombre" autocomplete="name" required=""></div>
+        <div class="lp_field"><label for="d-ruc">RUC de tu empresa</label><input class="text-field w-input" id="d-ruc" name="RUC" inputmode="numeric" maxlength="13" required="" placeholder="13 dígitos"></div></div>
+      <div class="lp_two"><div class="lp_field"><label for="d-trab">Trabajadores</label><select class="text-field w-select" id="d-trab" name="Trabajadores" required=""><option value="">Elige</option><option>1 a 10</option><option>11 a 99</option><option>100 o más</option></select></div>
+        <div class="lp_field"><label for="d-cel">Celular <small>(opcional)</small></label><input class="text-field w-input" id="d-cel" name="Celular" type="tel" autocomplete="tel"></div></div>
+      <p class="lp_err" role="alert">Revisa el correo, tu nombre, el RUC de 13 dígitos y el número de trabajadores.</p>
+      <div class="button-ring-form lp_full"><button type="submit" class="actuariaplus-button is-hero-primary lp_btn">Solicitar demostración<span aria-hidden="true" class="text-span-3"></span></button></div>
+      <p class="card_desc lp_note"><span aria-hidden="true" class="text-span-3"></span>Respuesta en un día hábil. Sin compromiso.</p></div>
+      <div data-estado="listo" hidden="" aria-live="polite" class="lp_done"><span class="beneficio_ico lp_done_ico"></span><h3 class="card_title">¡Listo! Te escribimos en un día hábil</h3>
+        <p class="card_desc lp_mt">Mientras tanto, ya puedes crear tu cuenta gratis y registrar tu nómina.</p>
+        <a href="https://plus.actuaria.com/auth/registro" class="secondbutton is-flat lp_btn_full lp_mt">Comenzar gratis<span aria-hidden="true" class="text-span-3"></span></a></div></form></div></div></div></section><section class="faq_section"><div class="container_faq"><div class="faq_head"><h2 class="section_title">Lo que preguntan antes de empezar</h2><p class="section_sub">Modelo de precios, alcance y cumplimiento.</p></div><div class="faq_list"><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Es un software de nómina?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">No. actuaria+ no reemplaza tu sistema de nómina: es el registro y control financiero de la tuya. Calcula lo que tu nómina cuesta hoy y lo que costará mañana, con respaldo actuarial.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Qué incluye el plan Free?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">El control de nómina (registro de tu nómina y cálculo de las salidas de personal), las 12 calculadoras especializadas y las actas de jubilación patronal, que se pagan por acta emitida. Es gratis para siempre y no pide tarjeta de crédito.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Cómo se determina el precio?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">Solo por el tamaño de tu empresa, en número de trabajadores. Puedes llevar Enterprise, con todo incluido, o armar tu plan producto a producto: el descuento crece con cada producto que sumas.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿El precio es por usuario?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">No. Todos los planes incluyen usuarios ilimitados.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Puedo pagar mes a mes?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">Sí, Enterprise se puede pagar mensualmente con tarjeta de crédito. Los planes se contratan por 12 meses.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Cumple con las NIIF?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">Sí. El estudio actuarial se calcula conforme a la NIC 19 y los impuestos diferidos conforme a la NIC 12, con el respaldo técnico de Actuaria Consultores.</p></nav></div></div></div></section><section class="cta_section"><div class="container_cta"><div class="cta"><div class="cta_panel"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset.jpg" alt="" sizes="(max-width: 479px) 95vw, (max-width: 767px) 97vw, (max-width: 991px) 96vw, 856px" srcset="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset-p-500.jpg 500w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset-p-800.jpg 800w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset-p-1080.jpg 1080w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset.jpg 1536w" class="cta_panel_photo"><div class="cta_panel_veil"></div><div class="cta_panel_glow"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png" alt="" sizes="(max-width: 479px) 95vw, (max-width: 767px) 97vw, (max-width: 991px) 96vw, 856px" srcset="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-500.png 500w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-800.png 800w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-1080.png 1080w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png 1501w" class="cta_formula"></div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png" alt="" sizes="(max-width: 479px) 95vw, (max-width: 767px) 97vw, (max-width: 991px) 96vw, 856px" srcset="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-500.png 500w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-800.png 800w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-1080.png 1080w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png 1501w" class="cta_formula is-right"><div class="cta_circle is-lg"></div><div class="cta_circle is-sm"></div><div class="cta_content"><h2 class="heading-section is-cta">Empieza hoy con el control de tu nómina, gratis</h2><p class="subheading-section is-cta">El control de nómina y las 12 calculadoras son gratis para siempre. Cuando necesites el estudio actuarial, ya tendrás todo listo.</p><div class="cta_spacer"></div><a href="https://plus.actuaria.com/auth/registro" class="secondbutton is-flat">Comenzar gratis<span aria-hidden="true" class="text-span-3"></span></a></div></div></div></div><div class="w-embed"><!-- Liquid glass del inicio, 2026-10-12, v11: vidrio de transparencia real.
+     Code Embed al final de Cta_Section (página Inicio). Aplica a la tarjeta CTA («No dejes tus decisiones críticas al
+     azar»), al aro del botón del hero, a los marcos de las cifras (+6.500 / estudios), a los testimonios y a las
+     certificaciones. «Nuestra Trayectoria» conserva su vidrio original (el usuario lo prefirió así).
+     - El vidrio es backdrop-filter sobre el propio elemento: deja ver lo que pasa por detrás en tiempo real (las bolas
+       de gradiente de Features, la textura del fondo mientras se deslizan los testimonios), desenfocado y saturado,
+       con un velo blanco de .3 y brillos especulares en ::after (luz arriba a la izquierda, filetes interiores).
+     - 2026-10-15: el usuario eligió como OFICIAL el vidrio de las cifras, que es vidrio claro (sin desenfoque).
+       Cifras, testimonios, certificaciones, la tarjeta CTA y el aro del botón del hero lo llevan; ver «Vidrio
+       OFICIAL» más abajo.
+     - v10 usaba una copia estática de la textura deformada con un filtro SVG: se veía «líquida» pero tapaba todo lo
+       que se movía por detrás (reclamo del usuario: el vidrio tiene que dejar ver el contenido de abajo). La
+       refracción SVG en tiempo real (backdrop-filter: url()) colgaba Chrome con GPU Intel en estas medidas: descartada.
+     - Aros: cifras y tarjeta CTA 16 px (12 en celular); testimonios y certificaciones, el padding de su clase (v12);
+       botones, el .button-ring del sitio (8 px; 6 a ≤479).
+     - Canto: una sola línea de 1 px en degradado (blanca arriba a la derecha, casi transparente abajo a la izquierda).
+     - .cta es el marco de la CTA: sus márgenes bajan lo mismo que el aro, así la sección mide igual. 888 px centrada.
+     La CTA de Nosotros usa las mismas clases y no se toca. -->
+<style>
+/* Material común. Desde 2026-10-29 no lleva desenfoque: todos estos marcos usan el vidrio oficial (claro), y el
+   blur(6px) que había aquí lo anulaba siempre la regla «Vidrio OFICIAL» de más abajo. */
+:is(.cta_section .cta, .hero_copy .button-ring, .card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame) {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+}
+:is(.cta_section .cta, .hero_copy .button-ring, .card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    rgba(255, 255, 255, .3);
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+/* Canto del vidrio: una sola línea de 1 px en degradado diagonal, blanca arriba a la derecha y casi transparente,
+   un poco gris, abajo a la izquierda (pedido del usuario). Es un aro de 1 px recortado con máscara; va en z-index 0
+   para quedar sobre el velo (el contenido interior, que viene después, queda encima). */
+:is(.cta_section .cta, .hero_copy .button-ring, .card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+/* Marcos de tarjeta: sin borde propio (el canto lo dibuja ::before) y sombra suave. v12 (2026-10-19): el aro de
+   testimonios y certificaciones es el padding de su clase (16 / 12; en celular 16 / 10 y 8), igual que en las
+   páginas de soluciones; solo las cifras conservan aquí su aro de 16 (12 en celular). */
+:is(.card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame) {
+  border: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.features .card_features-clon { padding: 16px; }
+@media (max-width: 767px) {
+  .features .card_features-clon { padding: 12px; }
+}
+/* Vidrio OFICIAL (2026-10-15, elegido por el usuario): el de las cifras «Clientes en la región» y «Estudios
+   actuariales». Es vidrio claro: deja ver el fondo nítido, sin desenfoque, bajo el velo blanco de .3, con la luz
+   arriba a la derecha, el canto de 1 px y la sombra; marco con radio de 40 px y aro de 16 px (12 en celular).
+   Hasta 2026-10-29 una interacción del Inicio ponía transform-style: preserve-3d en .features y .hero_main, y por eso
+   el desenfoque de las cifras y del botón del hero nunca se pintaba. Esa interacción ya no existe: aquí queda
+   explícito que estos marcos van sin desenfoque.
+   Los testimonios se igualan al oficial: con el desenfoque de 6 px la textura desaparecía y el aro se veía gris liso.
+   Las certificaciones también (mismo día): sin desenfoque, marco de 40 px y celda blanca como la tarjeta oficial,
+   de 24 px, sin borde y sin la sombra neumórfica que caía sobre el aro.
+   La tarjeta CTA también (mismo día): sin desenfoque, marco de 40 px con la sombra suave del oficial (antes una
+   sombra profunda de 24 px) y panel azul de 24 px sin sombra propia (antes un filete blanco y una sombra oscura que
+   caían sobre el aro). Ver «Tarjeta CTA» más abajo.
+   El aro del botón del hero también (mismo día). Ver «Botón del hero» más abajo.
+   Si se extiende a otros marcos, sumarlos a esta regla. Ojo con la especificidad: :is() toma la de su selector más
+   fuerte (0,2,0), así que una regla simple como .cert_frame { backdrop-filter: none } no le gana. */
+:is(.card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame, .cta_section .cta, .hero_copy .button-ring) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* v12 (2026-10-19, a pedido del usuario, para que el Inicio y las soluciones midan igual): testimonios y
+   certificaciones conservan los radios de su clase (40 y 28 en celular; 32, 28 y 24; celda 20 y 16), sin los
+   radios de 40 / 24 que ponía el oficial. La celda sigue sin borde ni sombra neumórfica. */
+.cert_frame .cert_cell {
+  border: 0;
+  box-shadow: none;
+}
+/* Botón del hero («Descubre cómo lo hacemos») con el vidrio oficial (2026-10-15). Conserva el aro de botón (8 px;
+   6 a ≤479, del .button-ring del sitio) y la píldora del botón, pero sin el neumorfismo del aro (sombra blanca arriba
+   a la izquierda y gris abajo a la derecha, que crecían con el mouse): lleva la sombra suave del oficial y radio de
+   40 px también en celular (antes 32). El botón azul pierde su sombra solo en reposo: al pasar el mouse, al hacer
+   clic y con el foco de teclado conserva sus efectos (:where() no suma especificidad, así esas reglas siguen ganando). */
+.hero_copy .button-ring,
+.hero_copy .button-ring:hover {
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+  border-radius: 40px;
+}
+.hero_copy .button-ring > .main_button:where(:not(:hover):not(:active):not(:focus-visible):not([data-wf-focus-visible])) {
+  box-shadow: none;
+}
+/* Tarjeta CTA, con el vidrio oficial (2026-10-15): marco de 40 px en todos los tamaños, la sombra suave de los
+   marcos de tarjeta y el panel azul de 24 px sin sombra propia. El aro sigue en --ring (16 px; 12 en celular). */
+.cta_section .cta {
+  --ring: 16px;
+  overflow: hidden;
+  padding: var(--ring);
+  max-width: 888px;
+  margin: calc(56px - var(--ring)) auto;
+  border-radius: 40px;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.cta_section .cta_panel {
+  box-shadow: none;
+  border-radius: 24px;
+}
+.cta_section .heading-section.is-cta {
+  text-wrap: balance;
+}
+@media (min-width: 992px) {
+  .cta_section .cta_content { padding: 64px; }
+}
+@media (max-width: 991px) {
+  .cta_section .cta { margin-top: calc(40px - var(--ring)); margin-bottom: calc(40px - var(--ring)); }
+}
+@media (max-width: 767px) {
+  .cta_section .cta { --ring: 12px; margin-top: calc(32px - var(--ring)); margin-bottom: calc(32px - var(--ring)); }
+}
+/* Botón «Agendar sesión ejecutiva» de la tarjeta CTA con el aro de vidrio oficial (2026-10-16, a pedido del usuario):
+   el mismo aro del botón del hero, 8 px por fuera de la píldora (6 a ≤479) y radio de 40 px. El enlace no tiene el
+   envoltorio .button-ring en el Designer, así que el aro lo dibujan los pseudoelementos del propio enlace, recortados
+   con máscara a un anillo para no velar la píldora blanca: ::after es el cuerpo del vidrio (velo .3, luz arriba a la
+   derecha y el sombreado de abajo) y ::before el canto de 1 px, por encima. La sombra suave del oficial va en el
+   enlace (el filtro abarca también sus pseudoelementos) y la píldora pierde su propia sombra solo en reposo (:where()
+   no suma especificidad y excluye hover, clic y foco, que conservan sus efectos). Margen superior del tamaño del aro,
+   para que el anillo no invada el hueco de 20 px con el párrafo. Sobre el panel navy el velo se ve azul claro, como el
+   aro de la tarjeta. */
+.cta_section .cta_content > .secondbutton.is-flat {
+  --aro: 8px;
+  position: relative;
+  isolation: isolate;
+  margin-top: var(--aro);
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.cta_section .cta_content > .secondbutton.is-flat:where(:not(:hover):not(:active):not(:focus-visible):not([data-wf-focus-visible])) {
+  box-shadow: none;
+}
+.cta_section .cta_content > .secondbutton.is-flat::before,
+.cta_section .cta_content > .secondbutton.is-flat::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--aro));
+  border-radius: 40px;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.cta_section .cta_content > .secondbutton.is-flat::after {
+  z-index: -1;
+  padding: var(--aro);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    rgba(255, 255, 255, .3);
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+.cta_section .cta_content > .secondbutton.is-flat::before {
+  z-index: 0;
+  padding: 1px;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+}
+@media (max-width: 479px) {
+  .cta_section .cta_content > .secondbutton.is-flat { --aro: 6px; }
+}
+</style></div></section><footer class="footer_section"><div class="footer_card"><div class="footer_main"><div class="footer_brand"><img alt="Actuaria Consultores" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750c02cd66c8ed1ef1b7_footer-logo-actuaria-blanco.svg" class="footer_logo"><div class="footer_group"><p class="footer_title">Contacto:</p><a aria-label="Llamar a Actuaria al (+593-2) 392-3400" href="tel:+59323923400" class="footer_line w-inline-block"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750c282395610261b975_footer-ico-phone.svg" class="footer_icon"></div><p class="footer_text">Teléfono: (+593-2) 392-3400</p></a><a aria-label="Escribir a Actuaria por WhatsApp al (+593-9) 7913-3351" target="_blank" rel="noopener" href="https://api.whatsapp.com/send/?phone=593979133351&amp;text=Hola+Actuaria%2C+necesito+m%C3%A1s+informaci%C3%B3n+https%3A%2F%2Factuaria.com%2F&amp;type=phone_number&amp;app_absent=0" class="footer_line w-inline-block"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750d282395610261b9ab_footer-ico-whatsapp.svg" class="footer_icon"></div><p class="footer_text">Whatsapp: (+593-9) 7913-3351 </p></a><a aria-label="Escribir a info@actuaria.com" href="mailto:info@actuaria.com" class="footer_line w-inline-block"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750dddcb76f0fb7b5fea_footer-ico-envelope.svg" class="footer_icon is-envelope"></div><p class="footer_text">Correo: info@actuaria.com</p></a></div><div class="footer_group"><p class="footer_title">Direcciones</p><div class="footer_line"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e1427a1f9ebfa9143_footer-ico-location.svg" class="footer_icon is-pin"></div><p class="footer_text">Quito: Av. Orellana E9-195 y Av. 6 de Diciembre, Edif. Alisal de Orellana, Of. 804.</p></div><div class="footer_line"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e1427a1f9ebfa9143_footer-ico-location.svg" class="footer_icon is-pin"></div><p class="footer_text">Guayaquil: Av. José Santiago Castillo y Av. Francisco de Orellana, Edif. Millenium. Of. 1107.</p></div></div><div class="footer_social"><a aria-label="Actuaria Consultores en Facebook" target="_blank" rel="noopener" href="https://www.facebook.com/actuariaconsultores" class="social_link w-inline-block"><img alt="Facebook" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e1427a1f9ebfa919c_footer-ico-facebook.svg" class="social_icon is-fb"></a><a aria-label="Actuaria Consultores en Instagram" target="_blank" rel="noopener" href="https://www.instagram.com/actuaria_ec/" class="social_link w-inline-block"><img alt="Instagram" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e282395610261bb1f_footer-ico-instagram.svg" class="social_icon"></a><a aria-label="Actuaria Consultores en LinkedIn" target="_blank" rel="noopener" href="https://www.linkedin.com/company/2412258/" class="social_link w-inline-block"><img alt="LinkedIn" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e02cd66c8ed1ef28c_footer-ico-linkedin.svg" class="social_icon"></a><a aria-label="Actuaria Consultores en YouTube" target="_blank" rel="noopener" href="https://www.youtube.com/channel/UCqtNWXgoRPgo3gmYfyi6B-A" class="social_link w-inline-block"><img alt="YouTube" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750f3c2f1ca03320bd92_footer-ico-youtube.svg" class="social_icon is-yt"></a></div></div><div class="footer_cols"><div class="footer_col is-1"><p class="footer_title">Gobierno Corporativo</p><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6abbe9ef7715a35b07817866_codigo-conducta-empresarial.pdf" target="_blank" class="footer_link">Código de Conducta Empresarial</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6abbe9f0b559bd0f608baca7_politica-igualdad-genero.pdf" target="_blank" class="footer_link">Política de Igualdad de Género</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6abbe9eff0ec45724fcbcbd6_codigo-buen-gobierno-corporativo.pdf" target="_blank" class="footer_link">Código de Buen Gobierno Corporativo</a></div><div class="footer_col is-2"><p class="footer_title">Transparencia</p><a href="https://actuaria.com/seguridad-de-la-informacion" class="footer_link">Seguridad de la Información</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df6459360730d2f79e4_politica-privacidad-proteccion-datos.pdf" target="_blank" class="footer_link">Política de Privacidad y Protección de Datos Personales</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df799ec7f9fe8ef9d73_politica-prevencion-lavado-activos-antisoborno.pdf" target="_blank" class="footer_link">Protección de Lavado de Activos y Antisoborno</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df7b31c8c53ca3393b3_politica-seguridad.pdf" target="_blank" class="footer_link">Política de Seguridad</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df880e66d64b3d5f97d_solicitud-ejercicio-derechos-datos-personales.pdf" target="_blank" class="footer_link">Solicitud para el Ejercicio de Derechos en el Tratamiento de Protección de Datos Personales</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df8abae1f93dd1f54ed_certificacion-iso-9001-2015.pdf" target="_blank" class="footer_link">Certificación ISO 9001:2015</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf" target="_blank" class="footer_link">Certificación ISO/IEC 27001:2022</a><link rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf"></div></div></div><div class="footer_divider"></div><div class="footer_bottom"><p class="footer_legal">© 2026 Actuaria Consultores. Todos los derechos reservados</p><a href="#" class="footer_cookies">Configuración cookies</a></div></div></footer><section class="mobile_bar"><div class="w-layout-blockcontainer mobile_container w-container"><div class="bar"><div class="w-layout-hflex contactos"><div class="telf"><a href="tel:+59323923400" class="bar_link w-inline-block"><h6 class="heading-6"></h6><h6 class="telf_link">+593 2392 3400</h6></a></div><div class="separador_bar"></div><div class="email"><a href="mailto:info@actuaria.com?subject=Informaci%C3%B3n" class="bar_link w-inline-block"><h6 class="heading-6"></h6><h6 class="email_link">info@actuaria.com</h6></a></div><div class="separador_bar"></div><div class="whatsapp"><a href="https://api.whatsapp.com/send/?phone=593979133351&amp;text=Hola+Actuaria%2C+necesito+m%C3%A1s+informaci%C3%B3n+https%3A%2F%2Factuaria.com%2F&amp;type=phone_number&amp;app_absent=0" target="_blank" class="bar_link_wa w-inline-block"><h6 class="wa-icon"></h6></a></div></div></div></div></section><div class="wa_float"><a href="https://api.whatsapp.com/send/?phone=593979133351&amp;text=Hola+Actuaria%2C+necesito+m%C3%A1s+informaci%C3%B3n+https%3A%2F%2Factuaria.com%2F&amp;type=phone_number&amp;app_absent=0" aria-label="Escríbenos por WhatsApp" rel="noopener" class="wa_float_btn"><span aria-hidden="true" class="wa_float_ico"></span></a></div><script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=6967c96e0fba2ea4f94d3c69" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/js/webflow.schunk.8f00140e6d49a9ab.js" type="text/javascript" integrity="sha384-pekAA3fZ9Fq62G9lj3Mt/f+F8Q0uWjeVIVjcIz0GTpLb36G9tKIv14M+zOaQZpjx" crossorigin="anonymous"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/js/webflow.7a57e554.4fd522b97c340a6b.js" type="text/javascript" integrity="sha384-HGr17lWdIXUwYlP6Cl+Iy+7M40AQFW9zx/i4/UUCD4q+P3GA982xOpp6HgnuGtuI" crossorigin="anonymous"></script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.credentials_marquee').forEach(function (cont) {
+    var tracks = cont.querySelectorAll('.credentials_grid.is-marquee');
+    if (tracks.length !== 1) return;
+    var clone = tracks[0].cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    clone.querySelectorAll('a, button, input, [tabindex]').forEach(function (el) { el.tabIndex = -1; });
+    cont.appendChild(clone);
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.testimonial_section').forEach(function (sec) {
+    var cont = sec.querySelector('.testimonial_container');
+    var track = cont && cont.querySelector('.testimonial_carusel');
+    if (!track || sec.querySelector('.testimonial_controls')) return;
+    var heading = sec.querySelector('.heading_frame, [class*="heading_frame"]') || cont.parentElement;
+
+    cont.setAttribute('tabindex', '0');
+    cont.setAttribute('role', 'region');
+    cont.setAttribute('aria-label', 'Testimonios de clientes');
+
+    var ctrls = document.createElement('div');
+    ctrls.className = 'testimonial_controls';
+    ctrls.innerHTML =
+      '<button type="button" class="testimonial_arrow" data-dir="-1" aria-label="Testimonio anterior"><span aria-hidden="true">&#xf053;</span></button>' +
+      '<button type="button" class="testimonial_arrow" data-dir="1" aria-label="Testimonio siguiente"><span aria-hidden="true">&#xf054;</span></button>';
+    cont.insertAdjacentElement('afterend', ctrls);
+
+    function step() {
+      var cards = track.children;
+      if (cards.length < 2) return cont.clientWidth;
+      return cards[1].getBoundingClientRect().left - cards[0].getBoundingClientRect().left;
+    }
+    function inset() {
+      var left = Math.round(heading.getBoundingClientRect().left);
+      sec.style.setProperty('--testi-inset', Math.max(16, left) + 'px');
+    }
+    function update() {
+      ctrls.hidden = cont.scrollWidth - cont.clientWidth <= 2;
+    }
+    ctrls.addEventListener('click', function (e) {
+      var b = e.target.closest('.testimonial_arrow');
+      if (!b) return;
+      var dir = Number(b.getAttribute('data-dir'));
+      var max = cont.scrollWidth - cont.clientWidth;
+      // Circular: past either end, wrap around to the other one.
+      if (dir > 0 && cont.scrollLeft >= max - 2) cont.scrollTo({ left: 0, behavior: 'smooth' });
+      else if (dir < 0 && cont.scrollLeft <= 2) cont.scrollTo({ left: max, behavior: 'smooth' });
+      else cont.scrollBy({ left: step() * dir, behavior: 'smooth' });
+    });
+    window.addEventListener('resize', function () { inset(); update(); });
+    inset();
+    update();
+  });
+});
+</script>
+
+<script>
+(function () {
+  function altoMenuFijo() {
+    var nav = document.querySelector('.navbar-logo-left');
+    if (!nav) return 0;
+    if (getComputedStyle(nav).position !== 'fixed') return 0;
+    return nav.getBoundingClientRect().height;
+  }
+
+  function irA(destino, suave) {
+    var y = destino.getBoundingClientRect().top + window.pageYOffset - altoMenuFijo() - 16;
+    if (y < 0) y = 0;
+    try {
+      window.scrollTo({ top: y, behavior: suave ? 'smooth' : 'auto' });
+    } catch (err) {
+      window.scrollTo(0, y);
+    }
+  }
+
+  function menosMovimiento() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  // Id of the in-page target of a link: "#algo", or this same page's URL with "#algo" (the menu
+  // link "/nosotros#trabaja-con-nosotros" seen from /nosotros). '' when it points elsewhere.
+  function anclaLocal(a) {
+    var href = a.getAttribute('href') || '';
+    if (href.charAt(0) === '#') return href.slice(1);
+    var url;
+    try { url = new URL(a.href, location.href); } catch (err) { return ''; }
+    var ruta = function (u) { return u.pathname.replace(/\/+$/, ''); };
+    if (url.origin !== location.origin || ruta(url) !== ruta(location)) return '';
+    if (url.search && url.search !== location.search) return '';
+    var id = url.hash.slice(1);
+    try { return decodeURIComponent(id); } catch (err) { return id; }
+  }
+
+  // The stopPropagation below also hides the click from Webflow's navbar, so a menu link would
+  // leave the "Nosotros" dropdown and the phone menu open over the page. Close them here.
+  function cerrarMenu(a) {
+    var dd = a.closest('.w-dropdown');
+    if (dd && window.jQuery) window.jQuery(dd).triggerHandler('w-close');
+    if (!a.closest('.w-nav, .w-nav-overlay')) return;
+    var boton = document.querySelector('.w-nav-button.w--open');
+    if (boton) boton.click();
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var el = e.target;
+    if (!el || typeof el.closest !== 'function') return;
+    var a = el.closest('a[href*="#"]');
+    if (!a) return;
+    if (a.matches('.w-tab-link, [role="tab"]')) return;
+    if (a.target && a.target !== '_self') return;
+    var id = anclaLocal(a);
+    if (!id) return;
+    var destino = document.getElementById(id);
+    if (!destino) return;
+    e.preventDefault();
+    e.stopPropagation();
+    cerrarMenu(a);
+    irA(destino, !menosMovimiento());
+    if (window.history && history.replaceState) {
+      history.replaceState(null, '', '#' + id);
+    }
+  }, true);
+
+  window.addEventListener('load', function () {
+    var id = (location.hash || '').slice(1);
+    if (!id) return;
+    var destino = document.getElementById(id);
+    if (!destino) return;
+    if (destino.matches('.w-tab-pane')) return;
+    setTimeout(function () { irA(destino, false); }, 120);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  if (typeof WeakSet !== 'function') return;
+  var FORMS = '.w-form form';
+  var mine = new WeakSet(); // fields whose current message was set here
+
+  function inForm(el) {
+    return !!el && typeof el.closest === 'function' && 'validity' in el && !!el.closest(FORMS);
+  }
+  // A required text field holding only spaces: valid for the browser, empty for webflow.js.
+  function onlySpaces(el) {
+    var t = (el.type || '').toLowerCase();
+    return !!el.required && t !== 'checkbox' && t !== 'radio' && t !== 'file' &&
+      typeof el.value === 'string' && el.value !== '' && el.value.trim() === '';
+  }
+  // An e-mail the browser accepts but nobody can write to: no dot after the @ ("nombre@gmail").
+  function noDot(el) {
+    return (el.type || '').toLowerCase() === 'email' && typeof el.value === 'string' && /@[^@.]+$/.test(el.value.trim());
+  }
+  // Problems the browser does not see by itself.
+  function extra(el) {
+    return onlySpaces(el) || noDot(el);
+  }
+  function message(el) {
+    var v = el.validity, t = (el.type || '').toLowerCase();
+    // First: a number box with text in it reads as empty to the browser, but it is not.
+    if (v.badInput) return t === 'number' ? 'Escribe solo números.' : 'Revisa este campo.';
+    if (v.valueMissing || onlySpaces(el)) {
+      if (t === 'checkbox') return 'Marca esta casilla para continuar.';
+      if (t === 'radio') return 'Elige una de las opciones.';
+      if (t === 'file') return 'Adjunta un archivo.';
+      if (el.tagName === 'SELECT') return 'Elige una opción de la lista.';
+      return 'Completa este campo.';
+    }
+    if (v.typeMismatch || noDot(el)) {
+      if (t === 'email') return 'Escribe un correo válido (por ejemplo, nombre@empresa.com).';
+      if (t === 'url') return 'Escribe la dirección completa, empezando por https://';
+      return 'Revisa el formato de este campo.';
+    }
+    if (v.patternMismatch) return el.title || 'Revisa el formato de este campo.';
+    if (v.tooShort) return 'Escribe al menos ' + el.minLength + ' caracteres.';
+    if (v.tooLong) return 'Escribe como máximo ' + el.maxLength + ' caracteres.';
+    if (v.rangeUnderflow) return 'El valor mínimo es ' + el.min + '.';
+    if (v.rangeOverflow) return 'El valor máximo es ' + el.max + '.';
+    if (v.stepMismatch) return 'Escribe un valor válido.';
+    return '';
+  }
+  function clear(el) {
+    if (mine.has(el)) { el.setCustomValidity(''); mine.delete(el); }
+  }
+  function mark(el, text) {
+    el.setCustomValidity(text);
+    mine.add(el);
+  }
+  // Judges the field again from scratch and leaves our text on it while it is still wrong.
+  function judge(el) {
+    clear(el);
+    var text = message(el);
+    if (text) mark(el, text);
+  }
+
+  // The browser fires "invalid" on each wrong field while it checks the form, before it shows
+  // its own notice: our text replaces it.
+  document.addEventListener('invalid', function (e) {
+    var el = e.target;
+    if (!inForm(el)) return;
+    if (el.validity.customError && !mine.has(el)) return; // another script's message
+    judge(el);
+  }, true);
+
+  // While the person types, a field that already showed our notice keeps it, updated, until it is
+  // right. Others are only marked for the problems the browser does not see.
+  function edited(e) {
+    var el = e.target;
+    if (!inForm(el)) return;
+    var group = el.type === 'radio' && el.name && el.form ?
+      [].filter.call(el.form.elements, function (x) { return x.type === 'radio' && x.name === el.name; }) : [el];
+    group.forEach(function (x) {
+      if (x.validity.customError && !mine.has(x)) return; // another script's message
+      if (mine.has(x) || extra(x)) judge(x);
+    });
+  }
+  document.addEventListener('input', edited, true);
+  document.addEventListener('change', edited, true);
+
+  // A value changed by a script fires no input event, so our old notice could still be there and
+  // block the form with no visible message. The click on the submit button (also fired by Enter)
+  // comes before the browser checks the form: judge our fields again right then.
+  document.addEventListener('click', function (e) {
+    var btn = e.target && typeof e.target.closest === 'function' && e.target.closest('input[type="submit"], button');
+    if (!btn || !btn.form || (btn.type || '').toLowerCase() !== 'submit' || !btn.form.matches(FORMS)) return;
+    [].forEach.call(btn.form.elements, function (el) { if (mine.has(el)) judge(el); });
+  }, true);
+
+  // Last guard, before webflow.js sends the form: problems the browser does not see in fields
+  // that were never edited (autofilled, for example). Capture phase on document, so it runs first.
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    if (!form || typeof form.matches !== 'function' || !form.matches(FORMS)) return;
+    var bad = [].filter.call(form.elements, function (el) { return el.willValidate && extra(el); });
+    if (!bad.length) return;
+    bad.forEach(judge);
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (typeof form.reportValidity === 'function') form.reportValidity();
+  }, true);
+})();
+</script>
+
+<script>
+(function () {
+  var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)');
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!fine || !fine.matches || calm.matches) return;
+
+  var TILT = 6;        // card: max rotation on X and Y, in degrees
+  var TWIST = 2.6;     // card: max rotation on Z, in degrees, strongest toward the corners
+  var PHOTO_TILT = 6;  // photo: extra rotation on X and Y on top of the card's
+
+  document.querySelectorAll('.team_grid .card_wrapper.is-member').forEach(function (card) {
+    var frame = 0;
+    var point = null;
+    var photo = card.querySelector('.team_photo');
+
+    // The shadow and the holographic film take the photo's box (the card is their offsetParent).
+    function measurePhoto() {
+      if (!photo) return;
+      card.style.setProperty('--holo-pt', photo.offsetTop + 'px');
+      card.style.setProperty('--holo-pl', photo.offsetLeft + 'px');
+      card.style.setProperty('--holo-ps', photo.offsetWidth + 'px');
+    }
+
+    function paint() {
+      frame = 0;
+      if (!point) return;
+      // The CMS item does not tilt, so its box maps the pointer without the card's rotation.
+      var box = (card.parentElement || card).getBoundingClientRect();
+      var x = Math.min(Math.max((point.clientX - box.left) / box.width, 0), 1) - 0.5;
+      var y = Math.min(Math.max((point.clientY - box.top) / box.height, 0), 1) - 0.5;
+      var s = card.style;
+      s.setProperty('--holo-x', x.toFixed(3));
+      s.setProperty('--holo-y', y.toFixed(3));
+      s.setProperty('--holo-rx', (-y * TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-ry', (x * TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-rz', (x * y * TWIST * 4).toFixed(2) + 'deg');
+      s.setProperty('--holo-prx', (-y * PHOTO_TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-pry', (x * PHOTO_TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-px', ((x + 0.5) * 100).toFixed(1) + '%');
+      s.setProperty('--holo-py', ((y + 0.5) * 100).toFixed(1) + '%');
+    }
+
+    card.addEventListener('pointerenter', function (e) {
+      point = e;
+      measurePhoto();
+      paint();
+      card.classList.add('is-holo');
+    });
+    card.addEventListener('pointermove', function (e) {
+      point = e;
+      if (!frame) frame = window.requestAnimationFrame(paint);
+    });
+    card.addEventListener('pointerleave', function () {
+      point = null;
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = 0;
+      card.classList.remove('is-holo');
+    });
+  });
+})();
+</script>
+
+<script>
+(function () {
+  // "Visitar perfil" names its person for screen readers. has-link marks the cards with a profile:
+  // only those open the gap (without one, Webflow writes href="#" and the site hides the link).
+  // --holo-nb is where the name ends inside the card: the link goes right below it.
+  document.querySelectorAll('.team_grid .card_wrapper.is-member').forEach(function (card) {
+    var link = card.querySelector('.card_link');
+    var name = card.querySelector('.team_name');
+    var href = link && link.getAttribute('href');
+    if (!href || href === '#' || !name) return;
+    card.classList.add('has-link');
+    link.setAttribute('aria-label', 'Visitar el perfil de LinkedIn de ' + name.textContent.trim());
+    function measureName() { card.style.setProperty('--holo-nb', (name.offsetTop + name.offsetHeight) + 'px'); }
+    card.addEventListener('pointerenter', measureName);
+    card.addEventListener('focusin', measureName);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var SERVICIO = {
+    '/beneficios-laborales': 'Estudio-Actuarial',
+    '/estudio-actuarial-jubilacion-patronal': 'Estudio-Actuarial',
+    '/seguros-y-medicina': 'Seguros-y-Salud',
+    '/riesgos-y-finanzas': 'Riesgos-y-Finanzas',
+    '/analisis-de-datos': 'Data-Analytics'
+  };
+  var name = SERVICIO[location.pathname.replace(/\/+$/, '')];
+  if (!name) return;
+  document.querySelectorAll('.w-form form input[type="checkbox"][name="' + name + '"]').forEach(function (box) {
+    box.checked = true;
+  });
+})();
+</script>
+
+<style>
+@property --tornasol { syntax: "<number>"; inherits: false; initial-value: 0; }
+
+.button-ring::after,
+.button-ring-form::after,
+.hero_copy .button-ring::after,
+.cta_section .cta_content > .secondbutton.is-flat::after {
+  --tornasol: .25;
+  background-color: rgba(255, 255, 255, .3);
+  background-image:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 50%, rgb(255 255 255 / calc(var(--tornasol) * 1.1)) 0%, rgb(255 255 255 / 0) 22%),
+    linear-gradient(125deg, rgb(76 100 217 / 0) 15%, rgb(76 100 217 / calc(var(--tornasol) * .84)) 30%, rgb(126 192 229 / calc(var(--tornasol) * .76)) 43%, rgb(219 84 31 / calc(var(--tornasol) * .68)) 56%, rgb(255 187 161 / calc(var(--tornasol) * .68)) 69%, rgb(76 100 217 / 0) 85%);
+  background-size: auto, 200% 200%, 260% 260%;
+  background-position: 0 0, 20% 20%, 0% 0%;
+  background-blend-mode: normal, normal, multiply;
+  animation: aro-tornasol 21.6s linear infinite;
+  transition: --tornasol .3s ease, background-color .3s ease;
+}
+.button-ring:hover::after,
+.button-ring-form:hover::after,
+.cta_section .cta_content > .secondbutton.is-flat:hover::after { --tornasol: .5; }
+.cta_section .cta_content > .secondbutton.is-flat:hover::after { background-color: rgba(255, 255, 255, .55); }
+@keyframes aro-tornasol {
+  0%, 100% { background-position: 0 0, 20% 20%, 0% 0%; }
+  25% { background-position: 0 0, 80% 20%, 100% 0%; }
+  50% { background-position: 0 0, 80% 80%, 100% 100%; }
+  75% { background-position: 0 0, 20% 80%, 0% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button-ring::after,
+  .button-ring-form::after,
+  .hero_copy .button-ring::after,
+  .cta_section .cta_content > .secondbutton.is-flat::after { animation: none; background-position: 0 0, 30% 30%, 50% 50%; }
+}
+</style>
+<script>
+(function () {
+  if (!('getAnimations' in Element.prototype)) return;
+  function init() {
+    var aros = document.querySelectorAll('.button-ring, .button-ring-form, .cta_section .cta_content > .secondbutton.is-flat');
+    aros.forEach(function (el) {
+      function velocidad(v) {
+        el.getAnimations({ subtree: true }).forEach(function (a) {
+          if (a.animationName && a.animationName.indexOf('aro-tornasol') === 0) a.playbackRate = v;
+        });
+      }
+      el.addEventListener('pointerenter', function () { velocidad(2); });
+      el.addEventListener('pointerleave', function () { velocidad(1); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+<style>
+.button-ring,
+.button-ring:hover,
+.button-ring-form,
+.button-ring-form:hover {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+  background-image: none;
+  animation: none;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+
+.button-ring::after,
+.button-ring-form::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+
+.button-ring::before,
+.button-ring-form::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+:is(.button-ring, .button-ring-form) > :is(.main_button, .actuariaplus-button):where(:not(:hover):not(:active):not(:focus-visible):not([data-wf-focus-visible])) {
+  box-shadow: none;
+}
+</style>
+<script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ad265a0289dfde21e0f7015%2Fvideosbajodemanda-1.0.0.js" type="text/javascript"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ad9bd0c3b1f3b4dcce5face%2Fformplaceholders-1.0.1.js" type="text/javascript"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ae1fd23f5187e0b8d493434%2Fpausafueradepantalla-1.0.0.js" type="text/javascript"></script><script src="https://renatopuente-ux.github.io/actuaria-flipbook/flipbook-1.0.2.js" type="text/javascript" integrity="sha384-2DEcif4qOPvCM1/onHUo8zFXEL+u4rs6ncblV/vAe4PL9tuftRNe7jjbVffRJaG1" crossorigin="anonymous"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ae36df6bcf198f2bee07713%2Fmedicioncalculadoras-1.0.1.js" type="text/javascript"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ac7eb12a83800b9db5f3bd9%2Fholo3dpuentes-1.0.1.js" type="text/javascript"></script><div class="lp_proto">Prototipo · el formulario no envía datos</div><script>// Demo request form of the actuaria+ landing prototype: validates and shows the success state, sends nothing.
+(function () {
+  var f = document.getElementById('form-demo');
+  if (!f) return;
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.elements.Correo.value.trim()) && f.elements.Nombre.value.trim() &&
+      /^\d{13}$/.test(f.elements.RUC.value.trim()) && f.elements.Trabajadores.value;
+    f.querySelector('.lp_err').classList.toggle('is-on', !ok);
+    if (ok) { f.querySelector('[data-estado="form"]').hidden = true; f.querySelector('[data-estado="listo"]').hidden = false; }
+  });
+})();
+</script></body></html>
