@@ -736,15 +736,36 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
 <meta name="robots" content="noindex"><style id="lp-estilos">/* Landing pieces that the site does not have yet. Everything else on the page is the site's own CSS.
    Prefix lp_ = new class to create in Webflow (or as an embed block of the landing page head). */
 
+/* Lighter page texture on the landings (user, 2026-11-05: 24 % lighter, for legibility). A 24 % white veil over the
+   site's texture = the texture at 76 % opacity over white: background #F4F4F4 -> #F7F7F7, lines #ECECEC -> #F1F1F1.
+   In Webflow: combo class lp_body on the page body (body_soluciones lp_body). */
+.body_soluciones.lp_body { background-image: linear-gradient(rgba(255, 255, 255, .24), rgba(255, 255, 255, .24)), url("https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ad298f6c525927a7fa8875d_textura-fondo-v2.svg"); }
+
 /* Simpler navbar: in-page anchors share the Blog link style; a little air between them */
 .lp_nav_item + .lp_nav_item { margin-left: 4px; }
 
 /* Video outside the hero: the hero's Glass Tornasol frame (rules copied from .main_hero .background-video), sized */
 /* width: 100% + align-self: stretch, or the centered flex parent shrinks the frame to its border (the video inside is
    absolutely positioned and gives no width): it showed as an empty «bubble» */
-.lp_video { width: 100%; max-width: 960px; align-self: center; margin: 32px auto 40px; }
-.lp_video .background-video { position: relative; width: 100%; aspect-ratio: 16 / 9; height: auto; }
+.lp_video { width: 100%; min-width: 0; }
+.lp_video .background-video { position: relative; width: 100%; aspect-ratio: 4 / 3; height: auto; }
 .lp_video .background-video > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* «Qué recibes» as a bento: the site's .bento_layout grid (3 columns) re-laid for this group.
+   >=1200: video 2 cols x 2 rows + the 4 cards in 2 x 2 beside it; 768-1199: video 1 col x 2 rows (portrait crop,
+   the lighthouse is vertical) + 2 cards, then 2 cards; <768: one column, video 4:3. */
+.lp_bento { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
+.lp_bento .lp_video { grid-column: span 2; grid-row: span 2; }
+.lp_bento .lp_video .background-video { aspect-ratio: auto; height: 100%; min-height: 320px; }
+@media (max-width: 1199px) {
+  .lp_bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lp_bento .lp_video { grid-column: span 1; }
+}
+@media (max-width: 767px) {
+  .lp_bento { grid-template-columns: minmax(0, 1fr); }
+  .lp_bento .lp_video { grid-row: auto; }
+  .lp_bento .lp_video .background-video { aspect-ratio: 4 / 3; height: auto; min-height: 0; }
+}
 
 /* Embedded production calculator */
 .lp_calc_frame { height: 780px; margin-top: 32px; overflow: hidden; }
@@ -936,13 +957,13 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
-/* Video outside the hero: the hero's Glass Tornasol frame (rules copied from .lp_video .background-video) { width: 100%; max-width: 960px; align-self: center; margin: 32px auto 40px; }
+/* Video outside the hero: the hero's Glass Tornasol frame (rules copied from .lp_video .background-video) { width: 100%; min-width: 0; }
 @media (prefers-reduced-motion: reduce) {
 .lp_video .background-video { animation: none; background-position: 0 0, 30% 30%, 50% 50%, 0 0; }
 }
 @media screen and (max-width: 767px) {
 .lp_video .background-video { --aro: 12px; }
-}</style></head><body class="body_soluciones"><div data-wf--navbar-main--variant="base" class="navbar-logo-left"><div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="navbar-logo-left-container shadow-three w-nav"><div class="container-2"><div class="navbar-wrapper"><a href="https://actuaria.com/" class="navbar-brand w-nav-brand"><img width="220" loading="lazy" alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbec17f7fc765c2ea5d9_logo-actuaria.svg" class="image"></a><nav role="navigation" class="nav-menu-wrapper w-nav-menu"><ul role="list" class="nav-menu-two w-list-unstyled"><li class="list-item lp_nav_item"><a href="#modulos" class="link_navbar-blog">Módulos</a></li><li class="list-item lp_nav_item"><a href="#precios" class="link_navbar-blog">Precios</a></li><li class="list-item lp_nav_item"><a href="#seguridad" class="link_navbar-blog">Seguridad</a></li><li class="list-item-2"><div class="nav-divider"></div></li><li class="mobile-margin-top-10"><a href="#demo" class="secondary-button-neo" data-evento="demo_navbar">Ver una demostración <span class="text-span-4"></span></a><a href="#demo" class="secondary-button-neo-back" data-evento="demo_navbar">Ver una demostración</a><div class="button-ring"><a href="https://plus.actuaria.com/auth/login" target="_blank" class="actuariaplus-button is-nav-app w-inline-block"><img width="50" loading="lazy" alt="actuaria+" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbeccb6a40ca56c13c67_logo-actuaria-plus.svg" class="nav_app-logo"></a></div></li></ul></nav><div class="menu-button w-nav-button"><div class="w-icon-nav-menu"></div></div></div></div></div><div class="w-embed"><style>
+}</style></head><body class="body_soluciones lp_body"><div data-wf--navbar-main--variant="base" class="navbar-logo-left"><div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="navbar-logo-left-container shadow-three w-nav"><div class="container-2"><div class="navbar-wrapper"><a href="https://actuaria.com/" class="navbar-brand w-nav-brand"><img width="220" loading="lazy" alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbec17f7fc765c2ea5d9_logo-actuaria.svg" class="image"></a><nav role="navigation" class="nav-menu-wrapper w-nav-menu"><ul role="list" class="nav-menu-two w-list-unstyled"><li class="list-item lp_nav_item"><a href="#modulos" class="link_navbar-blog">Módulos</a></li><li class="list-item lp_nav_item"><a href="#precios" class="link_navbar-blog">Precios</a></li><li class="list-item lp_nav_item"><a href="#seguridad" class="link_navbar-blog">Seguridad</a></li><li class="list-item-2"><div class="nav-divider"></div></li><li class="mobile-margin-top-10"><a href="#demo" class="secondary-button-neo" data-evento="demo_navbar">Ver una demostración <span class="text-span-4"></span></a><a href="#demo" class="secondary-button-neo-back" data-evento="demo_navbar">Ver una demostración</a><div class="button-ring"><a href="https://plus.actuaria.com/auth/login" target="_blank" class="actuariaplus-button is-nav-app w-inline-block"><img width="50" loading="lazy" alt="actuaria+" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbeccb6a40ca56c13c67_logo-actuaria-plus.svg" class="nav_app-logo"></a></div></li></ul></nav><div class="menu-button w-nav-button"><div class="w-icon-nav-menu"></div></div></div></div></div><div class="w-embed"><style>
 .navbar-logo-left .list-item { display: flex; align-items: center; gap: 12px; }
 .navbar-logo-left .w-locales-items { display: flex; align-items: center; gap: 2px; margin: 0; padding: 3px; border-radius: 999px; background: #eef0f6; box-shadow: inset 2px 2px 5px rgba(15, 23, 42, .11), inset -2px -2px 4px #fff; }
 .navbar-logo-left .w-locales-item a { display: flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: .3px; color: #4a5268; text-decoration: none; transition: background-color .2s, color .2s, box-shadow .2s; }
@@ -1040,7 +1061,7 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
     <ul class="lp_micro card_desc"><li><span aria-hidden="true" class="text-span-3"></span>Sin tarjeta de crédito</li><li><span aria-hidden="true" class="text-span-3"></span>Usuarios ilimitados</li><li><span aria-hidden="true" class="text-span-3"></span>Seguridad ISO/IEC 27001</li></ul></div><div id="w-node-feafaf96-6a1e-5c47-2fd2-1990b3a0474b-fcd53b04" class="w-layout-cell">
     <div class="lp_quote lp_panel" aria-label="Ejemplo del panel de actuaria+">
       <div class="lp_panel_in">
-        <div class="lp_panel_bar"><span></span><span></span><span></span><div class="chip">plus.actuaria.com</div></div>
+        <div class="lp_panel_bar"><span></span><span></span><span></span><div class="chip">actuariaplus.com</div></div>
         <div class="lp_kpis">
           <div class="lp_kpi"><p class="card_desc">Costo mensual de nómina</p><div class="process_number lp_num">$128.400</div></div>
           <div class="lp_kpi"><p class="card_desc">Provisión NIC 19</p><div class="process_number lp_num">$312.900</div><div class="chip is-resultado">Conforme a la norma</div></div>
