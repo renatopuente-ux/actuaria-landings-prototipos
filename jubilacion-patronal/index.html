@@ -747,8 +747,10 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
 /* Video outside the hero: the hero's Glass Tornasol frame (rules copied from .main_hero .background-video), sized */
 /* width: 100% + align-self: stretch, or the centered flex parent shrinks the frame to its border (the video inside is
    absolutely positioned and gives no width): it showed as an empty «bubble» */
+/* Base 16:9 = the videos' own ratio: the actuaria+ video dialog (.lp_modal .lp_video) uses it as is, any other ratio
+   crops the sides with object-fit: cover. Only the jubilación bento re-shapes it (.lp_bento below). */
 .lp_video { width: 100%; min-width: 0; }
-.lp_video .background-video { position: relative; width: 100%; aspect-ratio: 4 / 3; height: auto; }
+.lp_video .background-video { position: relative; width: 100%; aspect-ratio: 16 / 9; height: auto; }
 .lp_video .background-video > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 /* «Qué recibes» as a bento: the site's .bento_layout grid (3 columns) re-laid for this group.
