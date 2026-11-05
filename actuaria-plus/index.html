@@ -747,8 +747,10 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
 /* Video outside the hero: the hero's Glass Tornasol frame (rules copied from .main_hero .background-video), sized */
 /* width: 100% + align-self: stretch, or the centered flex parent shrinks the frame to its border (the video inside is
    absolutely positioned and gives no width): it showed as an empty «bubble» */
+/* Base 16:9 = the videos' own ratio: the actuaria+ video dialog (.lp_modal .lp_video) uses it as is, any other ratio
+   crops the sides with object-fit: cover. Only the jubilación bento re-shapes it (.lp_bento below). */
 .lp_video { width: 100%; min-width: 0; }
-.lp_video .background-video { position: relative; width: 100%; aspect-ratio: 4 / 3; height: auto; }
+.lp_video .background-video { position: relative; width: 100%; aspect-ratio: 16 / 9; height: auto; }
 .lp_video .background-video > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 /* «Qué recibes» as a bento: the site's .bento_layout grid (3 columns) re-laid for this group.
@@ -906,6 +908,10 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
 .lp_modal_x { width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer; background: #fff; color: #151f47; font: 400 26px/1 var(--_🔤-typography---font-family--body), sans-serif; box-shadow: 0 1px 6px rgba(15, 23, 42, .2); }
 .lp_modal .lp_video { margin: 12px 0 0; max-width: none; }
 .lp_modal video { background: #0b1027; }
+/* The frame wraps the video at its own 16:9 instead of cropping it: an aspect-ratio on the frame counts its Glass
+   ring too, so the video inside came out wider than 16:9 and lost the edges (2.8 % at 1440, 9 % at 390). */
+.lp_modal .lp_video .background-video { aspect-ratio: auto; height: auto; }
+.lp_modal .lp_video .background-video > video { position: relative; inset: auto; display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; }
 
 /* Demo */
 .lp_demo .beneficios_grid { align-items: center; }
