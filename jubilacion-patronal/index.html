@@ -1,559 +1,1627 @@
-<!doctype html>
-<html lang="es-EC">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Estudio actuarial de jubilación patronal · NIC 19 | Actuaria (prototipo)</title>
-<meta name="description" content="Estudio actuarial de jubilación patronal y desahucio conforme a la NIC 19 o la sección 28 de las NIIF para PYMES. Informe auditable en hasta 8 días laborables.">
-<meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>
-@font-face { font-family: "Lemon Milk Pro"; font-weight: 400; font-display: swap; src: url("https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20ae9d18b17fe9e2840-lemon-milk-pro-400.woff2") format("woff2"); }
-@font-face { font-family: "Lemon Milk Pro"; font-weight: 500; font-display: swap; src: url("https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20aeaadc3f75487f9b9-lemon-milk-pro-500.woff2") format("woff2"); }
-@font-face { font-family: "Lemon Milk Pro"; font-weight: 700; font-display: swap; src: url("https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20a563b6dd8d197f85f-lemon-milk-pro-700.woff2") format("woff2"); }
-:root {
-  --navy: #151f47; --navy-2: #24305e; --indigo: #4c64d9; --indigo-text: #2f5fcc; --blue: #3061aa;
-  --orange: #df5e2d; --orange-text: #a8431c; --orange-dark-bg: #ffbba1;
-  --bg: #f3f6fc; --box: #e8ecf4; --line: #d5dbe8; --muted: #4d5775; --ok-text: #1b5e20; --ok-bg: #edf7ed;
-  --f-display: "Lemon Milk Pro", Tahoma, sans-serif; --f-sub: Nunito, sans-serif; --f-body: Prompt, sans-serif;
-  --neu-out: 8px 8px 20px rgba(163, 177, 198, .55), -8px -8px 20px rgba(255, 255, 255, .9);
-  --neu-out-sm: 4px 4px 10px rgba(163, 177, 198, .5), -4px -4px 10px rgba(255, 255, 255, .9);
-  --neu-in: inset 3px 3px 8px rgba(163, 177, 198, .55), inset -3px -3px 8px rgba(255, 255, 255, .9);
-  --r: 24px; --r-sm: 14px;
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
-body { margin: 0; background: var(--bg); color: var(--navy); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
-img { max-width: 100%; display: block; }
-a { color: var(--indigo-text); }
-button, input, select, textarea { font-family: var(--f-body); font-size: 16px; }
-.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
-h1, h2 { font-family: var(--f-display); font-weight: 700; letter-spacing: -.5px; line-height: 1.12; margin: 0; }
-h1 { font-size: clamp(30px, 4.4vw, 50px); }
-h2 { font-size: clamp(26px, 3.2vw, 38px); }
-h3 { font: 800 20px/1.3 var(--f-sub); margin: 0; }
-.eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 800 13px/1 var(--f-sub); letter-spacing: .08em; text-transform: uppercase; color: var(--orange-text); }
-.eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--orange); }
-.lead { font-size: clamp(16px, 1.6vw, 19px); color: var(--muted); }
-.sec { padding: clamp(44px, 6vw, 72px) 0; }
-.sec_head { max-width: 760px; margin-bottom: 40px; }
-.sec_head p { margin: 14px 0 0; }
-.center { text-align: center; margin-inline: auto; }
-.card { background: var(--box); border-radius: var(--r); box-shadow: var(--neu-out); padding: 28px; }
-
-/* Buttons: text, then icon (house rule) */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none; font: 800 16px/1 var(--f-sub); transition: transform .15s ease, box-shadow .15s ease; }
-.btn:hover { transform: translateY(-1px); }
-.btn:focus-visible, .chip input:focus-visible + span, .field input:focus-visible, .field select:focus-visible { outline: 3px solid var(--indigo); outline-offset: 2px; }
-.btn--primary { background: var(--orange); color: #fff; box-shadow: 0 10px 24px rgba(223, 94, 45, .35); }
-.btn--primary:hover { box-shadow: 0 14px 30px rgba(223, 94, 45, .42); }
-.btn--ghost { background: var(--box); color: var(--navy); box-shadow: var(--neu-out-sm); }
-.btn--navy { background: var(--navy); color: #fff; }
-.btn--block { width: 100%; }
-
-/* Header: logo, phone/WhatsApp, one CTA — no navigation to leak visitors */
-.top { position: sticky; top: 0; z-index: 30; background: rgba(243, 246, 252, .88); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(213, 219, 232, .7); }
-.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; }
-.top_logo img { height: 30px; width: auto; }
-.top_acc { display: flex; align-items: center; gap: 18px; }
-.top_tel { font: 700 15px/1 var(--f-sub); color: var(--navy); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
-.top_tel i { color: #1e9e57; font-size: 18px; }
-.top .btn { min-height: 44px; padding: 0 20px; font-size: 15px; }
-
-/* Hero */
-.hero { padding: clamp(36px, 6vw, 72px) 0 56px; }
-.hero_grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: clamp(28px, 4vw, 56px); align-items: start; }
-.hero h1 { margin: 18px 0 18px; }
-.hero_ctas { display: flex; flex-wrap: wrap; gap: 14px; margin: 28px 0 30px; }
-.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-.checks li { display: flex; gap: 12px; align-items: flex-start; }
-.checks i { color: var(--ok-text); margin-top: 5px; }
-.hero_stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 34px; }
-.stat { background: var(--box); border-radius: var(--r-sm); box-shadow: var(--neu-out-sm); padding: 16px 14px; }
-.stat b { display: block; font: 700 clamp(20px, 2.4vw, 26px)/1.1 var(--f-display); }
-.stat span { display: block; font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.35; }
-
-/* Quote form (2 steps) */
-.quote { position: relative; }
-.quote_tag { position: absolute; top: -14px; right: 24px; background: var(--navy); color: #fff; font: 800 12px/1 var(--f-sub); letter-spacing: .06em; text-transform: uppercase; padding: 9px 14px; border-radius: 999px; }
-.quote h2 { font-size: 24px; }
-.quote_sub { margin: 8px 0 18px; color: var(--muted); font-size: 15px; }
-.steps { display: flex; gap: 8px; margin-bottom: 20px; }
-.steps span { flex: 1; height: 6px; border-radius: 99px; background: var(--line); }
-.steps span.on { background: var(--orange); }
-.q { margin: 0 0 18px; border: 0; padding: 0; }
-.q legend { font: 800 15px/1.3 var(--f-sub); margin-bottom: 10px; padding: 0; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { position: relative; }
-.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.chip span { display: inline-flex; align-items: center; min-height: 42px; padding: 0 14px; border-radius: 12px; background: var(--box); box-shadow: var(--neu-out-sm); font: 700 14px/1 var(--f-sub); color: var(--navy); cursor: pointer; }
-.chip input:checked + span { background: var(--navy); color: #fff; box-shadow: none; }
-.field { display: grid; gap: 6px; margin-bottom: 14px; }
-.field label { font: 700 14px/1.2 var(--f-sub); }
-.field label small { font-weight: 600; color: var(--muted); }
-.field input, .field select { min-height: 48px; border: 0; border-radius: 12px; background: var(--box); box-shadow: var(--neu-in); padding: 0 14px; color: var(--navy); width: 100%; }
-.field input::placeholder { color: #7a839f; }
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.extras { display: grid; gap: 8px; margin: 4px 0 16px; }
-.extras label, .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; cursor: pointer; }
-.extras input, .consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--navy); flex: none; }
-.quote_foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13px; color: var(--muted); }
-.quote_foot i { color: var(--indigo-text); }
-.back { background: none; border: 0; color: var(--indigo-text); font: 700 14px/1 var(--f-sub); cursor: pointer; padding: 10px 0; display: inline-flex; gap: 8px; align-items: center; }
-.err { color: #5f2120; background: #fdeded; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0 0 14px; display: none; }
-.err.on { display: block; }
-.done { text-align: center; padding: 18px 4px; }
-.done_ico { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px; background: var(--ok-bg); color: var(--ok-text); font-size: 28px; }
-.done ol { text-align: left; margin: 16px 0 20px; padding-left: 20px; }
-[hidden] { display: none !important; }
-
-/* Logo bar */
-.logos { padding: 8px 0 40px; }
-.logos p { text-align: center; font: 800 13px/1 var(--f-sub); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
-.logos_row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 18px 40px; }
-.logos_row img { height: 34px; width: auto; filter: grayscale(1) contrast(1.1); opacity: .75; }
-
-/* Obligation */
-.oblig { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: stretch; }
-.oblig .card h3 { margin-bottom: 14px; display: flex; gap: 10px; align-items: center; }
-.oblig .card h3 i { color: var(--orange); }
-.oblig ul { margin: 0; padding-left: 20px; }
-.oblig li + li { margin-top: 8px; }
-.risk { background: var(--navy); color: #fff; border-radius: var(--r); padding: 28px; }
-.risk h3 { color: #fff; }
-.risk h3 i { color: var(--orange-dark-bg); }
-.risk a { color: var(--orange-dark-bg); }
-
-/* Benefits */
-.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
-.ico { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--box); box-shadow: var(--neu-out-sm); color: var(--indigo); font-size: 21px; margin-bottom: 18px; }
-.grid4 .card p { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
-
-/* Deliverable */
-.deliv { display: grid; grid-template-columns: .95fr 1.05fr; gap: clamp(28px, 4vw, 56px); align-items: center; }
-.report { background: var(--box); border-radius: var(--r); box-shadow: var(--neu-out); padding: 26px; }
-.report_head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
-.report_head b { font: 800 16px/1.3 var(--f-sub); }
-.badge { font: 800 12px/1 var(--f-sub); padding: 7px 10px; border-radius: 999px; background: var(--ok-bg); color: var(--ok-text); white-space: nowrap; }
-.report_row { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
-.report_row span:last-child { font-weight: 600; text-align: right; }
-.report_note { font-size: 12px; color: var(--muted); margin: 14px 0 0; }
-.deliv ul { list-style: none; padding: 0; margin: 24px 0 28px; display: grid; gap: 14px; }
-.deliv li { display: flex; gap: 14px; }
-.deliv li i { color: var(--indigo); margin-top: 5px; width: 18px; }
-.deliv li b { font-family: var(--f-sub); }
-
-/* Process */
-.proc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; counter-reset: p; position: relative; }
-.proc .card { position: relative; }
-.proc_n { font: 700 34px/1 var(--f-display); color: var(--orange); margin-bottom: 14px; }
-.proc p { color: var(--muted); font-size: 15px; margin: 10px 0 0; }
-.timeline { margin-top: 26px; display: flex; align-items: center; gap: 12px; justify-content: center; font: 700 15px/1.4 var(--f-sub); text-align: center; }
-.timeline i { color: var(--indigo); }
-
-/* Team */
-.team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.member { text-align: center; }
-.member img { width: 132px; height: 132px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; box-shadow: var(--neu-out-sm); background: var(--box); }
-.member p { margin: 4px 0 12px; color: var(--muted); font-size: 15px; }
-.member a { font: 700 14px/1 var(--f-sub); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
-
-/* Testimonials */
-.quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-.quotes blockquote { margin: 0; display: flex; flex-direction: column; gap: 18px; }
-.quotes blockquote p { margin: 0; font-size: 15px; }
-.quotes .stars { color: var(--orange); font-size: 14px; letter-spacing: 2px; }
-.quotes footer { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--line); }
-.quotes footer img { height: 26px; width: auto; }
-.quotes footer b { display: block; font: 800 15px/1.2 var(--f-sub); }
-.quotes footer span { font-size: 13px; color: var(--muted); }
-
-/* Certifications */
-.certs { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; }
-.certs a, .certs div { background: var(--box); border-radius: var(--r-sm); box-shadow: var(--neu-out-sm); padding: 14px 18px; display: grid; place-items: center; min-height: 92px; min-width: 132px; text-decoration: none; }
-.certs img { max-height: 58px; width: auto; }
-.certs small { font: 700 12px/1 var(--f-sub); color: var(--indigo-text); margin-top: 8px; }
-
-/* FAQ */
-.faq { max-width: 860px; margin: 0 auto; display: grid; gap: 14px; }
-.faq details { background: var(--box); border-radius: var(--r-sm); box-shadow: var(--neu-out-sm); padding: 0 22px; }
-.faq summary { list-style: none; cursor: pointer; padding: 20px 0; font: 800 17px/1.35 var(--f-sub); display: flex; justify-content: space-between; gap: 16px; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary i { color: var(--indigo); transition: transform .2s ease; margin-top: 3px; }
-.faq details[open] summary i { transform: rotate(45deg); }
-.faq details p { margin: 0 0 20px; color: var(--muted); }
-
-/* Final CTA */
-.final { background: var(--navy); color: #fff; border-radius: 32px; padding: clamp(32px, 5vw, 56px); display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; align-items: center; }
-.final h2 { color: #fff; }
-.final p { color: #c7cfe0; margin: 14px 0 0; }
-.final .eyebrow { color: var(--orange-dark-bg); }
-.final .eyebrow::before { background: var(--orange-dark-bg); }
-.final_ctas { display: grid; gap: 12px; }
-.final .btn--ghost { background: rgba(255, 255, 255, .08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); }
-
-/* Footer */
-.foot { padding: 40px 0 120px; font-size: 14px; color: var(--muted); }
-.foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
-.foot a { color: var(--navy); }
-.proto { background: #fff4e5; color: #663c00; text-align: center; font-size: 13px; padding: 8px 16px; }
-
-/* Mobile sticky bar */
-.mbar { display: none; }
-@media (max-width: 991px) {
-  .hero_grid, .deliv, .oblig, .final { grid-template-columns: 1fr; }
-  .grid4, .proc { grid-template-columns: 1fr 1fr; }
-  .quotes, .team { grid-template-columns: 1fr; }
-  .team { max-width: 420px; margin-inline: auto; }
-  .top_tel span { display: none; }
-}
-@media (max-width: 767px) {
-  .top .btn { display: none; }
-  .grid4, .proc { grid-template-columns: 1fr; }
-  .hero_stats { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .stat { padding: 12px 10px; }
-  .two { grid-template-columns: 1fr; gap: 0; }
-  .mbar { display: grid; grid-template-columns: 1fr auto; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(243, 246, 252, .95); backdrop-filter: blur(10px); border-top: 1px solid var(--line); transform: translateY(110%); transition: transform .25s ease; }
-  .mbar.on { transform: none; }
-  .mbar .btn { min-height: 48px; }
-  .mbar .wa { width: 48px; padding: 0; background: #1e9e57; color: #fff; }
-  .card, .report, .risk { padding: 22px; }
-}
+<!DOCTYPE html>
+<html data-wf-domain="actuaria.com" data-wf-page="6aac66615825ece9fcd53b04" data-wf-site="6967c96e0fba2ea4f94d3c69" lang="es-EC"><head><meta charset="utf-8"><link href="https://cdn.prod.website-files.com" rel="preconnect" crossorigin="anonymous"><title>Estudio actuarial de jubilación patronal · NIC 19 | Actuaria (prototipo)</title><meta content="Estudio actuarial de jubilación patronal y desahucio conforme a la NIC 19 o la sección 28 de las NIIF para PYMES. Informe auditable en hasta 8 días laborables." name="description"><meta content="width=device-width, initial-scale=1" name="viewport"><meta content="Webflow" name="generator"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/css/actuaweb.webflow.shared.62b5a4775.min.css" rel="stylesheet" type="text/css" integrity="sha384-YrWkd1sjp4VEnbwispHnnECOQC5n37zTNcdJj8cD93QNUavLffkdSA7q7rRyPMcE" crossorigin="anonymous"><script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9883c0a48926ccd2c2e1f4_Light.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: light)"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9883cc97ffda7be3a54f64_Dark.png" rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9883c076eed4db7d98e70d_Light.png" rel="icon" type="image/png" sizes="48x48"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9882a02dbfacbe94a2e2c6_icon.png" rel="apple-touch-icon" sizes="180x180"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9882a010a3e286c71b7d8b_icon.png" rel="icon" type="image/png" sizes="192x192"><link href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a9882a010a3e286c71b7d88_icon.png" rel="icon" type="image/png" sizes="512x512"><script>
+(function () {
+  var d = document.documentElement, n = navigator, q = location.search, forzado = null;
+  var completo = /[?&]completo(=|&|$)/.test(q), pedido = /[?&]ligero(=|&|$)/.test(q);
+  try {
+    if (completo) sessionStorage.setItem('actuaria-ligero', '0');
+    else if (pedido) sessionStorage.setItem('actuaria-ligero', '1');
+    forzado = sessionStorage.getItem('actuaria-ligero');
+  } catch (e) { forzado = completo ? '0' : pedido ? '1' : null; }
+  var mm = window.matchMedia;
+  function cumple(c) { try { return !!(mm && mm.call(window, c).matches); } catch (e) { return false; } }
+  var c = n.connection;
+  var auto = /FBAN|FBAV|FB_IAB|Instagram/.test(n.userAgent || '') ||
+    (n.deviceMemory > 0 && n.deviceMemory <= 2) || !!(c && c.saveData);
+  var ligero = forzado === '1' || (forzado !== '0' && auto);
+  var quieto = ligero || cumple('(prefers-reduced-motion: reduce)');
+  if (ligero) d.classList.add('es-ligero');
+  if (!quieto) return;
+  d.classList.add('sin-movimiento');
+  if (ligero && mm) window.matchMedia = function (consulta) {
+    var real = mm.apply(window, arguments), s = String(consulta).replace(/\s+/g, '').toLowerCase(), si;
+    if (s.indexOf('prefers-reduced-motion:reduce') > -1) si = true;
+    else if (s.indexOf('prefers-reduced-motion:no-preference') > -1 || s.indexOf('hover:hover') > -1 || s.indexOf('pointer:fine') > -1) si = false;
+    else return real;
+    var nada = function () {};
+    return { matches: si, media: real.media, onchange: null, addListener: nada, removeListener: nada, addEventListener: nada, removeEventListener: nada, dispatchEvent: function () { return false; } };
+  };
+  document.addEventListener('animationstart', function (e) {
+    var t = e.target;
+    if (t === d || t === document.body || !t.getAnimations) return;
+    t.getAnimations({ subtree: true }).forEach(function (a) {
+      var ef = a.effect;
+      if (ef && ef.target === t && a.animationName === e.animationName && (ef.pseudoElement || '') === (e.pseudoElement || '') &&
+        ef.getTiming().iterations === Infinity) a.cancel();
+    });
+  }, true);
+  function ix2() {
+    var k = 0, visto = 0;
+    (function mirar() {
+      var ix, st;
+      try { ix = window.Webflow && Webflow.require && Webflow.require('ix2'); st = ix && ix.store && ix.store.getState(); } catch (e) { return; }
+      if (!st || !st.ixSession || !st.ixSession.active) { if (++k < 80) setTimeout(mirar, 250); return; }
+      var ev = (st.ixData && st.ixData.events) || {}, bucle = false, id;
+      for (id in ev) {
+        if (!/^(PAGE_START|PAGE_FINISH|MOUSE_OVER|MOUSE_OUT)$/.test(ev[id].eventTypeId)) return;
+        if (ev[id].config && ev[id].config.loop) bucle = true;
+      }
+      if (!bucle) return;
+      var vivas = 0, ins = st.ixInstances || {};
+      for (id in ins) { var e2 = ev[ins[id].eventId]; if (!(e2 && e2.config && e2.config.loop)) vivas++; }
+      if ((vivas || ++visto < 4) && ++k < 80) { setTimeout(mirar, 250); return; }
+      if (!vivas) ix.destroy();
+    })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ix2); else ix2();
+})();
+</script>
+<style>html.es-ligero *, html.es-ligero *::before, html.es-ligero *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.sin-movimiento .credentials_grid.is-marquee,
+html.sin-movimiento .logos_container,
+html.sin-movimiento .logos_container_b,
+html.sin-movimiento .typing_caret,
+html.sin-movimiento .calc_menu-flota,
+html.sin-movimiento .gradient_ball_a,
+html.sin-movimiento .gradient_ball_b,
+html.sin-movimiento .gradient_ball_c { animation: none !important; }
+html.sin-movimiento .logos_container,
+html.sin-movimiento .logos_container_b,
+html.sin-movimiento .gradient_ball_a,
+html.sin-movimiento .gradient_ball_b { transform: none !important; }
+html.sin-movimiento .gradient_ball_c { transform: translate3d(0, 32vh, 0) !important; }
+html.sin-movimiento .process_section .card_wrapper.is-step .beneficio_ico,
+html.sin-movimiento .features_right .icon_div_card::after,
+html.sin-movimiento .card_wrapper.is-esencia .beneficio_ico::after,
+html.sin-movimiento .nos_beneficios-intro + .nos_grid > .card_wrapper.is-glass .beneficio_ico::after,
+html.sin-movimiento .ct_cell .beneficio_ico::after,
+html.sin-movimiento .blog-bento_cta-ico { animation: none !important; background-position: 30% 30%, 50% 50% !important; }
+html.sin-movimiento .button-ring::after,
+html.sin-movimiento .button-ring-form::after,
+html.sin-movimiento .cta_section .cta_content > .secondbutton.is-flat::after,
+html.sin-movimiento .dir_card::after { animation: none !important; background-position: 0 0, 30% 30%, 50% 50% !important; }
+html.sin-movimiento .main_hero .background-video,
+html.sin-movimiento .blog-article_summary::before { animation: none !important; background-position: 0 0, 30% 30%, 50% 50%, 0 0 !important; }
+html.sin-movimiento .team_grid .card_wrapper.is-member .team_photo,
+html.sin-movimiento .nos_grid.is-4 .card_wrapper.is-member .team_photo,
+html.sin-movimiento .blog-aside_cta { animation: none !important; background-position: 0 0, 0 0, 30% 30%, 50% 50%, 0 0 !important; }
+html.sin-movimiento .nos_beneficios-intro + .nos_grid > .card_wrapper.is-glass,
+html.sin-movimiento .ct_cell[data-tornasol] { animation: none !important; background-position: 0 0, 0 0, 0 0, 30% 30%, 50% 50%, 0 0 !important; }
+html.sin-movimiento .radar_sweep { animation: none !important; transform: rotate(45deg); }
+html.sin-movimiento .radar_blip { animation: none !important; opacity: .8; }
+html.sin-movimiento .radar_ping { animation: none !important; opacity: 0; }
+html.sin-movimiento.pl-logo body::after { animation: pl-logo-in .3s ease-out both; }
+html.sin-movimiento.pl-logo.pl-out body::after { animation: pl-logo-fade .3s ease-in forwards; }
+html.sin-movimiento.pl-enter .navbar-logo-left,
+html.sin-movimiento.pl-enter .hero_main,
+html.sin-movimiento.pl-enter .hero_blog_preview,
+html.sin-movimiento.pl-enter .features { animation: none; }
 </style>
-</head>
-<body>
-<div class="proto">Prototipo de rediseño · el formulario no envía datos</div>
-
-<header class="top">
-  <div class="wrap">
-    <a class="top_logo" href="https://actuaria.com/" aria-label="Actuaria, ir al inicio"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbec17f7fc765c2ea5d9_logo-actuaria.svg" alt="Actuaria" width="146" height="30"></a>
-    <div class="top_acc">
-      <a class="top_tel" href="https://wa.me/593979133351?text=Hola%2C%20quiero%20cotizar%20un%20estudio%20actuarial%20de%20jubilaci%C3%B3n%20patronal" data-evento="whatsapp_cabecera"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>(+593-9) 7913-3351</span></a>
-      <a class="btn btn--primary" href="#cotizar" data-evento="cta_cabecera">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
-    </div>
-  </div>
-</header>
-
-<main>
-  <!-- Hero: outcome + deadline in the H1, the first step of the quote above the fold -->
-  <section class="hero">
-    <div class="wrap hero_grid">
-      <div>
-        <p class="eyebrow">Estudio actuarial · NIC 19 y NIIF PYMES</p>
-        <h1>Tu estudio de jubilación patronal, listo para la auditoría del cierre</h1>
-        <p class="lead">Calculamos tus provisiones de jubilación patronal y desahucio conforme a la NIC 19 o la sección 28 de las NIIF para PYMES. Recibes un informe auditable en hasta 8 días laborables y, si el auditor pregunta, nuestros actuarios lo sustentan.</p>
-        <div class="hero_ctas">
-          <a class="btn btn--primary" href="#cotizar" data-evento="cta_hero">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
-          <a class="btn btn--ghost" href="https://actuaria.com/calculadoras/jubilacion-patronal" data-evento="calculadora_hero">Calcula una estimación gratis <i class="fa-solid fa-calculator" aria-hidden="true"></i></a>
-        </div>
-        <ul class="checks">
-          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Jubilación patronal y bonificación por desahucio en un solo informe</span></li>
-          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Hipótesis y metodología documentadas, listas para revisión externa</span></li>
-          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Acompañamiento de nuestros actuarios durante la auditoría</span></li>
-        </ul>
-        <div class="hero_stats">
-          <div class="stat"><b>+40</b><span>años de experiencia actuarial</span></div>
-          <div class="stat"><b>+6.500</b><span>clientes en la región</span></div>
-          <div class="stat"><b>8 días</b><span>laborables como máximo para tu informe</span></div>
-        </div>
-      </div>
-
-      <div class="card quote" id="cotizar">
-        <span class="quote_tag">Sin compromiso</span>
-        <form id="form-cotizar" novalidate>
-          <input type="hidden" name="Tipo de servicio" value="Estudio-Actuarial">
-          <div data-paso="1">
-            <h2>Cotiza en 2 pasos</h2>
-            <p class="quote_sub">Dos preguntas para preparar tu cotización.</p>
-            <div class="steps" aria-hidden="true"><span class="on"></span><span></span></div>
-            <fieldset class="q">
-              <legend>¿Cuántos trabajadores tiene tu empresa?</legend>
-              <div class="chips">
-                <label class="chip"><input type="radio" name="Trabajadores" value="1-10" required><span>1 a 10</span></label>
-                <label class="chip"><input type="radio" name="Trabajadores" value="11-50"><span>11 a 50</span></label>
-                <label class="chip"><input type="radio" name="Trabajadores" value="51-200"><span>51 a 200</span></label>
-                <label class="chip"><input type="radio" name="Trabajadores" value="201-500"><span>201 a 500</span></label>
-                <label class="chip"><input type="radio" name="Trabajadores" value="500+"><span>Más de 500</span></label>
-              </div>
-            </fieldset>
-            <fieldset class="q">
-              <legend>¿Bajo qué norma reporta tu empresa?</legend>
-              <div class="chips">
-                <label class="chip"><input type="radio" name="Norma" value="NIC 19" required><span>NIIF completas (NIC 19)</span></label>
-                <label class="chip"><input type="radio" name="Norma" value="NIIF PYMES s.28"><span>NIIF para PYMES</span></label>
-                <label class="chip"><input type="radio" name="Norma" value="No sé"><span>No estoy seguro</span></label>
-              </div>
-            </fieldset>
-            <p class="err" role="alert" data-err="1">Elige una opción en cada pregunta para continuar.</p>
-            <button type="button" class="btn btn--primary btn--block" data-sig>Continuar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-            <p class="quote_foot"><i class="fa-solid fa-lock" aria-hidden="true"></i>Tus datos se tratan bajo ISO/IEC 27001.</p>
-          </div>
-
-          <div data-paso="2" hidden>
-            <h2>¿A quién enviamos la cotización?</h2>
-            <p class="quote_sub">Un asesor de Actuaria te contacta con la propuesta.</p>
-            <div class="steps" aria-hidden="true"><span class="on"></span><span class="on"></span></div>
-            <div class="two">
-              <div class="field"><label for="f-nombre">Nombre y apellido</label><input id="f-nombre" name="Nombre" autocomplete="name" required placeholder="Ej.: María Pérez"></div>
-              <div class="field"><label for="f-correo">Correo de trabajo</label><input id="f-correo" name="Correo" type="email" autocomplete="email" required placeholder="nombre@empresa.com"></div>
-            </div>
-            <div class="two">
-              <div class="field"><label for="f-empresa">Empresa</label><input id="f-empresa" name="Razon social" autocomplete="organization" required placeholder="Razón social"></div>
-              <div class="field"><label for="f-tel">Teléfono o WhatsApp <small>(opcional)</small></label><input id="f-tel" name="Telefono" type="tel" autocomplete="tel" placeholder="09 1234 5678"></div>
-            </div>
-            <div class="field"><label for="f-ruc">RUC <small>(opcional, agiliza la cotización)</small></label><input id="f-ruc" name="RUC" inputmode="numeric" maxlength="13" pattern="\d{13}" placeholder="13 dígitos"></div>
-            <p class="q" style="margin:4px 0 8px"><b style="font:800 15px/1.3 var(--f-sub)">¿Te interesa también…?</b> <small style="color:var(--muted)">(opcional)</small></p>
-            <div class="extras">
-              <label><input type="checkbox" name="Extra" value="Actas de jubilación patronal">Actas de jubilación patronal para quienes se jubilan</label>
-              <label><input type="checkbox" name="Extra" value="Impuestos diferidos">Informe de impuestos diferidos de las provisiones</label>
-              <label><input type="checkbox" name="Extra" value="Control tributario">Control tributario de provisiones (Kardex)</label>
-            </div>
-            <label class="consent"><input type="checkbox" name="Legal" required>Acepto la <a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df6459360730d2f79e4_politica-privacidad-proteccion-datos.pdf" target="_blank" rel="noopener">Política de Protección de Datos Personales</a> de Actuaria Consultores S.A.</label>
-            <p class="err" role="alert" data-err="2" style="margin-top:14px">Revisa tu nombre, correo, empresa y la aceptación de la política.</p>
-            <button type="submit" class="btn btn--primary btn--block" style="margin-top:16px">Recibir mi cotización <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
-            <button type="button" class="back" data-atras><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Volver</button>
-          </div>
-
-          <div class="done" data-paso="3" hidden aria-live="polite">
-            <div class="done_ico"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
-            <h2>¡Listo! Recibimos tu solicitud</h2>
-            <ol>
-              <li>Un asesor revisa los datos de tu empresa.</li>
-              <li>Te contacta con la cotización y la lista de información que necesitamos.</li>
-              <li>Con tu información completa, el informe sale en hasta 8 días laborables.</li>
-            </ol>
-            <a class="btn btn--ghost btn--block" href="https://actuaria.com/calculadoras/jubilacion-patronal">Mientras tanto, calcula una estimación <i class="fa-solid fa-calculator" aria-hidden="true"></i></a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <section class="logos" aria-label="Clientes">
-    <div class="wrap">
-      <p>Empresas que confían en Actuaria</p>
-      <div class="logos_row">
-        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a030590_testimonio-logo-bmi.png" alt="BMI Compañía de Seguros" loading="lazy">
-        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234d7fe7095f8b80564_testimonio-logo-aig.png" alt="AIG" loading="lazy">
-        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a0305d6_testimonio-logo-plan-vital.png" alt="Plan Vital" loading="lazy">
-        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace42343ed6e1306ad177f0_testimonio-logo-palig.png" alt="Pan-American Life Insurance Group" loading="lazy">
-      </div>
-    </div>
-  </section>
-
-  <!-- Qualify the visitor and name the risk of not doing it -->
-  <section class="sec" style="padding-top:24px">
-    <div class="wrap">
-      <div class="sec_head">
-        <p class="eyebrow">¿Lo necesitas?</p>
-        <h2>¿Tu empresa está obligada a tener el estudio?</h2>
-      </div>
-      <div class="oblig">
-        <div class="card">
-          <h3><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>Sí, si tu empresa:</h3>
-          <ul>
-            <li>está obligada a llevar contabilidad en Ecuador, y</li>
-            <li>tiene uno o más trabajadores bajo relación de dependencia.</li>
-          </ul>
-          <p style="margin:16px 0 0;color:var(--muted)">El estudio determina las provisiones de jubilación patronal y desahucio que se registran en los estados financieros, según la NIC 19 o la sección 28 de las NIIF para PYMES.</p>
-        </div>
-        <div class="risk">
-          <h3 style="margin-bottom:14px;display:flex;gap:10px;align-items:center"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Lo que revisan en el cierre</h3>
-          <p style="margin:0">Auditores y el SRI comparan las provisiones registradas con el respaldo actuarial. Un estudio sin hipótesis documentadas o fuera de norma termina en observaciones y ajustes de último momento.</p>
-          <p style="margin:16px 0 0"><a href="https://actuaria.com/post/jubilacion-patronal-y-conciliacion-tributaria-las-cinco-revisiones-comunes-que-realiza-el-sri">Las 5 revisiones más comunes del SRI <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head">
-        <p class="eyebrow">Beneficios</p>
-        <h2>Cierra el año con tus provisiones respaldadas</h2>
-        <p class="lead">Información clara para decidir y un respaldo técnico que resiste la revisión externa.</p>
-      </div>
-      <div class="grid4">
-        <div class="card"><div class="ico"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i></div><h3>Cumplimiento normativo</h3><p>Conforme a la NIC 19, la sección 28 de las NIIF para PYMES y el Código del Trabajo.</p></div>
-        <div class="card"><div class="ico"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div><h3>Optimización financiera</h3><p>Detecta oportunidades de ahorro en provisiones y mejora la planificación del flujo de caja.</p></div>
-        <div class="card"><div class="ico"><i class="fa-solid fa-magnifying-glass-chart" aria-hidden="true"></i></div><h3>Trazabilidad total</h3><p>Hipótesis y metodología documentadas, listas para la revisión de auditores.</p></div>
-        <div class="card"><div class="ico"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></div><h3>Actuarios a tu lado</h3><p>Soporte técnico de nuestros actuarios durante auditorías y cierres contables.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Show the deliverable: what the money buys -->
-  <section class="sec">
-    <div class="wrap deliv">
-      <div class="report" aria-label="Ejemplo de la estructura del informe">
-        <div class="report_head"><b>Informe actuarial · Jubilación patronal y desahucio</b><span class="badge"><i class="fa-solid fa-check" aria-hidden="true"></i> NIC 19</span></div>
-        <div class="report_row"><span>Obligación por jubilación patronal</span><span>Provisión al cierre</span></div>
-        <div class="report_row"><span>Bonificación por desahucio</span><span>Provisión al cierre</span></div>
-        <div class="report_row"><span>Costo del período e intereses</span><span>Para resultados</span></div>
-        <div class="report_row"><span>Ganancias y pérdidas actuariales</span><span>Para ORI</span></div>
-        <div class="report_row"><span>Hipótesis financieras y demográficas</span><span>Documentadas</span></div>
-        <div class="report_row" style="border-bottom:0"><span>Análisis de sensibilidad</span><span>Incluido</span></div>
-        <p class="report_note">Esquema ilustrativo del contenido. Cada informe se adapta a la norma y a la nómina de la empresa.</p>
-      </div>
-      <div>
-        <p class="eyebrow">Qué recibes</p>
-        <h2>Un informe que tu contador y tu auditor entienden</h2>
-        <ul>
-          <li><i class="fa-solid fa-file-lines" aria-hidden="true"></i><div><b>Provisiones calculadas por trabajador</b><br>Jubilación patronal y bonificación por desahucio, en los formatos técnicos de las NIIF.</div></li>
-          <li><i class="fa-solid fa-book-open" aria-hidden="true"></i><div><b>Metodología e hipótesis explicadas</b><br>Traducimos la complejidad actuarial en respaldos claros, listos para su aprobación.</div></li>
-          <li><i class="fa-solid fa-laptop" aria-hidden="true"></i><div><b>Todo en <a href="https://plus.actuaria.com/auth/login">actuaria+</a></b><br>Envías la información y consultas tus resultados en nuestra plataforma, con tus datos protegidos.</div></li>
-          <li><i class="fa-solid fa-headset" aria-hidden="true"></i><div><b>Sustento ante auditoría</b><br>Nuestros especialistas explican la metodología, las hipótesis y las conclusiones a tu equipo y a tus auditores.</div></li>
-        </ul>
-        <a class="btn btn--primary" href="#cotizar" data-evento="cta_entregable">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="eyebrow">Cómo funciona</p>
-        <h2>De tu nómina al informe, en 4 pasos</h2>
-      </div>
-      <div class="proc">
-        <div class="card"><div class="proc_n">01</div><h3>Envías la información</h3><p>La nómina y los parámetros contables, por nuestra plataforma y con total confidencialidad.</p></div>
-        <div class="card"><div class="proc_n">02</div><h3>Analizamos y calculamos</h3><p>Aplicamos el Código del Trabajo y la metodología actuarial de la NIC 19 o la sección 28 de las NIIF para PYMES.</p></div>
-        <div class="card"><div class="proc_n">03</div><h3>Recibes el informe</h3><p>Las provisiones consolidadas en los formatos técnicos de las NIIF, listas para su aprobación.</p></div>
-        <div class="card"><div class="proc_n">04</div><h3>Te acompañamos</h3><p>Sustentamos la metodología, las hipótesis y las conclusiones ante tus auditores.</p></div>
-      </div>
-      <p class="timeline"><i class="fa-regular fa-clock" aria-hidden="true"></i>Hasta 8 días laborables desde que recibimos la información completa</p>
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="eyebrow">Tu equipo</p>
-        <h2>Los actuarios detrás de tu informe</h2>
-        <p class="lead">Actuarios que sustentan la metodología, las hipótesis y las conclusiones de tu estudio ante cualquier auditoría.</p>
-      </div>
-      <div class="team">
-        <div class="card member"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6abc0af3a9759349a92f9f38_Esteban%20Vargas.png" alt="Esteban Vargas" loading="lazy" width="132" height="132"><h3>Esteban Vargas</h3><p>Chief Actuarial Officer</p><a href="https://www.linkedin.com/in/estebanvargas90/" target="_blank" rel="noopener">Ver perfil <i class="fa-brands fa-linkedin" aria-hidden="true"></i></a></div>
-        <div class="card member"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6a9f28d052b37339030ebd47_Ivan%20Ramirez.jpg" alt="Iván Ramírez" loading="lazy" width="132" height="132"><h3>Iván Ramírez</h3><p>Head of Employment Benefits</p><a href="https://www.linkedin.com/in/ivan-ramirez-actuaria-56556555/" target="_blank" rel="noopener">Ver perfil <i class="fa-brands fa-linkedin" aria-hidden="true"></i></a></div>
-        <div class="card member"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6aa97a673f6ddb01ec4823d0_Jos%C3%A9%20Luis%20Bed%C3%B3n.png" alt="José Luis Bedón" loading="lazy" width="132" height="132"><h3>José Luis Bedón</h3><p>Senior Consultant</p><a href="https://www.linkedin.com/in/jos%C3%A9-luis-bed%C3%B3n-jaramillo-0234216b/" target="_blank" rel="noopener">Ver perfil <i class="fa-brands fa-linkedin" aria-hidden="true"></i></a></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="eyebrow">Clientes</p>
-        <h2>Precisión que genera confianza</h2>
-      </div>
-      <div class="quotes">
-        <blockquote class="card"><span class="stars" aria-label="5 de 5">★★★★★</span><p>«Trabajar con Actuaria nos genera confianza. Su equipo ha demostrado un alto nivel de profesionalismo y conocimiento. Hemos obtenido soluciones personalizadas que se adaptan a nuestras necesidades.»</p><footer><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a030590_testimonio-logo-bmi.png" alt="BMI" loading="lazy"><div><b>Paúl Villagomez</b><span>Gerente Técnico y de Riesgos, BMI Ecuador</span></div></footer></blockquote>
-        <blockquote class="card"><span class="stars" aria-label="5 de 5">★★★★★</span><p>«El equipo de Actuaria Consultores ofrece un servicio actuarial excepcional. Su precisión, profesionalismo y atención al detalle han superado nuestras expectativas.»</p><footer><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234d7fe7095f8b80564_testimonio-logo-aig.png" alt="AIG" loading="lazy"><div><b>David Vega</b><span>Actuary I, AIG Ecuador</span></div></footer></blockquote>
-        <blockquote class="card"><span class="stars" aria-label="5 de 5">★★★★★</span><p>«No solo realizan cálculos matemáticos y actuariales, sino que son verdaderos asesores que se involucran en el crecimiento y desarrollo de la compañía.»</p><footer><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a0305d6_testimonio-logo-plan-vital.png" alt="Plan Vital" loading="lazy"><div><b>Julio Tarré</b><span>Gerente General, Plan Vital</span></div></footer></blockquote>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec" style="padding-top:8px">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="eyebrow">Respaldo</p>
-        <h2>Certificados y calificados</h2>
-        <p class="lead">Operamos bajo normas nacionales e internacionales que garantizan la precisión, la seguridad y la confidencialidad de tu información.</p>
-      </div>
-      <div class="certs">
-        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d488c10f86bbf0592a5_cert-supercias.png" alt="Superintendencia de Compañías, Valores y Seguros del Ecuador" loading="lazy"></div>
-        <a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df8abae1f93dd1f54ed_certificacion-iso-9001-2015.pdf" target="_blank" rel="noopener"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d484378fbb4caf1022a_cert-iso-9001-imq.png" alt="Certificación IMQ ISO 9001:2015" loading="lazy"><small>Ver credencial</small></a>
-        <a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf" target="_blank" rel="noopener"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d48bdf88084c6799bc6_cert-iso-27001-imq.svg" alt="Certificación IMQ ISO/IEC 27001:2022" loading="lazy"><small>Ver credencial</small></a>
-        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22cca_cert-iaa.png" alt="International Actuarial Association" loading="lazy"></div>
-        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22d19_cert-superbancos.png" alt="Superintendencia de Bancos del Ecuador" loading="lazy"></div>
-        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f11beeb8c078e46_cert-sello-actuarial.png" alt="Sello Actuarial" loading="lazy"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Objections: what, who, how long, what to send, which norm, data safety, price -->
-  <section class="sec">
-    <div class="wrap">
-      <div class="sec_head center">
-        <p class="eyebrow">Preguntas frecuentes</p>
-        <h2>Lo que nos preguntan antes de contratar</h2>
-      </div>
-      <div class="faq">
-        <details open><summary>¿Qué es un estudio actuarial de jubilación patronal?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Es el cálculo que determina las provisiones por jubilación patronal y bonificación por desahucio que tu empresa debe registrar en sus estados financieros, conforme a la NIC 19 o la sección 28 de las NIIF para PYMES.</p></details>
-        <details><summary>¿Quién está obligado a hacerlo en Ecuador?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Todas las entidades obligadas a llevar contabilidad que tienen uno o más trabajadores bajo relación de dependencia.</p></details>
-        <details><summary>¿Cuánto tiempo toma?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Depende del tamaño de tu nómina y de la disponibilidad de la información. Con la información completa, puede tomar hasta 8 días laborables.</p></details>
-        <details><summary>¿Qué información tengo que enviar?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>La información de la nómina y los parámetros contables de la empresa. Al cotizar te enviamos la lista exacta y la plantilla para cargarla en nuestra plataforma.</p></details>
-        <details><summary>¿NIC 19 o sección 28 de las NIIF para PYMES?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>La NIC 19 aplica a las empresas que reportan con NIIF completas; la sección 28, a las que reportan con NIIF para PYMES. Si no sabes cuál usa tu empresa, elige «No estoy seguro» en la cotización y lo revisamos contigo.</p></details>
-        <details><summary>¿Mis datos están protegidos?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Sí. Actuaria está certificada en ISO/IEC 27001:2022 de seguridad de la información, y los datos de tu nómina se envían y se consultan por nuestra plataforma, con total confidencialidad.</p></details>
-        <details><summary>¿Cuánto cuesta?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>El valor depende del número de trabajadores y de la norma que aplica tu empresa. Completa los 2 pasos de la cotización y un asesor te envía la propuesta, sin compromiso.</p></details>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec" style="padding-top:8px">
-    <div class="wrap">
-      <div class="final">
-        <div>
-          <p class="eyebrow">Cierre contable</p>
-          <h2>Ten tus provisiones listas antes del cierre</h2>
-          <p>Mientras antes nos envíes la información, antes tendrás el informe para tu contador y tu auditor.</p>
-        </div>
-        <div class="final_ctas">
-          <a class="btn btn--primary" href="#cotizar" data-evento="cta_final">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
-          <a class="btn btn--ghost" href="https://wa.me/593979133351?text=Hola%2C%20quiero%20cotizar%20un%20estudio%20actuarial%20de%20jubilaci%C3%B3n%20patronal" data-evento="whatsapp_final">Escríbenos por WhatsApp <i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer class="foot">
-  <div class="wrap">
-    <span>© 2026 Actuaria Consultores S.A. · Quito, Ecuador · (+593-2) 392-3400</span>
-    <span><a href="https://actuaria.com/">actuaria.com</a> · <a href="https://actuaria.com/contacto">Contacto</a></span>
-  </div>
-</footer>
-
-<div class="mbar" id="mbar">
-  <a class="btn btn--primary" href="#cotizar" data-evento="cta_barra_movil">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
-  <a class="btn wa" href="https://wa.me/593979133351?text=Hola%2C%20quiero%20cotizar%20un%20estudio%20actuarial%20de%20jubilaci%C3%B3n%20patronal" aria-label="Escríbenos por WhatsApp" data-evento="whatsapp_barra_movil"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
-</div>
 
 <script>
 (function () {
+  if (!/(^|\.)actuaria\.com$/.test(location.hostname)) return;
+  // Google Tag Manager
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WVB8ND3W');
+})();
+</script>
+<meta name="google-site-verification" content="FB-ZCm5pwxqKdojfdiJiHx7qF-XwOpjeXjBLeHBlrRY">
+<meta name="google-site-verification" content="Gm4rQlQGGQbmbDyH2LnCH21shQzxdn-pgwS29IiM9nM">
+
+<style>
+  @media (min-width: 992px) {
+    .nav-dropdown-list {
+      display: block;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 250ms ease, transform 350ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .nav-dropdown-list.w--open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-dropdown-list { transition: none; transform: none; }
+  }
+</style>
+
+<style>
+  html { scroll-behavior: smooth; }
+  #soluciones, #form { scroll-margin-top: 132px; }
+  @media (max-width: 991px) {
+    #soluciones, #form { scroll-margin-top: 92px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<style>
+  .card_wrapper.is-member a.card_link[href="#"] { display: none; }
+</style>
+
+<style>
+.w-form input[type="submit"].actuariaplus-button,
+.w-form input[type="submit"].cv_boton { font-family: Nunito, "Fa Solid 900", sans-serif; }
+.w-form input[type="submit"].f_submit { font-family: Arial, "Fa Solid 900", sans-serif; }
+</style>
+
+<link rel="preconnect" href="https://webflow-files-prod.global.ssl.fastly.net" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20a26b8682f7f2c72bd-fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20ad22246a98cfc173b-fa-brands-400.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6ad264bea12f1ddbf17a666a-Nunito-variable.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6ad264be63bb68d78ae9c40e-Prompt-400.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20aeaadc3f75487f9b9-lemon-milk-pro-500.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20ae9d18b17fe9e2840-lemon-milk-pro-400.woff2" as="font" type="font/woff2" crossorigin=""><style>
+
+  .credentials_section { overflow-x: clip; }
+
+  .credentials_marquee {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    position: relative;
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+  }
+  .credentials_marquee::before,
+  .credentials_marquee::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .credentials_marquee::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(245,247,252,0.95) 0%, rgba(245,247,252,0) 100%);
+  }
+  .credentials_marquee::after {
+    right: 0;
+    background: linear-gradient(270deg, rgba(245,247,252,0.95) 0%, rgba(245,247,252,0) 100%);
+  }
+  .credentials_grid.is-marquee {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    animation: carousel-creds-left 32s linear infinite;
+    will-change: transform;
+    min-width: max-content;
+    max-width: none;
+    justify-content: flex-start;
+  }
+  .credentials_marquee:hover .credentials_grid.is-marquee { animation-play-state: paused; }
+  @keyframes carousel-creds-left {
+    from { transform: translateX(0%); }
+    to   { transform: translateX(-100%); }
+  }
+  @media (max-width: 767px) {
+    .credentials_marquee::before,
+    .credentials_marquee::after { width: 56px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .credentials_grid.is-marquee { animation: none; }
+  }
+
+  .testimonial_section { overflow-x: clip; }
+  .testimonial_container {
+    display: block;
+    position: relative;
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--testi-inset, 24px);
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .testimonial_container::-webkit-scrollbar { display: none; }
+  .testimonial_container:focus-visible { outline: 2px solid #4c64d9; outline-offset: -2px; }
+  .testimonial_container > .testimonial_carusel {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 28px;
+    width: max-content;
+    max-width: none;
+    min-width: 0;
+    padding: 16px var(--testi-inset, 24px) 24px;
+    animation: none;
+  }
+  .testimonial_carusel > .card_testimonial {
+    width: 440px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    scroll-snap-align: start;
+    background: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.75);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+  }
+  .testimonial_carusel .card_base { box-shadow: none; }
+  .card_testimonial > .card_base { flex: 1; height: 100%; display: flex; flex-direction: column; }
+  .card_base > .bottom_card_testimonial { margin-top: auto; }
+  .testimonial_controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0 var(--testi-inset, 24px);
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    box-sizing: border-box;
+  }
+  .testimonial_controls[hidden] { display: none; }
+  .testimonial_arrow {
+    appearance: none;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(21,31,71,0.05);
+    border-radius: 50%;
+    background: #e8ecf4;
+    color: #151f47;
+    font: 900 16px "Fa Solid 900", "Font Awesome 6 Free";
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 10px rgba(15,23,42,0.12), -4px -4px 10px rgba(255,255,255,0.9);
+    transition: color .2s, box-shadow .2s, opacity .2s;
+  }
+  .testimonial_arrow:hover:not(:disabled) { color: #4c64d9; }
+  .testimonial_arrow:active:not(:disabled) { box-shadow: inset 3px 3px 8px rgba(15,23,42,0.10), inset -3px -3px 8px rgba(255,255,255,0.9); }
+  .testimonial_arrow:focus-visible { outline: 2px solid #4c64d9; outline-offset: 3px; }
+  .testimonial_arrow:disabled { opacity: .4; cursor: default; }
+  @media (max-width: 767px) {
+    .testimonial_carusel > .card_testimonial { width: 320px; }
+    .testimonial_controls { justify-content: center; }
+  }
+  @media (max-width: 479px) {
+    .testimonial_carusel > .card_testimonial { width: 280px; }
+    .testimonial_container > .testimonial_carusel { gap: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .testimonial_container { scroll-behavior: auto; }
+  }
+
+.process_section .card_wrapper.is-step::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  width: 120px;
+  height: 120px;
+  border-top-right-radius: 20px;
+  background-image: radial-gradient(rgba(76,100,217,.45) 1.3px, transparent 1.7px);
+  background-size: 11px 11px;
+  -webkit-mask-image: radial-gradient(circle at 100% 0, #000 0, rgba(0,0,0,.55) 40%, transparent 75%);
+  mask-image: radial-gradient(circle at 100% 0, #000 0, rgba(0,0,0,.55) 40%, transparent 75%);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .team_grid .glass_frame:hover { z-index: 2; }
+  .team_grid .card_wrapper.is-member .card_link {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--holo-nb, 150px) - 2px);
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    transform: translate3d(-50%, 0, 0);
+    transition: opacity .2s ease, transform .7s cubic-bezier(.2, .8, .2, 1);
+  }
+  .team_grid .card_wrapper.is-member.is-holo .card_link,
+  .team_grid .card_wrapper.is-member:focus-within .card_link {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate3d(calc(-50% + var(--holo-x, 0) * 5px), calc(var(--holo-y, 0) * 5px), 26px);
+    transition: opacity .3s ease .08s, transform .25s ease-out;
+  }
+}
+
+.process_section .card_wrapper.is-step {
+  overflow: hidden;
+  overflow: clip;
+}
+.process_section .card_wrapper.is-step .beneficio_ico {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+  border-radius: 12px;
+  color: #151f47;
+  background-color: rgba(21, 31, 71, .07);
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .28) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(125deg, rgba(76, 100, 217, 0) 15%, rgba(76, 100, 217, .21) 30%, rgba(126, 192, 229, .19) 43%, rgba(219, 84, 31, .17) 56%, rgba(255, 187, 161, .17) 69%, rgba(76, 100, 217, 0) 85%);
+  background-size: 200% 200%, 260% 260%;
+  background-position: 20% 20%, 0% 0%;
+  animation: pasos-tornasol 12s linear infinite;
+}
+@keyframes pasos-tornasol {
+  0%, 100% { background-position: 20% 20%, 0% 0%; }
+  25% { background-position: 80% 20%, 100% 0%; }
+  50% { background-position: 80% 80%, 100% 100%; }
+  75% { background-position: 20% 80%, 0% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .process_section .card_wrapper.is-step .beneficio_ico { animation: none; background-position: 30% 30%, 50% 50%; }
+}
+.process_section .card_wrapper.is-step .beneficio_ico::after {
+  content: attr(data-glyph);
+  position: absolute;
+  right: -30px;
+  bottom: -36px;
+  z-index: -1;
+  font-size: 150px;
+  line-height: 1;
+  color: #4c64d9;
+  opacity: .055;
+  pointer-events: none;
+}
+@supports (grid-template-rows: subgrid) {
+  .process_grid > .card_wrapper.is-step {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+  }
+  .process_grid > .card_wrapper.is-step:has(> .beneficio_ico) { grid-row: span 4; }
+}
+
+.testimonial_carusel .card_base { z-index: 0; }
+.testimonial_carusel .card_base::after {
+  content: "\f10e";
+  content: "\f10e" / "";
+  position: absolute;
+  right: -6px;
+  bottom: -22px;
+  z-index: -1;
+  font-family: "Fa Solid 900";
+  font-size: 170px;
+  line-height: 1;
+  color: #4c64d9;
+  opacity: .055;
+  pointer-events: none;
+}
+
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+.bridge_grid .card_wrapper.is-bridge{position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1),box-shadow .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge:hover{z-index:2}
+.bridge_grid .card_wrapper.is-bridge .bridge_media{position:relative;transition:transform .7s cubic-bezier(.2,.8,.2,1),box-shadow .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge>:not(.bridge_media){transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge.is-holo{transform:perspective(800px) rotateX(var(--holo-rx)) rotateY(var(--holo-ry)) rotateZ(var(--holo-rz)) scale(1.02);transition:transform .2s ease-out,box-shadow .4s ease;box-shadow:calc(var(--holo-x)*-14px) calc(12px + var(--holo-y)*-14px) 26px -9px rgba(15,23,42,.3),-6px -6px 16px rgba(255,255,255,.9)}
+.bridge_grid .card_wrapper.is-bridge.is-holo .bridge_media{transform:translate3d(calc(var(--holo-x)*12px),calc(var(--holo-y)*12px),50px) rotateX(var(--holo-prx)) rotateY(var(--holo-pry));box-shadow:0 0 0 3px #fff,0 16px 24px -8px rgba(15,23,42,.45);transition:transform .3s ease-out,box-shadow .4s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo .card_title{transform:translate3d(calc(var(--holo-x)*6px),calc(var(--holo-y)*6px),28px);transition:transform .3s ease-out}
+.bridge_grid .card_wrapper.is-bridge.is-holo>:not(.bridge_media):not(.card_title){transform:translate3d(calc(var(--holo-x)*4px),calc(var(--holo-y)*4px),16px);transition:transform .3s ease-out}
+.bridge_grid .card_wrapper.is-bridge::before{content:'';position:absolute;left:var(--holo-pl,24px);top:var(--holo-pt,24px);width:var(--holo-pw,calc(100% - 48px));height:var(--holo-ph,232px);border-radius:16px;background:rgba(15,23,42,.6);filter:blur(14px);opacity:0;pointer-events:none;transform:translate3d(calc(var(--holo-x,0)*-22px),calc(16px + var(--holo-y,0)*-22px),0) scale(.9);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge.is-holo::before{opacity:.45;transition:opacity .5s ease,transform .3s ease-out}
+.bridge_grid .card_wrapper.is-bridge .bridge_media::after{content:'';position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(circle at var(--holo-px,50%) var(--holo-py,50%),rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 45%),linear-gradient(125deg,rgba(76,100,217,0) 15%,rgba(76,100,217,.42) 30%,rgba(0,196,255,.38) 43%,rgba(255,70,200,.34) 56%,rgba(255,196,40,.34) 69%,rgba(76,100,217,0) 85%);background-size:100% 100%,260% 260%;background-position:0 0,var(--holo-px,50%) var(--holo-py,50%);mix-blend-mode:overlay;transition:opacity .5s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo .bridge_media::after{opacity:.5}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in{transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in .bridge_media{transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s ease}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in>:not(.bridge_media){transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.bridge_grid .card_wrapper.is-bridge.is-holo.is-holo-in::before{transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+}
+
+.products_section .solution_card.is-product,
+.bridge_grid .card_wrapper.is-bridge,
+.process_section .card_wrapper.is-step {
+  --aro: 8px;
+  --radio-int: 24px;
+  border: var(--aro) solid transparent;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  background-color: transparent;
+  background-image:
+    linear-gradient(#fff, #fff),
+    linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px),
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(rgba(255, 255, 255, .3), rgba(255, 255, 255, .3));
+  background-origin: padding-box, border-box, border-box, border-box;
+  background-clip: padding-box, border-box, border-box, border-box;
+  background-repeat: no-repeat;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.products_section .solution_card.is-product {
+  position: relative;
+  overflow: visible;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.bridge_grid .card_wrapper.is-bridge {
+  box-shadow: 0 1px 8px rgba(15, 23, 42, .32);
+}
+.process_section .card_wrapper.is-step {
+  --radio-int: 20px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), 0 1px 8px rgba(15, 23, 42, .32);
+}
+
+.products_section .solution_card.is-product::before,
+.bridge_grid .card_wrapper.is-bridge::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--aro));
+  z-index: 0;
+  padding: 1px;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.team_grid .glass_frame,
+body:has(.main_hero) .testimonial_carusel > .card_testimonial,
+body:has(.main_hero) .credentials_section .cert_frame {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+body:has(.main_hero) .credentials_section .cert_frame .cert_cell {
+  border: 0;
+  box-shadow: none;
+}
+
+.team_grid .glass_frame::after,
+body:has(.main_hero) .testimonial_carusel > .card_testimonial::after,
+body:has(.main_hero) .credentials_section .cert_frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    rgba(255, 255, 255, .3);
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+
+.team_grid .glass_frame::before,
+body:has(.main_hero) .testimonial_carusel > .card_testimonial::before,
+body:has(.main_hero) .credentials_section .cert_frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .team_grid .card_wrapper.is-member {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), box-shadow .7s cubic-bezier(.2, .8, .2, 1);
+  }
+  .team_grid .card_wrapper.is-member.is-holo {
+    z-index: 2;
+    transform: perspective(700px) rotateX(var(--holo-rx)) rotateY(var(--holo-ry)) rotateZ(var(--holo-rz)) scale(1.02);
+    transition: transform .15s ease-out, box-shadow .4s ease;
+    box-shadow: calc(var(--holo-x) * -14px) calc(12px + var(--holo-y) * -14px) 26px -9px rgba(15, 23, 42, .3),
+      -6px -6px 16px rgba(255, 255, 255, .9);
+  }
+  .team_grid .card_wrapper.is-member .team_photo,
+  .team_grid .card_wrapper.is-member .team_name,
+  .team_grid .card_wrapper.is-member .team_role {
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), box-shadow .7s cubic-bezier(.2, .8, .2, 1);
+  }
+
+  .team_grid .card_wrapper.is-member.is-holo .team_photo,
+  .team_grid .card_wrapper.is-member.is-holo .team_name,
+  .team_grid .card_wrapper.is-member.is-holo .team_role {
+    transition: transform .25s ease-out, box-shadow .4s ease;
+  }
+
+  .team_grid .card_wrapper.is-member.is-holo .team_photo {
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px), 60px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+    box-shadow: 0 0 0 3px #fff, 0 12px 20px -6px rgba(15, 23, 42, .45);
+  }
+  .team_grid .card_wrapper.is-member.is-holo .team_name {
+    transform: translate3d(calc(var(--holo-x) * 6px), calc(var(--holo-y) * 6px), 32px);
+  }
+  .team_grid .card_wrapper.is-member.is-holo .team_role {
+    transform: translate3d(calc(var(--holo-x) * 4px), calc(var(--holo-y) * 4px), 20px);
+  }
+
+  .team_grid .card_wrapper.is-member::before,
+  .team_grid .card_wrapper.is-member::after {
+    content: '';
+    position: absolute;
+    top: var(--holo-pt, 24px);
+    left: var(--holo-pl, calc(50% - 36px));
+    width: var(--holo-ps, 72px);
+    height: var(--holo-ps, 72px);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .team_grid .card_wrapper.is-member::before {
+    background: rgba(15, 23, 42, .6);
+    filter: blur(12px);
+    transform: translate3d(calc(var(--holo-x, 0) * -24px), calc(15px + var(--holo-y, 0) * -24px), 0) scale(.85);
+    transition: opacity .5s ease, transform .7s cubic-bezier(.2, .8, .2, 1);
+  }
+  .team_grid .card_wrapper.is-member.is-holo::before { opacity: .55; transition: opacity .5s ease, transform .25s ease-out; }
+  .team_grid .card_wrapper.is-member::after {
+    background:
+      radial-gradient(circle at var(--holo-px, 50%) var(--holo-py, 50%), rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 45%),
+      linear-gradient(125deg, rgba(76, 100, 217, 0) 15%, rgba(76, 100, 217, .42) 30%, rgba(0, 196, 255, .38) 43%,
+        rgba(255, 70, 200, .34) 56%, rgba(255, 196, 40, .34) 69%, rgba(76, 100, 217, 0) 85%);
+    background-size: 100% 100%, 260% 260%;
+    background-position: 0 0, var(--holo-px, 50%) var(--holo-py, 50%);
+    mix-blend-mode: overlay;
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), opacity .5s ease;
+  }
+
+  .team_grid .card_wrapper.is-member.is-holo::after {
+    opacity: .5;
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px), 60.5px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+    transition: transform .25s ease-out, opacity .5s ease;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+
+  .team_grid .card_wrapper.is-member.has-link.is-holo .team_photo {
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px - 7px), 60px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo::after {
+    transform: translate3d(calc(var(--holo-x) * 14px), calc(var(--holo-y) * 14px - 7px), 60.5px)
+      rotateX(var(--holo-prx)) rotateY(var(--holo-pry)) scale(1.06);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo::before {
+    transform: translate3d(calc(var(--holo-x, 0) * -24px), calc(8px + var(--holo-y, 0) * -24px), 0) scale(.85);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo .team_name {
+    transform: translate3d(calc(var(--holo-x) * 6px), calc(var(--holo-y) * 6px - 7px), 32px);
+  }
+  .team_grid .card_wrapper.is-member.has-link.is-holo .team_role {
+    transform: translate3d(calc(var(--holo-x) * 4px), calc(var(--holo-y) * 4px + 14px), 20px);
+  }
+
+  .team_grid .card_wrapper.is-member.has-link:focus-within:not(.is-holo) .team_photo,
+  .team_grid .card_wrapper.is-member.has-link:focus-within:not(.is-holo) .team_name {
+    transform: translate3d(0, -7px, 0);
+  }
+  .team_grid .card_wrapper.is-member.has-link:focus-within:not(.is-holo) .team_role {
+    transform: translate3d(0, 14px, 0);
+  }
+}
+
+.process_section .card_wrapper.is-step .beneficio_ico {
+  box-shadow:
+    inset 0 0 0 4px rgba(255, 255, 255, .62),
+    inset -5px 5px 10px -5px rgba(255, 255, 255, 1),
+    inset 5px -5px 10px -5px rgba(160, 168, 186, .3),
+    0 1px 5px rgba(15, 23, 42, .18);
+}
+
+.main_hero .background-video {
+  --aro: 16px;
+  --radio-int: 24px;
+  border: var(--aro) solid transparent;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  background-color: rgba(255, 255, 255, .3);
+  background-image:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .275) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(125deg, rgba(76, 100, 217, 0) 15%, rgba(76, 100, 217, .21) 30%, rgba(126, 192, 229, .19) 43%, rgba(219, 84, 31, .17) 56%, rgba(255, 187, 161, .17) 69%, rgba(76, 100, 217, 0) 85%),
+    linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px);
+  background-size: auto, 200% 200%, 260% 260%, auto;
+  background-position: 0 0, 20% 20%, 0% 0%, 0 0;
+  background-blend-mode: normal, normal, multiply, normal;
+  background-origin: border-box;
+  background-clip: border-box;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  isolation: isolate;
+  overflow: visible;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+  animation: hero-tornasol 21.6s linear infinite;
+}
+.main_hero .background-video > video { border-radius: var(--radio-int); }
+
+.main_hero .background-video::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--aro));
+  z-index: 1;
+  padding: 1px;
+  border-radius: calc(var(--radio-int) + var(--aro));
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+@keyframes hero-tornasol {
+  0%, 100% { background-position: 0 0, 20% 20%, 0% 0%, 0 0; }
+  25% { background-position: 0 0, 80% 20%, 100% 0%, 0 0; }
+  50% { background-position: 0 0, 80% 80%, 100% 100%, 0 0; }
+  75% { background-position: 0 0, 20% 80%, 0% 100%, 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .main_hero .background-video { animation: none; background-position: 0 0, 30% 30%, 50% 50%, 0 0; }
+}
+@media screen and (max-width: 767px) {
+  .main_hero .background-video { --aro: 12px; }
+}
+
+.team_grid .card_wrapper.is-member { --aro: 6px; }
+.team_grid .card_wrapper.is-member .team_photo {
+  --tornasol: 0;
+  box-sizing: content-box;
+  border: var(--aro) solid transparent;
+  margin: calc(-1 * var(--aro)) calc(-1 * var(--aro)) calc(4px - var(--aro));
+  background-color: transparent;
+  background-image:
+    linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px),
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 50%, rgb(255 255 255 / calc(var(--tornasol) * 1.1)) 0%, rgb(255 255 255 / 0) 22%),
+    linear-gradient(125deg, rgb(76 100 217 / 0) 15%, rgb(76 100 217 / calc(var(--tornasol) * .84)) 30%, rgb(126 192 229 / calc(var(--tornasol) * .76)) 43%, rgb(219 84 31 / calc(var(--tornasol) * .68)) 56%, rgb(255 187 161 / calc(var(--tornasol) * .68)) 69%, rgb(76 100 217 / 0) 85%),
+    linear-gradient(rgba(255, 255, 255, .3), rgba(255, 255, 255, .3));
+  background-origin: border-box;
+  background-clip: border-box;
+  background-size: auto, auto, 200% 200%, 260% 260%, auto;
+  background-position: 0 0, 0 0, 20% 20%, 0% 0%, 0 0;
+  background-blend-mode: normal, normal, normal, multiply, normal;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .75);
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+  animation: equipo-aro-tornasol 21.6s linear infinite;
+  transition: --tornasol .3s ease;
+}
+.team_grid .card_wrapper.is-member:hover .team_photo,
+.team_grid .card_wrapper.is-member.is-holo .team_photo { --tornasol: .25; }
+@keyframes equipo-aro-tornasol {
+  0%, 100% { background-position: 0 0, 0 0, 20% 20%, 0% 0%, 0 0; }
+  25% { background-position: 0 0, 0 0, 80% 20%, 100% 0%, 0 0; }
+  50% { background-position: 0 0, 0 0, 80% 80%, 100% 100%, 0 0; }
+  75% { background-position: 0 0, 0 0, 20% 80%, 0% 100%, 0 0; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+
+  .team_grid .card_wrapper.is-member .team_photo {
+    transition: transform .7s cubic-bezier(.2, .8, .2, 1), box-shadow .7s cubic-bezier(.2, .8, .2, 1), --tornasol .3s ease;
+  }
+  .team_grid .card_wrapper.is-member.is-holo .team_photo {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .85), 0 12px 20px -6px rgba(15, 23, 42, .45);
+    transition: transform .25s ease-out, box-shadow .4s ease, --tornasol .3s ease;
+  }
+
+  .team_grid .card_wrapper.is-member::before,
+  .team_grid .card_wrapper.is-member::after {
+    top: calc(var(--holo-pt, 18px) + var(--aro));
+    left: calc(var(--holo-pl, calc(50% - 42px)) + var(--aro));
+    width: calc(var(--holo-ps, 84px) - 2 * var(--aro));
+    height: calc(var(--holo-ps, 84px) - 2 * var(--aro));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team_grid .card_wrapper.is-member .team_photo { animation: none; background-position: 0 0, 0 0, 30% 30%, 50% 50%, 0 0; }
+}
+</style>
+<meta name="robots" content="noindex"><style id="lp-estilos">/* Landing pieces that the site does not have yet. Everything else on the page is the site's own CSS.
+   Prefix lp_ = new class to create in Webflow (or as an embed block of the landing page head). */
+
+/* Prototype banner (not for Webflow) */
+.lp_proto { position: fixed; right: 16px; bottom: 96px; z-index: 1000; max-width: calc(100% - 32px); background: #fff4e5; color: #663c00; font: 400 12px/1.35 var(--_🔤-typography---font-family--body), sans-serif; padding: 8px 14px; border-radius: 999px; box-shadow: 0 4px 14px rgba(15, 23, 42, .15); pointer-events: none; }
+@media (max-width: 767px) { .lp_proto { bottom: 150px; right: 12px; } }
+
+/* Hero: primary (Glass CTA ring) + secondary side by side */
+.lp_hero_ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+
+/* Hero figures in the info cell */
+.info_hero_template { gap: 16px; align-items: stretch; }
+.lp_stat { flex: 1 1 0; min-width: 0; }
+.lp_stat .process_number { font-size: 28px; line-height: 32px; }
+.lp_stat .card_desc { margin-top: 4px; }
+
+/* Quote card: Glass Base, same recipe as .products_section .solution_card.is-product (ring 12 / inner radius 24) */
+.lp_quote { --aro: 12px; --radio-int: 24px; position: relative; width: 100%; border: var(--aro) solid transparent; border-radius: calc(var(--radio-int) + var(--aro));
+  background-color: transparent;
+  background-image: linear-gradient(#fff, #fff), linear-gradient(to top, rgba(15, 23, 42, .18), rgba(15, 23, 42, 0) 18px), radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%), linear-gradient(rgba(255, 255, 255, .3), rgba(255, 255, 255, .3));
+  background-origin: padding-box, border-box, border-box, border-box; background-clip: padding-box, border-box, border-box, border-box; background-repeat: no-repeat;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32)); }
+.lp_quote::before { content: ""; position: absolute; inset: calc(-1 * var(--aro)); z-index: 0; padding: 1px; border-radius: calc(var(--radio-int) + var(--aro)); pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.lp_quote_form { position: relative; z-index: 1; padding: 28px; }
+.lp_quote_head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin-bottom: 6px; }
+.lp_quote_head .chip { white-space: nowrap; }
+.lp_quote_title { font-size: 22px; line-height: 28px; }
+.lp_steps { display: flex; gap: 8px; margin: 16px 0 20px; }
+.lp_steps span { flex: 1; height: 6px; border-radius: 99px; background: #e6e9f0; }
+.lp_steps span.is-on { background: var(--_🏷️-colours-semantic---fill--brand-strong); }
+.lp_q { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
+.lp_q legend { padding: 0; margin-bottom: 10px; }
+.lp_options { display: flex; flex-wrap: wrap; gap: 8px; }
+.lp_option { position: relative; margin: 0; font-weight: 400; }
+.lp_option input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.lp_option span { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid #ccc; border-radius: 32px; background: #fff; cursor: pointer;
+  font: 700 14px/1 var(--_🔤-typography---font-family--heading), sans-serif; color: var(--_🏷️-colours-semantic---text--strong); transition: background-color .15s ease, color .15s ease; }
+.lp_option input:checked + span { background: var(--_🏷️-colours-semantic---fill--brand-strong); border-color: var(--_🏷️-colours-semantic---fill--brand-strong); color: #fff; }
+.lp_option input:focus-visible + span { outline: 3px solid #4c64d9; outline-offset: 2px; }
+.lp_two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.lp_field label small, .lp_extras_title small { font-weight: 400; color: #000933a6; }
+.lp_field .text-field { width: 100%; }
+.lp_extras_title { margin: 6px 0 8px; }
+.lp_extras { display: grid; gap: 8px; margin-bottom: 14px; }
+.lp_extras label, .lp_consent { display: flex; gap: 10px; align-items: flex-start; font: 400 14px/1.45 var(--_🔤-typography---font-family--body), sans-serif; color: #000933a6; margin: 0; cursor: pointer; }
+.lp_extras input, .lp_consent input { width: 18px; height: 18px; margin-top: 2px; flex: none; accent-color: #151f47; }
+.lp_err { display: none; color: #5f2120; background: #fdeded; border-radius: 12px; padding: 10px 12px; font: 400 14px/1.4 var(--_🔤-typography---font-family--body), sans-serif; margin: 12px 0 0; }
+.lp_err.is-on { display: block; }
+.lp_full { display: flex; width: 100%; }
+.button-ring-form.lp_full { margin-top: 16px; }
+.lp_btn { border: 0; width: 100%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.lp_note { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+.lp_back { background: none; border: 0; padding: 12px 0 0; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; font: 700 14px/1 var(--_🔤-typography---font-family--heading), sans-serif; color: var(--_🏷️-colours-semantic---fill--brand-alternate); }
+.lp_done { text-align: center; }
+.lp_done_ico { margin: 4px auto 14px; }
+.lp_done_list { text-align: left; padding-left: 20px; margin: 14px 0 18px; }
+.lp_done_list li + li { margin-top: 6px; }
+.lp_done .secondbutton { justify-content: center; }
+[hidden] { display: none !important; }
+
+/* Content helpers */
+.lp_list { padding-left: 18px; margin: 10px 0 12px; }
+.lp_list li + li { margin-top: 6px; }
+.lp_more { display: inline-flex; gap: 8px; align-items: center; margin-top: 14px; font: 700 14px/1 var(--_🔤-typography---font-family--heading), sans-serif; }
+@media (min-width: 1200px) { .products_grid.lp_grid_4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; } }
+
+@media (max-width: 767px) {
+  .lp_two { grid-template-columns: 1fr; }
+  .lp_quote { --aro: 8px; }
+  .lp_quote_form { padding: 20px; }
+  .info_hero_template { flex-wrap: wrap; }
+  .lp_stat { flex: 1 1 30%; }
+  .lp_stat .process_number { font-size: 22px; line-height: 26px; }
+}
+</style></head><body class="body_soluciones"><div data-wf--navbar-main--variant="base" class="navbar-logo-left"><div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="navbar-logo-left-container shadow-three w-nav"><div class="container-2"><div class="navbar-wrapper"><a href="https://actuaria.com/" class="navbar-brand w-nav-brand"><img width="220" loading="lazy" alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbec17f7fc765c2ea5d9_logo-actuaria.svg" class="image"></a><nav role="navigation" class="nav-menu-wrapper w-nav-menu"><ul role="list" class="nav-menu-two w-list-unstyled"><li><div data-delay="0" data-hover="false" class="nav-dropdown w-dropdown"><div class="nav-dropdown-toggle w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="link_navbar">Soluciones</div></div><nav class="nav-dropdown-list shadow-three mobile-shadow-hide w-dropdown-list"><a href="https://actuaria.com/beneficios-laborales" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Beneficios Laborales</h6></a><a href="https://actuaria.com/seguros-y-medicina" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Seguros y Salud</h6></a><a href="https://actuaria.com/analisis-de-datos" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Análisis de Datos</h6></a><a href="https://actuaria.com/riesgos-y-finanzas" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Riesgos y Finanzas</h6></a></nav></div></li><li><div data-delay="0" data-hover="false" class="nav-dropdown w-dropdown"><div class="nav-dropdown-toggle w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="link_navbar">Recursos</div></div><nav class="nav-dropdown-list shadow-three mobile-shadow-hide w-dropdown-list"><div data-hover="false" data-delay="0" data-calc-menu="1" class="w-dropdown"><div class="nav_link_drop w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="icon_chip_nav"></div><div class="nav_link_drop_text">Calculadoras</div></div><nav data-calc-panel="1" class="w-dropdown-list"><div data-calc-cols="1"><div data-calc-col="beneficios"><details data-calc-grupo="beneficios" name="calc-grupos"><summary><div data-calc-titulo="1">Beneficios post empleo</div></summary><a href="https://actuaria.com/calculadoras/jubilacion-patronal" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Jubilación patronal</h6></a><a href="https://actuaria.com/calculadoras/despido-intempestivo" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Despido intempestivo</h6></a><a href="https://actuaria.com/calculadoras/desahucio" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Desahucio</h6></a><a href="https://actuaria.com/calculadoras/jubilacion-vejez-iess" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Jubilación por vejez IESS</h6></a><a href="https://actuaria.com/calculadoras/fondo-pensiones-iess" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Fondo de pensiones IESS</h6></a><a href="https://actuaria.com/calculadoras/aportes-iess" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Aportes al IESS</h6></a></details></div><div data-calc-col="ahorros"><details data-calc-grupo="ahorros" name="calc-grupos"><summary><div data-calc-titulo="1">Ahorros e impuestos</div></summary><a href="https://actuaria.com/calculadoras/decimo-tercer-sueldo" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Décimo tercer sueldo</h6></a><a href="https://actuaria.com/calculadoras/decimo-cuarto-sueldo" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Décimo cuarto sueldo</h6></a><a href="https://actuaria.com/calculadoras/vacaciones" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Vacaciones</h6></a><a href="https://actuaria.com/calculadoras/fondos-de-reserva" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Fondos de reserva</h6></a><a href="https://actuaria.com/calculadoras/ahorro-programado" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Ahorro programado</h6></a><a href="https://actuaria.com/calculadoras/impuesto-a-la-renta" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Impuesto a la renta</h6></a></details></div></div></nav></div><a href="https://actuaria.com/coeficientes-jp-am99" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"><span></span></div><h6 class="nav_link_drop_text">Coeficientes JP-AM99</h6></a></nav></div></li><li><div data-delay="0" data-hover="false" class="nav-dropdown w-dropdown"><div class="nav-dropdown-toggle w-dropdown-toggle"><div class="nav-dropdown-icon w-icon-dropdown-toggle"></div><div class="link_navbar">Nosotros</div></div><nav class="nav-dropdown-list shadow-three mobile-shadow-hide w-dropdown-list"><a href="https://actuaria.com/nosotros" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Nuestro equipo</h6></a><a href="https://actuaria.com/nosotros#trabaja-con-nosotros" class="nav_link_drop w-inline-block"><div class="icon_chip_nav"></div><h6 class="nav_link_drop_text">Trabaja con nosotros</h6></a></nav></div></li><li class="list-item"><a href="https://actuaria.com/blog" class="link_navbar-blog">Blog</a><div class="w-locales-list"><div role="list" class="w-locales-items"><div role="listitem" class="w-locales-item"><a hreflang="es-EC" href="https://actuaria.com/estudio-actuarial-jubilacion-patronal" aria-current="page" class="w--current">ES</a></div><div role="listitem" class="w-locales-item"><a hreflang="en" href="https://actuaria.com/en/estudio-actuarial-jubilacion-patronal">EN</a></div></div></div></li><li class="list-item-2"><div class="nav-divider"></div></li><li class="mobile-margin-top-10"><a href="https://actuaria.com/contacto" class="secondary-button-neo">Contacto <span class="text-span-4"></span></a><a href="https://actuaria.com/contacto" class="secondary-button-neo-back">Cotizar</a><div class="button-ring"><a href="https://plus.actuaria.com/auth/login" target="_blank" class="actuariaplus-button is-nav-app w-inline-block"><img width="50" loading="lazy" alt="actuaria+" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbeccb6a40ca56c13c67_logo-actuaria-plus.svg" class="nav_app-logo"></a></div></li></ul></nav><div class="menu-button w-nav-button"><div class="w-icon-nav-menu"></div></div></div></div></div><div class="w-embed"><style>
+.navbar-logo-left .list-item { display: flex; align-items: center; gap: 12px; }
+.navbar-logo-left .w-locales-items { display: flex; align-items: center; gap: 2px; margin: 0; padding: 3px; border-radius: 999px; background: #eef0f6; box-shadow: inset 2px 2px 5px rgba(15, 23, 42, .11), inset -2px -2px 4px #fff; }
+.navbar-logo-left .w-locales-item a { display: flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; font-family: Nunito, sans-serif; font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: .3px; color: #4a5268; text-decoration: none; transition: background-color .2s, color .2s, box-shadow .2s; }
+.navbar-logo-left .w-locales-item a::before { content: ""; flex: none; width: 16px; height: 12px; border-radius: 2px; background: center / cover no-repeat; box-shadow: 0 0 0 1px rgba(21, 31, 71, .1); }
+.navbar-logo-left .w-locales-item a[hreflang^="es"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30'%3E%3Crect width='40' height='30' fill='%23AA151B'/%3E%3Crect y='7.5' width='40' height='15' fill='%23F1BF00'/%3E%3C/svg%3E"); }
+.navbar-logo-left .w-locales-item a[hreflang^="en"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30'%3E%3CclipPath id='t'%3E%3Cpath d='M20,15h20v15zv15h-20zh-20v-15zv-15h20z'/%3E%3C/clipPath%3E%3Crect width='40' height='30' fill='%23012169'/%3E%3Cpath d='M0,0L40,30M40,0L0,30' stroke='%23fff' stroke-width='6'/%3E%3Cpath d='M0,0L40,30M40,0L0,30' clip-path='url(%23t)' stroke='%23C8102E' stroke-width='4'/%3E%3Cpath d='M20,0v30M0,15h40' stroke='%23fff' stroke-width='10'/%3E%3Cpath d='M20,0v30M0,15h40' stroke='%23C8102E' stroke-width='6'/%3E%3C/svg%3E"); }
+.navbar-logo-left .w-locales-item a:hover { color: #4c64d9; background: rgba(255, 255, 255, .6); }
+.navbar-logo-left .w-locales-item a.w--current { background: linear-gradient(145deg, #fff, #eceff5); color: #151f47; box-shadow: 2px 2px 5px rgba(15, 23, 42, .26), -2px -2px 4px #fff; }
+.navbar-logo-left .w-locales-item a:focus-visible { outline: 2px solid #4c64d9; outline-offset: 2px; }
+@media (min-width: 992px) {
+  .navbar-logo-left .list-item { gap: 8px; }
+  .navbar-logo-left .w-locales-items { padding: 2px; }
+  .navbar-logo-left .w-locales-item a { gap: 0; padding: 6px 7px; font-size: 0; letter-spacing: 0; }
+}
+
+@media (min-width: 1280px) {
+  .navbar-logo-left .secondary-button-neo { padding-left: 16px; padding-right: 16px; }
+  .navbar-logo-left .actuariaplus-button.is-nav-app { padding-left: 20px; padding-right: 20px; }
+}
+@media (min-width: 992px) and (max-width: 1279.98px) {
+  .navbar-logo-left .nav-dropdown { margin-left: 1px; margin-right: 1px; }
+  .navbar-logo-left .nav-dropdown .w-dropdown-toggle { padding-right: 26px; }
+  .navbar-logo-left .secondary-button-neo { padding-left: 8px; padding-right: 8px; }
+  .navbar-logo-left .actuariaplus-button.is-nav-app { padding-left: 24px; padding-right: 24px; }
+  .navbar-logo-left .nav-divider { margin-left: 6px; margin-right: 6px; }
+}
+@media (min-width: 992px) and (max-width: 1099.98px) {
+  .navbar-logo-left .navbar-brand img { width: 114px; min-width: 0; height: auto; }
+  .navbar-logo-left .link_navbar-blog { padding-left: 6px; padding-right: 6px; font-size: 16px; }
+  .navbar-logo-left .list-item { gap: 2px; margin-right: 8px; }
+  .navbar-logo-left .w-locales-item a { padding: 6px; }
+  .navbar-logo-left .nav-divider { display: none; }
+  .navbar-logo-left .secondary-button-neo { padding-left: 8px; padding-right: 8px; }
+  .navbar-logo-left .actuariaplus-button.is-nav-app { padding-left: 16px; padding-right: 16px; }
+  .navbar-logo-left .button-ring { padding: 5px; }
+}
+@media (max-width: 991px) {
+  .navbar-logo-left .list-item { flex-direction: column; gap: 10px; }
+}
+</style></div><div class="w-embed w-script"><script>
+(function () {
+  if (!/^en\b/i.test(document.documentElement.lang)) return;
+  var CAT = {
+    'Beneficios Laborales y Actuariales': 'Labor and Actuarial Benefits',
+    'Seguros y Medicina Prepagada': 'Insurance and Prepaid Healthcare',
+    'Análisis de Datos para Negocios': 'Business Data Analytics',
+    'Riesgo y Finanzas Corporativas': 'Risk and Corporate Finance',
+    'Beneficios post empleo': 'Post-employment benefits',
+    'Ahorros e impuestos': 'Savings and taxes'
+  };
+  var RUTAS = ['/post/', '/calculadoras/', '/nosotros#', '/ods5-appporlaequidad', '/ods15-nftree'];
+  var MES = { ene: 'Jan', feb: 'Feb', mar: 'Mar', abr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', ago: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dic: 'Dec' };
+  function run() {
+    document.querySelectorAll('.chip, .heading-7').forEach(function (el) {
+      var t = el.textContent.trim();
+      if (!el.children.length && CAT[t]) el.textContent = CAT[t];
+    });
+    document.querySelectorAll('[data-fecha]').forEach(function (el) {
+      var m = el.textContent.trim().match(/^(\d{1,2}) ([a-z]{3}) (\d{4})$/);
+      if (m && MES[m[2]]) el.textContent = MES[m[2]] + ' ' + m[1] + ', ' + m[3];
+    });
+    document.querySelectorAll(RUTAS.map(function (r) { return 'a[href^="' + r + '"]:not([hreflang])'; }).join(', ')).forEach(function (a) {
+      a.setAttribute('href', '/en' + a.getAttribute('href'));
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function () { setTimeout(run, 0); });
+})();
+</script>
+</div><div class="w-embed"><style>
+[data-calc-menu]{display:block;margin:0;z-index:auto}
+[data-calc-menu]>.w-dropdown-toggle{display:flex;width:100%;padding:0 40px 0 16px;white-space:normal}
+[data-calc-menu]>.w-dropdown-toggle .nav_link_drop_text{font-weight:800}
+[data-calc-menu]>.w-dropdown-toggle .w-icon-dropdown-toggle{transition:transform .2s ease}
+[data-calc-menu]>.w-dropdown-toggle.w--open .w-icon-dropdown-toggle{transform:rotate(180deg)}
+[data-calc-menu]>[data-calc-panel]{position:static;min-width:0;background:none;padding:0 0 6px}
+[data-calc-cols]{display:block}
+[data-calc-grupo]>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px 10px 24px;border-radius:8px;list-style:none;cursor:pointer}
+[data-calc-grupo]>summary::-webkit-details-marker{display:none}
+[data-calc-grupo]>summary::after{content:"\f078";flex:none;font-family:"Fa Solid 900";font-size:10px;color:rgba(21,31,71,.55);transition:transform .2s ease}
+[data-calc-grupo][open]>summary::after{transform:rotate(180deg)}
+[data-calc-grupo]>summary:hover{background-color:rgba(21,31,71,.05)}
+[data-calc-grupo]>summary:focus-visible{outline:2px solid #4c64d9;outline-offset:-2px}
+[data-calc-titulo]{font:800 11px/1.4 Nunito,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:rgba(21,31,71,.6)}
+[data-calc-grupo] .nav_link_drop{padding-left:32px}
+[data-calc-panel] .nav_link_drop_text{font-size:15px;line-height:38px}
+[data-calc-menu]+.nav_link_drop{margin-top:4px;border-top:1px solid rgba(21,31,71,.08)}
+@media (prefers-reduced-motion:reduce){[data-calc-menu] .w-icon-dropdown-toggle,[data-calc-grupo]>summary::after{transition:none}}
+@media (min-width:992px){.nav-dropdown-list.shadow-three.mobile-shadow-hide.w--open:has([data-calc-menu]){width:290px}}
+@media (max-width:991px){.nav-dropdown-list.shadow-three.mobile-shadow-hide.w--open:has([data-calc-menu]){width:270px}.w-nav-overlay [data-nav-menu-open]{max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain}}
+</style>
+</div></div><section class="main_hero"><div class="w-layout-blockcontainer conatiner_main_hero_template w-container"><div id="w-node-_28e4e536-ad51-ebce-a065-a60e2e5ae772-fcd53b04" class="w-layout-layout bento_grid_templates wf-layout-layout"><div class="w-layout-cell"><div class="chipset_cards"><h4 class="text_chip_cards">Estudio actuarial · NIC 19 y NIIF PYMES</h4><div class="icon_chip"></div></div><h1 class="text-displaymedium">Tu estudio de jubilación patronal, listo para la auditoría del cierre</h1><p class="paragraph_template">Calculamos tus provisiones de jubilación patronal y desahucio conforme a la NIC 19 o la sección 28 de las NIIF para PYMES. Recibes un informe auditable en hasta 8 días laborables y, si el auditor pregunta, nuestros actuarios lo sustentan.</p><div class="lp_hero_ctas">
+      <div class="button-ring"><a href="#cotizar" class="main_button is-hero-primary" data-evento="cta_hero">Cotiza tu estudio<span aria-hidden="true" class="text-span-3"></span></a></div>
+      <a href="https://actuaria.com/calculadoras/jubilacion-patronal" class="secondbutton is-flat" data-evento="calculadora_hero">Calcula una estimación gratis<span aria-hidden="true" class="text-span-3"></span></a>
+    </div></div><div id="w-node-feafaf96-6a1e-5c47-2fd2-1990b3a0474b-fcd53b04" class="w-layout-cell">
+    <div class="lp_quote" id="cotizar">
+      <form class="lp_quote_form" id="form-cotizar" novalidate="">
+        <input type="hidden" name="Tipo de servicio" value="Estudio-Actuarial">
+        <div data-paso="1">
+          <div class="lp_quote_head"><h2 class="card_title lp_quote_title">Cotiza en 2 pasos</h2><div class="chip is-resultado">Sin compromiso</div></div>
+          <p class="card_desc">Dos preguntas para preparar tu cotización.</p>
+          <div class="lp_steps" aria-hidden="true"><span class="is-on"></span><span></span></div>
+          <fieldset class="lp_q"><legend class="faq_question">¿Cuántos trabajadores tiene tu empresa?</legend><div class="lp_options">
+            <label class="lp_option"><input type="radio" name="Trabajadores" value="1 a 10" required=""><span>1 a 10</span></label><label class="lp_option"><input type="radio" name="Trabajadores" value="11 a 50"><span>11 a 50</span></label><label class="lp_option"><input type="radio" name="Trabajadores" value="51 a 200"><span>51 a 200</span></label><label class="lp_option"><input type="radio" name="Trabajadores" value="201 a 500"><span>201 a 500</span></label><label class="lp_option"><input type="radio" name="Trabajadores" value="Más de 500"><span>Más de 500</span></label>
+          </div></fieldset>
+          <fieldset class="lp_q"><legend class="faq_question">¿Bajo qué norma reporta tu empresa?</legend><div class="lp_options">
+            <label class="lp_option"><input type="radio" name="Norma" value="NIC 19" required=""><span>NIIF completas (NIC 19)</span></label><label class="lp_option"><input type="radio" name="Norma" value="NIIF PYMES s.28"><span>NIIF para PYMES</span></label><label class="lp_option"><input type="radio" name="Norma" value="No sé"><span>No estoy seguro</span></label>
+          </div></fieldset>
+          <p class="lp_err" role="alert" data-err="1">Elige una opción en cada pregunta para continuar.</p>
+          <div class="button-ring-form lp_full"><button type="button" class="actuariaplus-button is-hero-primary lp_btn" data-sig="">Continuar<span aria-hidden="true" class="text-span-3"></span></button></div>
+          <p class="card_desc lp_note"><span aria-hidden="true" class="text-span-3"></span>Tus datos se tratan bajo ISO/IEC 27001.</p>
+        </div>
+        <div data-paso="2" hidden="">
+          <div class="lp_quote_head"><h2 class="card_title lp_quote_title">¿A quién enviamos la cotización?</h2></div>
+          <p class="card_desc">Un asesor de Actuaria te contacta con la propuesta.</p>
+          <div class="lp_steps" aria-hidden="true"><span class="is-on"></span><span class="is-on"></span></div>
+          <div class="lp_two">
+            <div class="lp_field"><label for="f-nombre">Nombre y apellido</label><input class="text-field w-input" id="f-nombre" name="Nombre" autocomplete="name" required="" placeholder="Ej.: María Pérez"></div>
+            <div class="lp_field"><label for="f-correo">Correo de trabajo</label><input class="text-field w-input" id="f-correo" name="Correo" type="email" autocomplete="email" required="" placeholder="nombre@empresa.com"></div>
+          </div>
+          <div class="lp_two">
+            <div class="lp_field"><label for="f-empresa">Empresa</label><input class="text-field w-input" id="f-empresa" name="Razon social" autocomplete="organization" required="" placeholder="Razón social"></div>
+            <div class="lp_field"><label for="f-tel">Teléfono o WhatsApp <small>(opcional)</small></label><input class="text-field w-input" id="f-tel" name="Telefono" type="tel" autocomplete="tel" placeholder="09 1234 5678"></div>
+          </div>
+          <div class="lp_field"><label for="f-ruc">RUC <small>(opcional, agiliza la cotización)</small></label><input class="text-field w-input" id="f-ruc" name="RUC" inputmode="numeric" maxlength="13" placeholder="13 dígitos"></div>
+          <p class="faq_question lp_extras_title">¿Te interesa también…? <small>(opcional)</small></p>
+          <div class="lp_extras">
+            <label><input type="checkbox" name="Extra" value="Actas de jubilación patronal">Actas de jubilación patronal para quienes se jubilan</label>
+            <label><input type="checkbox" name="Extra" value="Impuestos diferidos">Informe de impuestos diferidos de las provisiones</label>
+            <label><input type="checkbox" name="Extra" value="Control tributario">Control tributario de provisiones (Kardex)</label>
+          </div>
+          <label class="lp_consent"><input type="checkbox" name="Legal" required="">Acepto la <a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df6459360730d2f79e4_politica-privacidad-proteccion-datos.pdf" target="_blank" rel="noopener" class="link">Política de Protección de Datos Personales</a> de Actuaria Consultores S.A.</label>
+          <p class="lp_err" role="alert" data-err="2">Revisa tu nombre, correo, empresa y la aceptación de la política.</p>
+          <div class="button-ring-form lp_full"><button type="submit" class="actuariaplus-button is-hero-primary lp_btn">Recibir mi cotización<span aria-hidden="true" class="text-span-3"></span></button></div>
+          <button type="button" class="lp_back" data-atras=""><span aria-hidden="true" class="text-span-3"></span>Volver</button>
+        </div>
+        <div data-paso="3" hidden="" aria-live="polite" class="lp_done">
+          <span class="beneficio_ico lp_done_ico"></span>
+          <h2 class="card_title lp_quote_title">¡Listo! Recibimos tu solicitud</h2>
+          <ol class="card_desc lp_done_list"><li>Un asesor revisa los datos de tu empresa.</li><li>Te contacta con la cotización y la lista de información que necesitamos.</li><li>Con tu información completa, el informe sale en hasta 8 días laborables.</li></ol>
+          <a href="https://actuaria.com/calculadoras/jubilacion-patronal" class="secondbutton is-flat lp_full">Mientras tanto, calcula una estimación<span aria-hidden="true" class="text-span-3"></span></a>
+        </div>
+      </form>
+    </div></div><div class="w-layout-cell"><div class="w-layout-hflex info_hero_template"><div class="lp_stat"><div class="process_number">+40</div><p class="card_desc">años de experiencia actuarial</p></div><div class="lp_stat"><div class="process_number">+6.500</div><p class="card_desc">clientes en la región</p></div><div class="lp_stat"><div class="process_number">8 días</div><p class="card_desc">laborables como máximo para tu informe</p></div></div></div></div></div></section><section class="brands_section"><div class="w-layout-blockcontainer container_brands w-container"><div class="w-layout-hflex brands"><div class="w-layout-vflex heading_frame"><h2 class="heading-section">Empresas que confían en Actuaria</h2><h2 class="subheading-section">Más de 6.500 clientes en la región, de todos los sectores.</h2></div></div></div><div class="carousel_container_alfa"><div class="gradient_div_logos"></div><div class="gradient_div_logos_end"></div><div class="logos_container"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e970b146669156b878_McDonalds_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e83ece46905ebb7c9c_Unilever_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e893dc4aa6bc47eb2f_GrupoElRosado_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e89905f06b2aeecd4b_Adelca_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e6f27e9994666133ca_Tia_Gris%201.png" loading="lazy" alt="" class="logo_stone"></div><div class="logos_container"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e970b146669156b878_McDonalds_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e83ece46905ebb7c9c_Unilever_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e893dc4aa6bc47eb2f_GrupoElRosado_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e89905f06b2aeecd4b_Adelca_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e5e6f27e9994666133ca_Tia_Gris%201.png" loading="lazy" alt="" class="logo_stone"></div></div><div class="carousel_container_beta"><div class="gradient_div_logos-_start"></div><div class="gradient_div_logos_end"></div><div class="logos_container_b"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e6426e467a1d3793524b_Humana_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e6413e256ae9ff4dd068_BancoBolivariano_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e640af7049ae1ac41f9f_DinersClub_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e64001c8aedb99035f24_BancoPichincha_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e6404990369a7d74bea0_Saludsa_Gris%201.png" loading="lazy" alt="" class="logo_stone"></div><div class="logos_container_b"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e6426e467a1d3793524b_Humana_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e6413e256ae9ff4dd068_BancoBolivariano_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e640af7049ae1ac41f9f_DinersClub_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e64001c8aedb99035f24_BancoPichincha_Gris%201.png" loading="lazy" alt="" class="logo_stone"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a85e6404990369a7d74bea0_Saludsa_Gris%201.png" loading="lazy" alt="" class="logo_stone"></div></div></section><section class="beneficios_section lp_oblig">
+      <div class="container_beneficios">
+        <div class="section_head"><h2 class="section_title">¿Tu empresa está obligada a tener el estudio?</h2><p class="section_sub">Si llevas contabilidad y tienes trabajadores bajo relación de dependencia, sí.</p></div>
+        <div class="beneficios_grid lp_grid_2">
+          <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">Sí, si tu empresa:</h3>
+            <ul class="card_desc lp_list"><li>está obligada a llevar contabilidad en Ecuador, y</li><li>tiene uno o más trabajadores bajo relación de dependencia.</li></ul>
+            <p class="card_desc">El estudio determina las provisiones de jubilación patronal y desahucio que se registran en los estados financieros, según la NIC 19 o la sección 28 de las NIIF para PYMES.</p></div>
+          <div class="beneficio_card"><span class="beneficio_ico"></span><h3 class="card_title">Lo que revisan en el cierre</h3>
+            <p class="card_desc">Auditores y el SRI comparan las provisiones registradas con el respaldo actuarial. Un estudio sin hipótesis documentadas o fuera de norma termina en observaciones y ajustes de último momento.</p>
+            <a class="link lp_more" href="https://actuaria.com/post/jubilacion-patronal-y-conciliacion-tributaria-las-cinco-revisiones-comunes-que-realiza-el-sri">Las 5 revisiones más comunes del SRI<span aria-hidden="true" class="text-span-3"></span></a></div>
+        </div>
+      </div>
+    </section><section class="beneficios_section"><div class="container_beneficios"><div class="section_head"><h2 class="section_title">Cierra el año con tus provisiones respaldadas</h2><p class="section_sub">Información clara para decidir y un respaldo técnico que resiste la revisión externa.</p></div><div class="beneficios_grid"><div class="beneficio_card"><span aria-hidden="true" data-glyph="" class="beneficio_ico"></span><h3 class="card_title">Cumplimiento normativo</h3><p class="card_desc">Asegura conformidad total con la NIC 19 y la sección 28 de las NIIF para PYMES.</p></div><div class="beneficio_card"><span aria-hidden="true" data-glyph="" class="beneficio_ico"></span><h3 class="card_title">Optimización financiera</h3><p class="card_desc">Detecta oportunidades de ahorro en provisiones y mejora la planificación del flujo de caja.</p></div><div class="beneficio_card"><span aria-hidden="true" data-glyph="" class="beneficio_ico"></span><h3 class="card_title">Trazabilidad total</h3><p class="card_desc">Informes auditables, con hipótesis y metodología documentadas, listos para revisión externa.</p></div><div class="beneficio_card"><span aria-hidden="true" data-glyph="" class="beneficio_ico"></span><h3 class="card_title">Actuarios a tu lado</h3><p class="card_desc">Soporte técnico de nuestros actuarios durante auditorías y cierres contables.</p></div></div></div></section><section class="products_section">
+    <div class="container_products">
+      <h2 class="section_title is-product">Un informe que tu contador y tu auditor entienden</h2>
+      <div class="products_grid lp_grid_4">
+        <div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Provisiones</div><h3 class="card_title">Calculadas por trabajador</h3><p class="card_desc">Jubilación patronal y bonificación por desahucio, en los formatos técnicos de las NIIF.</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Respaldo</div><h3 class="card_title">Metodología e hipótesis explicadas</h3><p class="card_desc">Hipótesis financieras y demográficas documentadas, con su análisis de sensibilidad.</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Resultados</div><h3 class="card_title">Listo para registrar</h3><p class="card_desc">Costo del período, intereses y ganancias o pérdidas actuariales, separados para resultados y ORI.</p></div></div><div class="solution_card is-product"><div class="card_content"><div class="chip is-resultado">Auditoría</div><h3 class="card_title">Sustento ante tu auditor</h3><p class="card_desc">Nuestros especialistas explican la metodología, las hipótesis y las conclusiones a tu equipo y a tus auditores.</p></div></div>
+      </div>
+    <div class="products_plus"><div class="products_plus_body"><div class="chip is-resultado">Plataforma</div><h3 class="card_title">Accede a todo desde <a href="https://plus.actuaria.com/auth/login" class="link is-aplus-logo">actuaria+</a></h3><p class="card_desc">Envías la información y consultas tus resultados en <a href="https://plus.actuaria.com/auth/login" class="link">actuaria+</a>, nuestra plataforma digital que analiza integralmente tu nómina, con tus datos protegidos.</p></div><div class="button-ring"><a href="#cotizar" class="main_button is-hero-primary">Cotiza tu estudio<span aria-hidden="true" class="text-span-3"></span></a></div></div></div></section><section class="process_section"><div class="container_process"><div class="process_head"><h2 class="section_title">De tu nómina al informe, en 4 pasos</h2><p class="section_sub">Hasta 8 días laborables desde que recibimos la información completa.</p></div><div class="process_grid"><div class="card_wrapper is-step"><div class="process_number">01</div><h3 class="card_title">Envío de información</h3><p class="card_desc">Recibimos la información de la nómina y parámetros contables a través de nuestra plataforma. Nos aseguramos de garantizar la total confidencialidad y protección de datos desde el primer contacto.</p></div><div class="card_wrapper is-step"><div class="process_number">02</div><h3 class="card_title">Análisis y cálculo</h3><p class="card_desc">Procesamos la información aplicando la normativa legal según el Código del Trabajo y la metodología actuarial conforme la normativa contable NIC 19 y Sección 28 de la NIIF para PYMES.</p></div><div class="card_wrapper is-step"><div class="process_number">03</div><h3 class="card_title">Informe de resultados</h3><p class="card_desc">Consolidamos los valores de las provisiones bajo los formatos técnicos conforme las NIIF. Traducimos toda la complejidad actuarial en respaldos claros y listos para su aprobación.</p></div><div class="card_wrapper is-step"><div class="process_number">04</div><h3 class="card_title">Acompañamiento</h3><p class="card_desc">Respaldamos técnicamente los resultados del estudio actuarial, poniendo a disposición de tu equipo la experiencia de nuestros especialistas para explicar y sustentar la metodología, hipótesis y conclusiones ante auditorías.</p></div></div><div class="process_cta"><div class="button-ring"><a href="#cotizar" class="main_button is-hero-primary">Cotiza tu estudio<span aria-hidden="true" class="text-span-3"></span></a></div></div></div></section><section class="team_section"><div class="container_team"><div class="team_head"><h2 class="section_title">Los actuarios detrás de tu informe</h2><p class="section_sub">Actuarios certificados que sustentan la metodología, las hipótesis y las conclusiones de tu estudio ante cualquier auditoría.</p></div><div class="w-dyn-list"><div role="list" class="team_grid w-dyn-items"><div role="listitem" class="glass_frame w-dyn-item"><div class="card_wrapper is-member is-framed"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6abc0af3a9759349a92f9f38_Esteban%20Vargas.png" loading="lazy" alt="Esteban Vargas" sizes="100vw" srcset="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6abc0af3a9759349a92f9f38_Esteban%20Vargas-p-500.png 500w, https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6abc0af3a9759349a92f9f38_Esteban%20Vargas-p-800.png 800w, https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6abc0af3a9759349a92f9f38_Esteban%20Vargas.png 1080w" class="team_photo"><div class="team_name">Esteban Vargas</div><a rel="noopener noreferrer" target="_blank" href="https://www.linkedin.com/in/estebanvargas90/" class="card_link">Visitar perfil</a><div class="team_role">Chief Actuarial Officer</div></div></div><div role="listitem" class="glass_frame w-dyn-item"><div class="card_wrapper is-member is-framed"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6a9f28d052b37339030ebd47_Ivan%20Ramirez.jpg" loading="lazy" alt="Iván Ramírez" sizes="100vw" srcset="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6a9f28d052b37339030ebd47_Ivan%20Ramirez-p-500.jpg 500w, https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6a9f28d052b37339030ebd47_Ivan%20Ramirez-p-800.jpg 800w, https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6a9f28d052b37339030ebd47_Ivan%20Ramirez.jpg 1080w" class="team_photo"><div class="team_name">Iván Ramírez</div><a rel="noopener noreferrer" target="_blank" href="https://www.linkedin.com/in/ivan-ramirez-actuaria-56556555/" class="card_link">Visitar perfil</a><div class="team_role">Head of Employment Benefits</div></div></div><div role="listitem" class="glass_frame w-dyn-item"><div class="card_wrapper is-member is-framed"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6aa97a673f6ddb01ec4823d0_Jos%C3%A9%20Luis%20Bed%C3%B3n.png" loading="lazy" alt="José Luis Bedón" sizes="100vw" srcset="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6aa97a673f6ddb01ec4823d0_Jos%C3%A9%20Luis%20Bed%C3%B3n-p-500.png 500w, https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6aa97a673f6ddb01ec4823d0_Jos%C3%A9%20Luis%20Bed%C3%B3n-p-800.png 800w, https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6aa97a673f6ddb01ec4823d0_Jos%C3%A9%20Luis%20Bed%C3%B3n.png 1080w" class="team_photo"><div class="team_name">José Luis Bedón</div><a rel="noopener noreferrer" target="_blank" href="https://www.linkedin.com/in/jos%C3%A9-luis-bed%C3%B3n-jaramillo-0234216b/" class="card_link">Visitar perfil</a><div class="team_role">Senior Consultant</div></div></div></div></div></div></section><section class="testimonial_section"><div class="w-layout-blockcontainer container_testimonial w-container"><div class="w-layout-hflex testimonial"><div class="w-layout-vflex heading_frame-testimonial"><h2 class="heading-section">Precisión que genera confianza</h2><h2 class="subheading-section">La experiencia de trabajar con Actuaria, en palabras de nuestros clientes.</h2></div><div class="w-layout-hflex testimonial_container"><div class="testimonial_carusel"><div class="w-layout-vflex card_testimonial"><div class="w-layout-vflex card_base"><div class="stars_review"></div><p class="p_cards-testimonial">"Trabajar con Actuaria nos genera confianza. Su equipo ha demostrado un alto nivel de profesionalismo y conocimiento. Hemos obtenido soluciones personalizadas que se adaptan a nuestras necesidades. La comunicación es fluida y siempre están disponibles para resolver cualquier inquietud."</p><div class="bottom_card_testimonial"><div class="testimonial_logo-chip"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a030590_testimonio-logo-bmi.png" loading="eager" alt="BMI Compañía de Seguros" class="testimonial_logo-img"></div><div class="w-layout-vflex names_testimonial"><p class="testimonial_author">Paúl Villagomez</p><p class="p_cards-testimonial-cargo">Gerente Técnico y de Riesgos, BMI Ecuador</p></div></div></div></div><div class="w-layout-vflex card_testimonial"><div class="w-layout-vflex card_base"><div class="stars_review"></div><p class="p_cards-testimonial">"El Equipo de Actuaria Consultores ofrece un servicio actuarial excepcional. Su precisión, profesionalismo y atención al detalle han superado nuestras expectativas, proporcionando soluciones claras y efectivas. Altamente recomendados."</p><div class="bottom_card_testimonial"><div class="testimonial_logo-chip"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234d7fe7095f8b80564_testimonio-logo-aig.png" loading="eager" alt="AIG" class="testimonial_logo-img"></div><div class="w-layout-vflex names_testimonial"><p class="testimonial_author">David Vega</p><p class="p_cards-testimonial-cargo">Actuary I, AIG Ecuador</p></div></div></div></div><div class="w-layout-vflex card_testimonial"><div class="w-layout-vflex card_base"><div class="stars_review"></div><p class="p_cards-testimonial">"Conozco a Actuaria hace muchos años. Su profesionalismo y empatía son incomparables. No solo realizan cálculos matemáticos y actuariales, sino que son verdaderos asesores que se involucran en el crecimiento y desarrollo de la compañía."</p><div class="bottom_card_testimonial"><div class="testimonial_logo-chip"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a0305d6_testimonio-logo-plan-vital.png" loading="eager" alt="Plan Vital" class="testimonial_logo-img"></div><div class="w-layout-vflex names_testimonial"><p class="testimonial_author">Julio Tarré</p><p class="p_cards-testimonial-cargo">Gerente General, Plan Vital</p></div></div></div></div><div class="card_testimonial"><div class="card_base"><div class="stars_review"><span></span></div><p class="p_cards-testimonial">"Gracias a Actuaria hemos implementado un sistema de cálculo de Capital Adecuado en tiempo Real utilizando los datos más actualizados disponibles, esto ha mejorado nuestra eficiencia, precisión, reduciendo errores y optimizando la toma de decisiones."</p><div class="bottom_card_testimonial"><div class="testimonial_logo-chip"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace42343ed6e1306ad177f0_testimonio-logo-palig.png" loading="eager" alt="Pan-American Life Insurance Group" class="testimonial_logo-img"></div><div class="names_testimonial"><p class="testimonial_author">Lía Silva</p><p class="p_cards-testimonial-cargo">CFO, Panamerican Life Insurance Group</p></div></div></div></div></div></div></div></div></section><section class="credentials_section"><div class="w-layout-blockcontainer container_credentials w-container"><div class="w-layout-hflex credentials"><div class="w-layout-vflex heading_frame is-credentials"><h2 class="heading-section">Respaldados por certificaciones nacionales e internacionales</h2><h2 class="subheading-section">Operamos bajo las más estrictas normativas nacionales e internacionales para garantizar la precisión, seguridad y confidencialidad de su información.</h2></div><div class="credentials_marquee"><div class="credentials_grid is-marquee"><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d488c10f86bbf0592a5_cert-supercias.png" loading="lazy" alt="Superintendencia de Compañías, Valores y Seguros del Ecuador" class="cert_logo"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d484378fbb4caf1022a_cert-iso-9001-imq.png" loading="lazy" alt="Certificación IMQ ISO 9001:2015" class="cert_logo is-iso-9001"></div></div><a rel="noopener" target="_blank" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df8abae1f93dd1f54ed_certificacion-iso-9001-2015.pdf" class="cert_link">Ver credencial</a></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d48bdf88084c6799bc6_cert-iso-27001-imq.svg" loading="lazy" alt="Certificación IMQ ISO/IEC 27001:2022" class="cert_logo is-iso-27001"></div></div><a rel="noopener" target="_blank" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf" class="cert_link">Ver credencial</a><link rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf"></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f11beeb8c078e46_cert-sello-actuarial.png" loading="lazy" alt="Sello Actuarial" class="cert_logo"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22cca_cert-iaa.png" loading="lazy" alt="International Actuarial Association" class="cert_logo is-iaa"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d48517c214a11c6f978_cert-pbss.png" loading="lazy" alt="Pensions, Benefits and Social Security Section" class="cert_logo is-pbss"></div></div></div><div class="cert_item"><div class="cert_frame"><div class="cert_cell"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22d19_cert-superbancos.png" loading="lazy" alt="Superintendencia de Bancos del Ecuador" class="cert_logo"></div></div></div></div></div></div></div></section><section class="faq_section"><div class="container_faq"><div class="faq_head"><h2 class="section_title">Lo que nos preguntan antes de contratar</h2><p class="section_sub">Si tu duda no está aquí, escríbenos por WhatsApp.</p></div><div class="faq_list"><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Qué es un estudio actuarial de jubilación patronal?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">Es el cálculo que determina las provisiones por jubilación patronal y bonificación por desahucio que tu empresa debe registrar en sus estados financieros, conforme a la NIC 19 o la sección 28 de las NIIF para PYMES.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Quién está obligado a hacerlo en Ecuador?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">Todas las entidades obligadas a llevar contabilidad que tienen uno o más trabajadores bajo relación de dependencia.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Cuánto tiempo toma?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">Depende del tamaño de tu nómina y de la disponibilidad de la información. Con la información completa, puede tomar hasta 8 días laborables.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Qué información tengo que enviar?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">La información de la nómina y los parámetros contables de la empresa. Al cotizar te enviamos la lista exacta y la plantilla para cargarla en nuestra plataforma.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿NIC 19 o sección 28 de las NIIF para PYMES?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">La NIC 19 aplica a las empresas que reportan con NIIF completas; la sección 28, a las que reportan con NIIF para PYMES. Si no sabes cuál usa tu empresa, elige «No estoy seguro» en la cotización y lo revisamos contigo.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Mis datos están protegidos?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">Sí. Actuaria está certificada en ISO/IEC 27001:2022 de seguridad de la información, y los datos de tu nómina se envían y se consultan por nuestra plataforma, con total confidencialidad.</p></nav></div><div data-hover="false" data-delay="0" class="card_wrapper is-faq w-dropdown"><div class="faq_toggle w-dropdown-toggle"><div class="faq_question">¿Cuánto cuesta?</div><div class="faq_icon w-icon-dropdown-toggle"></div></div><nav class="faq_panel w-dropdown-list"><p class="faq_answer">El valor depende del número de trabajadores y de la norma que aplica tu empresa. Completa los 2 pasos de la cotización y un asesor te envía la propuesta, sin compromiso.</p></nav></div></div></div></section><section class="cta_section"><div class="container_cta"><div class="cta"><div class="cta_panel"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset.jpg" alt="" sizes="(max-width: 479px) 95vw, (max-width: 767px) 97vw, (max-width: 991px) 96vw, 856px" srcset="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset-p-500.jpg 500w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset-p-800.jpg 800w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset-p-1080.jpg 1080w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd00fc0feaddf482c90_cta-velero-sunset.jpg 1536w" class="cta_panel_photo"><div class="cta_panel_veil"></div><div class="cta_panel_glow"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png" alt="" sizes="(max-width: 479px) 95vw, (max-width: 767px) 97vw, (max-width: 991px) 96vw, 856px" srcset="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-500.png 500w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-800.png 800w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-1080.png 1080w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png 1501w" class="cta_formula"></div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png" alt="" sizes="(max-width: 479px) 95vw, (max-width: 767px) 97vw, (max-width: 991px) 96vw, 856px" srcset="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-500.png 500w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-800.png 800w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas-p-1080.png 1080w, https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a886cd0a1704fda908ed9da_cta-formulas.png 1501w" class="cta_formula is-right"><div class="cta_circle is-lg"></div><div class="cta_circle is-sm"></div><div class="cta_content"><h2 class="heading-section is-cta">Ten tus provisiones listas antes del cierre</h2><p class="subheading-section is-cta">Mientras antes nos envíes la información, antes tendrás el informe para tu contador y tu auditor.</p><div class="cta_spacer"></div><a href="#cotizar" class="secondbutton is-flat">Cotiza tu estudio<span aria-hidden="true" class="text-span-3"></span></a></div></div></div></div><div class="w-embed"><!-- Liquid glass del inicio, 2026-10-12, v11: vidrio de transparencia real.
+     Code Embed al final de Cta_Section (página Inicio). Aplica a la tarjeta CTA («No dejes tus decisiones críticas al
+     azar»), al aro del botón del hero, a los marcos de las cifras (+6.500 / estudios), a los testimonios y a las
+     certificaciones. «Nuestra Trayectoria» conserva su vidrio original (el usuario lo prefirió así).
+     - El vidrio es backdrop-filter sobre el propio elemento: deja ver lo que pasa por detrás en tiempo real (las bolas
+       de gradiente de Features, la textura del fondo mientras se deslizan los testimonios), desenfocado y saturado,
+       con un velo blanco de .3 y brillos especulares en ::after (luz arriba a la izquierda, filetes interiores).
+     - 2026-10-15: el usuario eligió como OFICIAL el vidrio de las cifras, que es vidrio claro (sin desenfoque).
+       Cifras, testimonios, certificaciones, la tarjeta CTA y el aro del botón del hero lo llevan; ver «Vidrio
+       OFICIAL» más abajo.
+     - v10 usaba una copia estática de la textura deformada con un filtro SVG: se veía «líquida» pero tapaba todo lo
+       que se movía por detrás (reclamo del usuario: el vidrio tiene que dejar ver el contenido de abajo). La
+       refracción SVG en tiempo real (backdrop-filter: url()) colgaba Chrome con GPU Intel en estas medidas: descartada.
+     - Aros: cifras y tarjeta CTA 16 px (12 en celular); testimonios y certificaciones, el padding de su clase (v12);
+       botones, el .button-ring del sitio (8 px; 6 a ≤479).
+     - Canto: una sola línea de 1 px en degradado (blanca arriba a la derecha, casi transparente abajo a la izquierda).
+     - .cta es el marco de la CTA: sus márgenes bajan lo mismo que el aro, así la sección mide igual. 888 px centrada.
+     La CTA de Nosotros usa las mismas clases y no se toca. -->
+<style>
+/* Material común. Desde 2026-10-29 no lleva desenfoque: todos estos marcos usan el vidrio oficial (claro), y el
+   blur(6px) que había aquí lo anulaba siempre la regla «Vidrio OFICIAL» de más abajo. */
+:is(.cta_section .cta, .hero_copy .button-ring, .card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame) {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+}
+:is(.cta_section .cta, .hero_copy .button-ring, .card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    rgba(255, 255, 255, .3);
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+/* Canto del vidrio: una sola línea de 1 px en degradado diagonal, blanca arriba a la derecha y casi transparente,
+   un poco gris, abajo a la izquierda (pedido del usuario). Es un aro de 1 px recortado con máscara; va en z-index 0
+   para quedar sobre el velo (el contenido interior, que viene después, queda encima). */
+:is(.cta_section .cta, .hero_copy .button-ring, .card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+/* Marcos de tarjeta: sin borde propio (el canto lo dibuja ::before) y sombra suave. v12 (2026-10-19): el aro de
+   testimonios y certificaciones es el padding de su clase (16 / 12; en celular 16 / 10 y 8), igual que en las
+   páginas de soluciones; solo las cifras conservan aquí su aro de 16 (12 en celular). */
+:is(.card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame) {
+  border: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.features .card_features-clon { padding: 16px; }
+@media (max-width: 767px) {
+  .features .card_features-clon { padding: 12px; }
+}
+/* Vidrio OFICIAL (2026-10-15, elegido por el usuario): el de las cifras «Clientes en la región» y «Estudios
+   actuariales». Es vidrio claro: deja ver el fondo nítido, sin desenfoque, bajo el velo blanco de .3, con la luz
+   arriba a la derecha, el canto de 1 px y la sombra; marco con radio de 40 px y aro de 16 px (12 en celular).
+   Hasta 2026-10-29 una interacción del Inicio ponía transform-style: preserve-3d en .features y .hero_main, y por eso
+   el desenfoque de las cifras y del botón del hero nunca se pintaba. Esa interacción ya no existe: aquí queda
+   explícito que estos marcos van sin desenfoque.
+   Los testimonios se igualan al oficial: con el desenfoque de 6 px la textura desaparecía y el aro se veía gris liso.
+   Las certificaciones también (mismo día): sin desenfoque, marco de 40 px y celda blanca como la tarjeta oficial,
+   de 24 px, sin borde y sin la sombra neumórfica que caía sobre el aro.
+   La tarjeta CTA también (mismo día): sin desenfoque, marco de 40 px con la sombra suave del oficial (antes una
+   sombra profunda de 24 px) y panel azul de 24 px sin sombra propia (antes un filete blanco y una sombra oscura que
+   caían sobre el aro). Ver «Tarjeta CTA» más abajo.
+   El aro del botón del hero también (mismo día). Ver «Botón del hero» más abajo.
+   Si se extiende a otros marcos, sumarlos a esta regla. Ojo con la especificidad: :is() toma la de su selector más
+   fuerte (0,2,0), así que una regla simple como .cert_frame { backdrop-filter: none } no le gana. */
+:is(.card_features-clon, .testimonial_carusel > .card_testimonial, .cert_frame, .cta_section .cta, .hero_copy .button-ring) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* v12 (2026-10-19, a pedido del usuario, para que el Inicio y las soluciones midan igual): testimonios y
+   certificaciones conservan los radios de su clase (40 y 28 en celular; 32, 28 y 24; celda 20 y 16), sin los
+   radios de 40 / 24 que ponía el oficial. La celda sigue sin borde ni sombra neumórfica. */
+.cert_frame .cert_cell {
+  border: 0;
+  box-shadow: none;
+}
+/* Botón del hero («Descubre cómo lo hacemos») con el vidrio oficial (2026-10-15). Conserva el aro de botón (8 px;
+   6 a ≤479, del .button-ring del sitio) y la píldora del botón, pero sin el neumorfismo del aro (sombra blanca arriba
+   a la izquierda y gris abajo a la derecha, que crecían con el mouse): lleva la sombra suave del oficial y radio de
+   40 px también en celular (antes 32). El botón azul pierde su sombra solo en reposo: al pasar el mouse, al hacer
+   clic y con el foco de teclado conserva sus efectos (:where() no suma especificidad, así esas reglas siguen ganando). */
+.hero_copy .button-ring,
+.hero_copy .button-ring:hover {
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+  border-radius: 40px;
+}
+.hero_copy .button-ring > .main_button:where(:not(:hover):not(:active):not(:focus-visible):not([data-wf-focus-visible])) {
+  box-shadow: none;
+}
+/* Tarjeta CTA, con el vidrio oficial (2026-10-15): marco de 40 px en todos los tamaños, la sombra suave de los
+   marcos de tarjeta y el panel azul de 24 px sin sombra propia. El aro sigue en --ring (16 px; 12 en celular). */
+.cta_section .cta {
+  --ring: 16px;
+  overflow: hidden;
+  padding: var(--ring);
+  max-width: 888px;
+  margin: calc(56px - var(--ring)) auto;
+  border-radius: 40px;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.cta_section .cta_panel {
+  box-shadow: none;
+  border-radius: 24px;
+}
+.cta_section .heading-section.is-cta {
+  text-wrap: balance;
+}
+@media (min-width: 992px) {
+  .cta_section .cta_content { padding: 64px; }
+}
+@media (max-width: 991px) {
+  .cta_section .cta { margin-top: calc(40px - var(--ring)); margin-bottom: calc(40px - var(--ring)); }
+}
+@media (max-width: 767px) {
+  .cta_section .cta { --ring: 12px; margin-top: calc(32px - var(--ring)); margin-bottom: calc(32px - var(--ring)); }
+}
+/* Botón «Agendar sesión ejecutiva» de la tarjeta CTA con el aro de vidrio oficial (2026-10-16, a pedido del usuario):
+   el mismo aro del botón del hero, 8 px por fuera de la píldora (6 a ≤479) y radio de 40 px. El enlace no tiene el
+   envoltorio .button-ring en el Designer, así que el aro lo dibujan los pseudoelementos del propio enlace, recortados
+   con máscara a un anillo para no velar la píldora blanca: ::after es el cuerpo del vidrio (velo .3, luz arriba a la
+   derecha y el sombreado de abajo) y ::before el canto de 1 px, por encima. La sombra suave del oficial va en el
+   enlace (el filtro abarca también sus pseudoelementos) y la píldora pierde su propia sombra solo en reposo (:where()
+   no suma especificidad y excluye hover, clic y foco, que conservan sus efectos). Margen superior del tamaño del aro,
+   para que el anillo no invada el hueco de 20 px con el párrafo. Sobre el panel navy el velo se ve azul claro, como el
+   aro de la tarjeta. */
+.cta_section .cta_content > .secondbutton.is-flat {
+  --aro: 8px;
+  position: relative;
+  isolation: isolate;
+  margin-top: var(--aro);
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+.cta_section .cta_content > .secondbutton.is-flat:where(:not(:hover):not(:active):not(:focus-visible):not([data-wf-focus-visible])) {
+  box-shadow: none;
+}
+.cta_section .cta_content > .secondbutton.is-flat::before,
+.cta_section .cta_content > .secondbutton.is-flat::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--aro));
+  border-radius: 40px;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.cta_section .cta_content > .secondbutton.is-flat::after {
+  z-index: -1;
+  padding: var(--aro);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    rgba(255, 255, 255, .3);
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+.cta_section .cta_content > .secondbutton.is-flat::before {
+  z-index: 0;
+  padding: 1px;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+}
+@media (max-width: 479px) {
+  .cta_section .cta_content > .secondbutton.is-flat { --aro: 6px; }
+}
+</style></div></section><footer class="footer_section"><div class="footer_card"><div class="footer_main"><div class="footer_brand"><img alt="Actuaria Consultores" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750c02cd66c8ed1ef1b7_footer-logo-actuaria-blanco.svg" class="footer_logo"><div class="footer_group"><p class="footer_title">Contacto:</p><a aria-label="Llamar a Actuaria al (+593-2) 392-3400" href="tel:+59323923400" class="footer_line w-inline-block"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750c282395610261b975_footer-ico-phone.svg" class="footer_icon"></div><p class="footer_text">Teléfono: (+593-2) 392-3400</p></a><a aria-label="Escribir a Actuaria por WhatsApp al (+593-9) 7913-3351" target="_blank" rel="noopener" href="https://api.whatsapp.com/send/?phone=593979133351&amp;text=Hola+Actuaria%2C+necesito+m%C3%A1s+informaci%C3%B3n+https%3A%2F%2Factuaria.com%2F&amp;type=phone_number&amp;app_absent=0" class="footer_line w-inline-block"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750d282395610261b9ab_footer-ico-whatsapp.svg" class="footer_icon"></div><p class="footer_text">Whatsapp: (+593-9) 7913-3351 </p></a><a aria-label="Escribir a info@actuaria.com" href="mailto:info@actuaria.com" class="footer_line w-inline-block"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750dddcb76f0fb7b5fea_footer-ico-envelope.svg" class="footer_icon is-envelope"></div><p class="footer_text">Correo: info@actuaria.com</p></a></div><div class="footer_group"><p class="footer_title">Direcciones</p><div class="footer_line"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e1427a1f9ebfa9143_footer-ico-location.svg" class="footer_icon is-pin"></div><p class="footer_text">Quito: Av. Orellana E9-195 y Av. 6 de Diciembre, Edif. Alisal de Orellana, Of. 804.</p></div><div class="footer_line"><div class="footer_line_icon"><img alt="" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e1427a1f9ebfa9143_footer-ico-location.svg" class="footer_icon is-pin"></div><p class="footer_text">Guayaquil: Av. José Santiago Castillo y Av. Francisco de Orellana, Edif. Millenium. Of. 1107.</p></div></div><div class="footer_social"><a aria-label="Actuaria Consultores en Facebook" target="_blank" rel="noopener" href="https://www.facebook.com/actuariaconsultores" class="social_link w-inline-block"><img alt="Facebook" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e1427a1f9ebfa919c_footer-ico-facebook.svg" class="social_icon is-fb"></a><a aria-label="Actuaria Consultores en Instagram" target="_blank" rel="noopener" href="https://www.instagram.com/actuaria_ec/" class="social_link w-inline-block"><img alt="Instagram" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e282395610261bb1f_footer-ico-instagram.svg" class="social_icon"></a><a aria-label="Actuaria Consultores en LinkedIn" target="_blank" rel="noopener" href="https://www.linkedin.com/company/2412258/" class="social_link w-inline-block"><img alt="LinkedIn" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750e02cd66c8ed1ef28c_footer-ico-linkedin.svg" class="social_icon"></a><a aria-label="Actuaria Consultores en YouTube" target="_blank" rel="noopener" href="https://www.youtube.com/channel/UCqtNWXgoRPgo3gmYfyi6B-A" class="social_link w-inline-block"><img alt="YouTube" src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a88750f3c2f1ca03320bd92_footer-ico-youtube.svg" class="social_icon is-yt"></a></div></div><div class="footer_cols"><div class="footer_col is-1"><p class="footer_title">Gobierno Corporativo</p><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6abbe9ef7715a35b07817866_codigo-conducta-empresarial.pdf" target="_blank" class="footer_link">Código de Conducta Empresarial</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6abbe9f0b559bd0f608baca7_politica-igualdad-genero.pdf" target="_blank" class="footer_link">Política de Igualdad de Género</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6abbe9eff0ec45724fcbcbd6_codigo-buen-gobierno-corporativo.pdf" target="_blank" class="footer_link">Código de Buen Gobierno Corporativo</a></div><div class="footer_col is-2"><p class="footer_title">Transparencia</p><a href="https://actuaria.com/seguridad-de-la-informacion" class="footer_link">Seguridad de la Información</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df6459360730d2f79e4_politica-privacidad-proteccion-datos.pdf" target="_blank" class="footer_link">Política de Privacidad y Protección de Datos Personales</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df799ec7f9fe8ef9d73_politica-prevencion-lavado-activos-antisoborno.pdf" target="_blank" class="footer_link">Protección de Lavado de Activos y Antisoborno</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df7b31c8c53ca3393b3_politica-seguridad.pdf" target="_blank" class="footer_link">Política de Seguridad</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df880e66d64b3d5f97d_solicitud-ejercicio-derechos-datos-personales.pdf" target="_blank" class="footer_link">Solicitud para el Ejercicio de Derechos en el Tratamiento de Protección de Datos Personales</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df8abae1f93dd1f54ed_certificacion-iso-9001-2015.pdf" target="_blank" class="footer_link">Certificación ISO 9001:2015</a><a rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf" target="_blank" class="footer_link">Certificación ISO/IEC 27001:2022</a><link rel="noopener" href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf"></div></div></div><div class="footer_divider"></div><div class="footer_bottom"><p class="footer_legal">© 2026 Actuaria Consultores. Todos los derechos reservados</p><a href="#" class="footer_cookies">Configuración cookies</a></div></div></footer><section class="mobile_bar"><div class="w-layout-blockcontainer mobile_container w-container"><div class="bar"><div class="w-layout-hflex contactos"><div class="telf"><a href="tel:+59323923400" class="bar_link w-inline-block"><h6 class="heading-6"></h6><h6 class="telf_link">+593 2392 3400</h6></a></div><div class="separador_bar"></div><div class="email"><a href="mailto:info@actuaria.com?subject=Informaci%C3%B3n" class="bar_link w-inline-block"><h6 class="heading-6"></h6><h6 class="email_link">info@actuaria.com</h6></a></div><div class="separador_bar"></div><div class="whatsapp"><a href="https://api.whatsapp.com/send/?phone=593979133351&amp;text=Hola+Actuaria%2C+necesito+m%C3%A1s+informaci%C3%B3n+https%3A%2F%2Factuaria.com%2F&amp;type=phone_number&amp;app_absent=0" target="_blank" class="bar_link_wa w-inline-block"><h6 class="wa-icon"></h6></a></div></div></div></div></section><div class="wa_float"><a href="https://api.whatsapp.com/send/?phone=593979133351&amp;text=Hola+Actuaria%2C+necesito+m%C3%A1s+informaci%C3%B3n+https%3A%2F%2Factuaria.com%2F&amp;type=phone_number&amp;app_absent=0" aria-label="Escríbenos por WhatsApp" rel="noopener" class="wa_float_btn"><span aria-hidden="true" class="wa_float_ico"></span></a></div><script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=6967c96e0fba2ea4f94d3c69" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/js/webflow.schunk.8f00140e6d49a9ab.js" type="text/javascript" integrity="sha384-pekAA3fZ9Fq62G9lj3Mt/f+F8Q0uWjeVIVjcIz0GTpLb36G9tKIv14M+zOaQZpjx" crossorigin="anonymous"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/js/webflow.7a57e554.4fd522b97c340a6b.js" type="text/javascript" integrity="sha384-HGr17lWdIXUwYlP6Cl+Iy+7M40AQFW9zx/i4/UUCD4q+P3GA982xOpp6HgnuGtuI" crossorigin="anonymous"></script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.credentials_marquee').forEach(function (cont) {
+    var tracks = cont.querySelectorAll('.credentials_grid.is-marquee');
+    if (tracks.length !== 1) return;
+    var clone = tracks[0].cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    clone.querySelectorAll('a, button, input, [tabindex]').forEach(function (el) { el.tabIndex = -1; });
+    cont.appendChild(clone);
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.testimonial_section').forEach(function (sec) {
+    var cont = sec.querySelector('.testimonial_container');
+    var track = cont && cont.querySelector('.testimonial_carusel');
+    if (!track || sec.querySelector('.testimonial_controls')) return;
+    var heading = sec.querySelector('.heading_frame, [class*="heading_frame"]') || cont.parentElement;
+
+    cont.setAttribute('tabindex', '0');
+    cont.setAttribute('role', 'region');
+    cont.setAttribute('aria-label', 'Testimonios de clientes');
+
+    var ctrls = document.createElement('div');
+    ctrls.className = 'testimonial_controls';
+    ctrls.innerHTML =
+      '<button type="button" class="testimonial_arrow" data-dir="-1" aria-label="Testimonio anterior"><span aria-hidden="true">&#xf053;</span></button>' +
+      '<button type="button" class="testimonial_arrow" data-dir="1" aria-label="Testimonio siguiente"><span aria-hidden="true">&#xf054;</span></button>';
+    cont.insertAdjacentElement('afterend', ctrls);
+
+    function step() {
+      var cards = track.children;
+      if (cards.length < 2) return cont.clientWidth;
+      return cards[1].getBoundingClientRect().left - cards[0].getBoundingClientRect().left;
+    }
+    function inset() {
+      var left = Math.round(heading.getBoundingClientRect().left);
+      sec.style.setProperty('--testi-inset', Math.max(16, left) + 'px');
+    }
+    function update() {
+      ctrls.hidden = cont.scrollWidth - cont.clientWidth <= 2;
+    }
+    ctrls.addEventListener('click', function (e) {
+      var b = e.target.closest('.testimonial_arrow');
+      if (!b) return;
+      var dir = Number(b.getAttribute('data-dir'));
+      var max = cont.scrollWidth - cont.clientWidth;
+      // Circular: past either end, wrap around to the other one.
+      if (dir > 0 && cont.scrollLeft >= max - 2) cont.scrollTo({ left: 0, behavior: 'smooth' });
+      else if (dir < 0 && cont.scrollLeft <= 2) cont.scrollTo({ left: max, behavior: 'smooth' });
+      else cont.scrollBy({ left: step() * dir, behavior: 'smooth' });
+    });
+    window.addEventListener('resize', function () { inset(); update(); });
+    inset();
+    update();
+  });
+});
+</script>
+
+<script>
+(function () {
+  function altoMenuFijo() {
+    var nav = document.querySelector('.navbar-logo-left');
+    if (!nav) return 0;
+    if (getComputedStyle(nav).position !== 'fixed') return 0;
+    return nav.getBoundingClientRect().height;
+  }
+
+  function irA(destino, suave) {
+    var y = destino.getBoundingClientRect().top + window.pageYOffset - altoMenuFijo() - 16;
+    if (y < 0) y = 0;
+    try {
+      window.scrollTo({ top: y, behavior: suave ? 'smooth' : 'auto' });
+    } catch (err) {
+      window.scrollTo(0, y);
+    }
+  }
+
+  function menosMovimiento() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  // Id of the in-page target of a link: "#algo", or this same page's URL with "#algo" (the menu
+  // link "/nosotros#trabaja-con-nosotros" seen from /nosotros). '' when it points elsewhere.
+  function anclaLocal(a) {
+    var href = a.getAttribute('href') || '';
+    if (href.charAt(0) === '#') return href.slice(1);
+    var url;
+    try { url = new URL(a.href, location.href); } catch (err) { return ''; }
+    var ruta = function (u) { return u.pathname.replace(/\/+$/, ''); };
+    if (url.origin !== location.origin || ruta(url) !== ruta(location)) return '';
+    if (url.search && url.search !== location.search) return '';
+    var id = url.hash.slice(1);
+    try { return decodeURIComponent(id); } catch (err) { return id; }
+  }
+
+  // The stopPropagation below also hides the click from Webflow's navbar, so a menu link would
+  // leave the "Nosotros" dropdown and the phone menu open over the page. Close them here.
+  function cerrarMenu(a) {
+    var dd = a.closest('.w-dropdown');
+    if (dd && window.jQuery) window.jQuery(dd).triggerHandler('w-close');
+    if (!a.closest('.w-nav, .w-nav-overlay')) return;
+    var boton = document.querySelector('.w-nav-button.w--open');
+    if (boton) boton.click();
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var el = e.target;
+    if (!el || typeof el.closest !== 'function') return;
+    var a = el.closest('a[href*="#"]');
+    if (!a) return;
+    if (a.matches('.w-tab-link, [role="tab"]')) return;
+    if (a.target && a.target !== '_self') return;
+    var id = anclaLocal(a);
+    if (!id) return;
+    var destino = document.getElementById(id);
+    if (!destino) return;
+    e.preventDefault();
+    e.stopPropagation();
+    cerrarMenu(a);
+    irA(destino, !menosMovimiento());
+    if (window.history && history.replaceState) {
+      history.replaceState(null, '', '#' + id);
+    }
+  }, true);
+
+  window.addEventListener('load', function () {
+    var id = (location.hash || '').slice(1);
+    if (!id) return;
+    var destino = document.getElementById(id);
+    if (!destino) return;
+    if (destino.matches('.w-tab-pane')) return;
+    setTimeout(function () { irA(destino, false); }, 120);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  if (typeof WeakSet !== 'function') return;
+  var FORMS = '.w-form form';
+  var mine = new WeakSet(); // fields whose current message was set here
+
+  function inForm(el) {
+    return !!el && typeof el.closest === 'function' && 'validity' in el && !!el.closest(FORMS);
+  }
+  // A required text field holding only spaces: valid for the browser, empty for webflow.js.
+  function onlySpaces(el) {
+    var t = (el.type || '').toLowerCase();
+    return !!el.required && t !== 'checkbox' && t !== 'radio' && t !== 'file' &&
+      typeof el.value === 'string' && el.value !== '' && el.value.trim() === '';
+  }
+  // An e-mail the browser accepts but nobody can write to: no dot after the @ ("nombre@gmail").
+  function noDot(el) {
+    return (el.type || '').toLowerCase() === 'email' && typeof el.value === 'string' && /@[^@.]+$/.test(el.value.trim());
+  }
+  // Problems the browser does not see by itself.
+  function extra(el) {
+    return onlySpaces(el) || noDot(el);
+  }
+  function message(el) {
+    var v = el.validity, t = (el.type || '').toLowerCase();
+    // First: a number box with text in it reads as empty to the browser, but it is not.
+    if (v.badInput) return t === 'number' ? 'Escribe solo números.' : 'Revisa este campo.';
+    if (v.valueMissing || onlySpaces(el)) {
+      if (t === 'checkbox') return 'Marca esta casilla para continuar.';
+      if (t === 'radio') return 'Elige una de las opciones.';
+      if (t === 'file') return 'Adjunta un archivo.';
+      if (el.tagName === 'SELECT') return 'Elige una opción de la lista.';
+      return 'Completa este campo.';
+    }
+    if (v.typeMismatch || noDot(el)) {
+      if (t === 'email') return 'Escribe un correo válido (por ejemplo, nombre@empresa.com).';
+      if (t === 'url') return 'Escribe la dirección completa, empezando por https://';
+      return 'Revisa el formato de este campo.';
+    }
+    if (v.patternMismatch) return el.title || 'Revisa el formato de este campo.';
+    if (v.tooShort) return 'Escribe al menos ' + el.minLength + ' caracteres.';
+    if (v.tooLong) return 'Escribe como máximo ' + el.maxLength + ' caracteres.';
+    if (v.rangeUnderflow) return 'El valor mínimo es ' + el.min + '.';
+    if (v.rangeOverflow) return 'El valor máximo es ' + el.max + '.';
+    if (v.stepMismatch) return 'Escribe un valor válido.';
+    return '';
+  }
+  function clear(el) {
+    if (mine.has(el)) { el.setCustomValidity(''); mine.delete(el); }
+  }
+  function mark(el, text) {
+    el.setCustomValidity(text);
+    mine.add(el);
+  }
+  // Judges the field again from scratch and leaves our text on it while it is still wrong.
+  function judge(el) {
+    clear(el);
+    var text = message(el);
+    if (text) mark(el, text);
+  }
+
+  // The browser fires "invalid" on each wrong field while it checks the form, before it shows
+  // its own notice: our text replaces it.
+  document.addEventListener('invalid', function (e) {
+    var el = e.target;
+    if (!inForm(el)) return;
+    if (el.validity.customError && !mine.has(el)) return; // another script's message
+    judge(el);
+  }, true);
+
+  // While the person types, a field that already showed our notice keeps it, updated, until it is
+  // right. Others are only marked for the problems the browser does not see.
+  function edited(e) {
+    var el = e.target;
+    if (!inForm(el)) return;
+    var group = el.type === 'radio' && el.name && el.form ?
+      [].filter.call(el.form.elements, function (x) { return x.type === 'radio' && x.name === el.name; }) : [el];
+    group.forEach(function (x) {
+      if (x.validity.customError && !mine.has(x)) return; // another script's message
+      if (mine.has(x) || extra(x)) judge(x);
+    });
+  }
+  document.addEventListener('input', edited, true);
+  document.addEventListener('change', edited, true);
+
+  // A value changed by a script fires no input event, so our old notice could still be there and
+  // block the form with no visible message. The click on the submit button (also fired by Enter)
+  // comes before the browser checks the form: judge our fields again right then.
+  document.addEventListener('click', function (e) {
+    var btn = e.target && typeof e.target.closest === 'function' && e.target.closest('input[type="submit"], button');
+    if (!btn || !btn.form || (btn.type || '').toLowerCase() !== 'submit' || !btn.form.matches(FORMS)) return;
+    [].forEach.call(btn.form.elements, function (el) { if (mine.has(el)) judge(el); });
+  }, true);
+
+  // Last guard, before webflow.js sends the form: problems the browser does not see in fields
+  // that were never edited (autofilled, for example). Capture phase on document, so it runs first.
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    if (!form || typeof form.matches !== 'function' || !form.matches(FORMS)) return;
+    var bad = [].filter.call(form.elements, function (el) { return el.willValidate && extra(el); });
+    if (!bad.length) return;
+    bad.forEach(judge);
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (typeof form.reportValidity === 'function') form.reportValidity();
+  }, true);
+})();
+</script>
+
+<script>
+(function () {
+  var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)');
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!fine || !fine.matches || calm.matches) return;
+
+  var TILT = 6;        // card: max rotation on X and Y, in degrees
+  var TWIST = 2.6;     // card: max rotation on Z, in degrees, strongest toward the corners
+  var PHOTO_TILT = 6;  // photo: extra rotation on X and Y on top of the card's
+
+  document.querySelectorAll('.team_grid .card_wrapper.is-member').forEach(function (card) {
+    var frame = 0;
+    var point = null;
+    var photo = card.querySelector('.team_photo');
+
+    // The shadow and the holographic film take the photo's box (the card is their offsetParent).
+    function measurePhoto() {
+      if (!photo) return;
+      card.style.setProperty('--holo-pt', photo.offsetTop + 'px');
+      card.style.setProperty('--holo-pl', photo.offsetLeft + 'px');
+      card.style.setProperty('--holo-ps', photo.offsetWidth + 'px');
+    }
+
+    function paint() {
+      frame = 0;
+      if (!point) return;
+      // The CMS item does not tilt, so its box maps the pointer without the card's rotation.
+      var box = (card.parentElement || card).getBoundingClientRect();
+      var x = Math.min(Math.max((point.clientX - box.left) / box.width, 0), 1) - 0.5;
+      var y = Math.min(Math.max((point.clientY - box.top) / box.height, 0), 1) - 0.5;
+      var s = card.style;
+      s.setProperty('--holo-x', x.toFixed(3));
+      s.setProperty('--holo-y', y.toFixed(3));
+      s.setProperty('--holo-rx', (-y * TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-ry', (x * TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-rz', (x * y * TWIST * 4).toFixed(2) + 'deg');
+      s.setProperty('--holo-prx', (-y * PHOTO_TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-pry', (x * PHOTO_TILT * 2).toFixed(2) + 'deg');
+      s.setProperty('--holo-px', ((x + 0.5) * 100).toFixed(1) + '%');
+      s.setProperty('--holo-py', ((y + 0.5) * 100).toFixed(1) + '%');
+    }
+
+    card.addEventListener('pointerenter', function (e) {
+      point = e;
+      measurePhoto();
+      paint();
+      card.classList.add('is-holo');
+    });
+    card.addEventListener('pointermove', function (e) {
+      point = e;
+      if (!frame) frame = window.requestAnimationFrame(paint);
+    });
+    card.addEventListener('pointerleave', function () {
+      point = null;
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = 0;
+      card.classList.remove('is-holo');
+    });
+  });
+})();
+</script>
+
+<script>
+(function () {
+  // "Visitar perfil" names its person for screen readers. has-link marks the cards with a profile:
+  // only those open the gap (without one, Webflow writes href="#" and the site hides the link).
+  // --holo-nb is where the name ends inside the card: the link goes right below it.
+  document.querySelectorAll('.team_grid .card_wrapper.is-member').forEach(function (card) {
+    var link = card.querySelector('.card_link');
+    var name = card.querySelector('.team_name');
+    var href = link && link.getAttribute('href');
+    if (!href || href === '#' || !name) return;
+    card.classList.add('has-link');
+    link.setAttribute('aria-label', 'Visitar el perfil de LinkedIn de ' + name.textContent.trim());
+    function measureName() { card.style.setProperty('--holo-nb', (name.offsetTop + name.offsetHeight) + 'px'); }
+    card.addEventListener('pointerenter', measureName);
+    card.addEventListener('focusin', measureName);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var SERVICIO = {
+    '/beneficios-laborales': 'Estudio-Actuarial',
+    '/estudio-actuarial-jubilacion-patronal': 'Estudio-Actuarial',
+    '/seguros-y-medicina': 'Seguros-y-Salud',
+    '/riesgos-y-finanzas': 'Riesgos-y-Finanzas',
+    '/analisis-de-datos': 'Data-Analytics'
+  };
+  var name = SERVICIO[location.pathname.replace(/\/+$/, '')];
+  if (!name) return;
+  document.querySelectorAll('.w-form form input[type="checkbox"][name="' + name + '"]').forEach(function (box) {
+    box.checked = true;
+  });
+})();
+</script>
+
+<style>
+@property --tornasol { syntax: "<number>"; inherits: false; initial-value: 0; }
+
+.button-ring::after,
+.button-ring-form::after,
+.hero_copy .button-ring::after,
+.cta_section .cta_content > .secondbutton.is-flat::after {
+  --tornasol: .25;
+  background-color: rgba(255, 255, 255, .3);
+  background-image:
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 50%, rgb(255 255 255 / calc(var(--tornasol) * 1.1)) 0%, rgb(255 255 255 / 0) 22%),
+    linear-gradient(125deg, rgb(76 100 217 / 0) 15%, rgb(76 100 217 / calc(var(--tornasol) * .84)) 30%, rgb(126 192 229 / calc(var(--tornasol) * .76)) 43%, rgb(219 84 31 / calc(var(--tornasol) * .68)) 56%, rgb(255 187 161 / calc(var(--tornasol) * .68)) 69%, rgb(76 100 217 / 0) 85%);
+  background-size: auto, 200% 200%, 260% 260%;
+  background-position: 0 0, 20% 20%, 0% 0%;
+  background-blend-mode: normal, normal, multiply;
+  animation: aro-tornasol 21.6s linear infinite;
+  transition: --tornasol .3s ease, background-color .3s ease;
+}
+.button-ring:hover::after,
+.button-ring-form:hover::after,
+.cta_section .cta_content > .secondbutton.is-flat:hover::after { --tornasol: .5; }
+.cta_section .cta_content > .secondbutton.is-flat:hover::after { background-color: rgba(255, 255, 255, .55); }
+@keyframes aro-tornasol {
+  0%, 100% { background-position: 0 0, 20% 20%, 0% 0%; }
+  25% { background-position: 0 0, 80% 20%, 100% 0%; }
+  50% { background-position: 0 0, 80% 80%, 100% 100%; }
+  75% { background-position: 0 0, 20% 80%, 0% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button-ring::after,
+  .button-ring-form::after,
+  .hero_copy .button-ring::after,
+  .cta_section .cta_content > .secondbutton.is-flat::after { animation: none; background-position: 0 0, 30% 30%, 50% 50%; }
+}
+</style>
+<script>
+(function () {
+  if (!('getAnimations' in Element.prototype)) return;
+  function init() {
+    var aros = document.querySelectorAll('.button-ring, .button-ring-form, .cta_section .cta_content > .secondbutton.is-flat');
+    aros.forEach(function (el) {
+      function velocidad(v) {
+        el.getAnimations({ subtree: true }).forEach(function (a) {
+          if (a.animationName && a.animationName.indexOf('aro-tornasol') === 0) a.playbackRate = v;
+        });
+      }
+      el.addEventListener('pointerenter', function () { velocidad(2); });
+      el.addEventListener('pointerleave', function () { velocidad(1); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+<style>
+.button-ring,
+.button-ring:hover,
+.button-ring-form,
+.button-ring-form:hover {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+  background-image: none;
+  animation: none;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 8px rgba(15, 23, 42, .32));
+}
+
+.button-ring::after,
+.button-ring-form::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 -14px 18px -14px rgba(15, 23, 42, .18);
+}
+
+.button-ring::before,
+.button-ring-form::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(to bottom left, rgba(255, 255, 255, .95), rgba(255, 255, 255, .45) 50%, rgba(160, 168, 186, .18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+:is(.button-ring, .button-ring-form) > :is(.main_button, .actuariaplus-button):where(:not(:hover):not(:active):not(:focus-visible):not([data-wf-focus-visible])) {
+  box-shadow: none;
+}
+</style>
+<script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ad265a0289dfde21e0f7015%2Fvideosbajodemanda-1.0.0.js" type="text/javascript"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ad9bd0c3b1f3b4dcce5face%2Fformplaceholders-1.0.1.js" type="text/javascript"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ae1fd23f5187e0b8d493434%2Fpausafueradepantalla-1.0.0.js" type="text/javascript"></script><script src="https://renatopuente-ux.github.io/actuaria-flipbook/flipbook-1.0.2.js" type="text/javascript" integrity="sha384-2DEcif4qOPvCM1/onHUo8zFXEL+u4rs6ncblV/vAe4PL9tuftRNe7jjbVffRJaG1" crossorigin="anonymous"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ae36df6bcf198f2bee07713%2Fmedicioncalculadoras-1.0.1.js" type="text/javascript"></script><script src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69%2F689e5ba67671442434f3ca35%2F6ac7eb12a83800b9db5f3bd9%2Fholo3dpuentes-1.0.1.js" type="text/javascript"></script><div class="lp_proto">Prototipo · el formulario no envía datos</div><script>// 2-step quote form of the landing prototype: step 1 (workers, norm) → step 2 (contact) → done.
+// Prototype only: validates and shows the success state, sends nothing.
+(function () {
   var form = document.getElementById('form-cotizar');
+  if (!form) return;
   var pasos = form.querySelectorAll('[data-paso]');
   function ir(n) {
     pasos.forEach(function (p) { p.hidden = p.getAttribute('data-paso') !== String(n); });
-    var foco = form.querySelector('[data-paso="' + n + '"] h2');
-    if (foco) { foco.setAttribute('tabindex', '-1'); foco.focus({ preventScroll: true }); }
+    var t = form.querySelector('[data-paso="' + n + '"] h2');
+    if (t) { t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); }
   }
   form.querySelector('[data-sig]').addEventListener('click', function () {
     var ok = form.querySelector('[name="Trabajadores"]:checked') && form.querySelector('[name="Norma"]:checked');
-    form.querySelector('[data-err="1"]').classList.toggle('on', !ok);
+    form.querySelector('[data-err="1"]').classList.toggle('is-on', !ok);
     if (ok) ir(2);
   });
   form.querySelector('[data-atras]').addEventListener('click', function () { ir(1); });
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var req = ['Nombre', 'Correo', 'Razon social'].every(function (n) { return form.elements[n].value.trim(); });
+    var lleno = ['Nombre', 'Correo', 'Razon social'].every(function (n) { return form.elements[n].value.trim(); });
     var correo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.elements.Correo.value.trim());
     var ruc = form.elements.RUC.value.trim();
-    var ok = req && correo && form.elements.Legal.checked && (!ruc || /^\d{13}$/.test(ruc));
-    form.querySelector('[data-err="2"]').classList.toggle('on', !ok);
+    var ok = lleno && correo && form.elements.Legal.checked && (!ruc || /^\d{13}$/.test(ruc));
+    form.querySelector('[data-err="2"]').classList.toggle('is-on', !ok);
     if (ok) ir(3);
   });
-  // Mobile bar appears once the hero form is out of view, and hides while the form is on screen
-  var bar = document.getElementById('mbar'), quote = document.getElementById('cotizar');
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (es) { bar.classList.toggle('on', !es[0].isIntersecting && scrollY > 200); }).observe(quote);
-  }
 })();
-</script>
-</body>
-</html>
+</script></body></html>
