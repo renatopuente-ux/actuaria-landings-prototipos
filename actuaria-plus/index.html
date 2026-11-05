@@ -759,6 +759,9 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
 .lp_bento { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
 .lp_bento .lp_video { grid-column: span 2; grid-row: span 2; }
 .lp_bento .lp_video .background-video { aspect-ratio: auto; height: 100%; min-height: 320px; }
+/* The lighthouse sits at ~64 % of the 16:9 frame: a centered crop to portrait left it on the right edge.
+   75 % puts it near the middle at every bento shape (portrait 0.9 and 0.66, and 4:3 on phones). */
+.lp_bento .lp_video .background-video > video { object-position: 75% 50%; background-position: 75% 50%; }
 @media (max-width: 1199px) {
   .lp_bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lp_bento .lp_video { grid-column: span 1; }
@@ -852,6 +855,10 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
 .lp_panel_in { position: relative; z-index: 1; padding: 22px; }
 .lp_panel_bar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
 .lp_panel_bar > span { width: 10px; height: 10px; border-radius: 50%; background: #dfe3ec; }
+/* macOS window controls (user, 2026-11-05), in the Mac order: close red, minimize yellow, zoom green */
+.lp_panel_bar > span:nth-child(1) { background: #ff5f57; box-shadow: inset 0 0 0 .5px #e2463f; }
+.lp_panel_bar > span:nth-child(2) { background: #febc2e; box-shadow: inset 0 0 0 .5px #e1a116; }
+.lp_panel_bar > span:nth-child(3) { background: #28c840; box-shadow: inset 0 0 0 .5px #1aab29; }
 .lp_panel_bar .chip { margin-left: 8px; }
 .lp_kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .lp_kpi { background: #f6f8fc; border-radius: 16px; padding: 14px; display: grid; gap: 6px; align-content: start; }
