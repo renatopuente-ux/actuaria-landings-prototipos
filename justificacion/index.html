@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Justificación de diseño · Landings</title>
+<meta name="description" content="Por qué se rediseñaron así las landings de jubilación patronal y actuaria+: cada decisión con su antes y su ahora.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Prompt:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+@font-face { font-family: "Lemon Milk Pro"; font-weight: 700; font-display: swap; src: url("https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20a563b6dd8d197f85f-lemon-milk-pro-700.woff2") format("woff2"); }
+:root {
+  --navy: #151f47; --indigo: #4c64d9; --orange: #df5e2d; --orange-text: #b4441c; --orange-soft: #fde9e1;
+  --bg: #f3f6fc; --box: #e8ecf4; --line: #d7ddea; --muted: #4d5775; --ok: #1b5e20;
+  --neu: 8px 8px 20px rgba(163, 177, 198, .5), -8px -8px 20px rgba(255, 255, 255, .9);
+  --neu-sm: 4px 4px 10px rgba(163, 177, 198, .45), -4px -4px 10px rgba(255, 255, 255, .9);
+  --display: "Lemon Milk Pro", Tahoma, sans-serif; --head: Nunito, sans-serif; --body: Prompt, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--navy); font: 400 16px/1.65 var(--body); }
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--navy); }
+.wrap { width: min(1120px, 100% - 32px); margin: 0 auto; }
+
+/* Header */
+.top { padding: 64px 0 40px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 700 13px/1 var(--head); letter-spacing: .3px; color: var(--muted); background: var(--box); box-shadow: var(--neu-sm); border-radius: 999px; padding: 8px 14px; }
+h1 { font: 700 clamp(30px, 5vw, 50px)/1.1 var(--display); letter-spacing: -.5px; margin: 22px 0 16px; max-width: 16ch; }
+.lead { font-size: 18px; color: var(--muted); max-width: 62ch; margin: 0 0 26px; }
+.ctas { display: flex; flex-wrap: wrap; gap: 14px; }
+.btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 800 15px/1 var(--head); border-radius: 999px; padding: 14px 22px; }
+.btn.is-dark { background: var(--navy); color: #fff; box-shadow: var(--neu-sm); }
+.btn.is-light { background: var(--box); color: var(--navy); box-shadow: var(--neu-sm); }
+.btn:focus-visible, .toc a:focus-visible, figure a:focus-visible { outline: 3px solid var(--indigo); outline-offset: 3px; }
+
+/* Table of contents */
+.toc { position: sticky; top: 0; z-index: 5; background: rgba(243, 246, 252, .92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.toc .wrap { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+.toc a { flex: none; text-decoration: none; font: 700 14px/1 var(--head); color: var(--muted); padding: 9px 14px; border-radius: 999px; }
+.toc a:hover { background: var(--box); color: var(--navy); }
+
+/* Sections */
+section { padding: 56px 0 8px; scroll-margin-top: 56px; }
+h2 { font: 700 clamp(24px, 3.4vw, 34px)/1.15 var(--display); letter-spacing: -.3px; margin: 0 0 12px; }
+.sub { color: var(--muted); max-width: 70ch; margin: 0 0 28px; }
+.dato { display: flex; gap: 18px; align-items: center; background: var(--box); box-shadow: var(--neu); border-radius: 24px; padding: 22px 26px; margin: 0 0 32px; }
+.dato .cifra { font: 800 38px/1 var(--head); color: var(--orange-text); flex: none; }
+.dato p { margin: 0; color: var(--muted); }
+.dato strong { color: var(--navy); }
+
+/* Principles */
+.principios { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.principio { background: var(--box); box-shadow: var(--neu); border-radius: 24px; padding: 24px; }
+.principio i { font-size: 20px; color: var(--orange); width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--bg); box-shadow: var(--neu-sm); margin-bottom: 14px; }
+.principio h3 { font: 800 18px/1.3 var(--head); margin: 0 0 6px; }
+.principio p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* Decision cards */
+.dec { background: var(--box); box-shadow: var(--neu); border-radius: 28px; padding: 28px; margin: 0 0 28px; }
+.dec_head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 18px; }
+.num { font: 800 15px/1 var(--head); color: var(--orange-text); background: var(--orange-soft); border-radius: 999px; padding: 7px 11px; flex: none; }
+.dec h3 { font: 800 clamp(19px, 2.2vw, 23px)/1.3 var(--head); margin: 0; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.pair.is-stack { grid-template-columns: minmax(0, 1fr); }
+.pair.is-3 { grid-template-columns: 1.25fr 1fr 1fr; }
+.pair.is-solo { grid-template-columns: minmax(0, 1fr); max-width: 860px; }
+.pair.is-movil { grid-template-columns: repeat(2, minmax(0, 300px)); justify-content: center; gap: 28px; }
+figure { margin: 0; }
+figure a { display: block; border-radius: 18px; overflow: hidden; background: #fff; box-shadow: var(--neu-sm); }
+figure img { width: 100%; }
+figcaption { display: flex; align-items: center; gap: 8px; font: 700 13px/1.3 var(--head); color: var(--muted); margin: 10px 4px 0; }
+.tag { font: 800 12px/1 var(--head); border-radius: 999px; padding: 5px 9px; }
+.tag.is-antes { background: #fff; color: var(--muted); border: 1px solid var(--line); }
+.tag.is-ahora { background: var(--navy); color: #fff; }
+.why { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; margin-top: 24px; }
+.why h4 { font: 800 14px/1 var(--head); text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin: 0 0 10px; display: flex; gap: 8px; align-items: center; }
+.why p { margin: 0 0 10px; }
+.why ul { margin: 0; padding-left: 0; list-style: none; }
+.why li { position: relative; padding-left: 26px; margin-bottom: 8px; }
+.why li::before { content: "\f00c"; font: 900 12px/1 "Font Awesome 6 Free"; color: var(--ok); position: absolute; left: 2px; top: 6px; }
+.why .is-cambio li::before { content: "\f061"; color: var(--orange-text); }
+
+/* Lists without images */
+.extra { background: var(--box); box-shadow: var(--neu); border-radius: 24px; padding: 24px 28px; margin: 0 0 28px; }
+.extra h3 { font: 800 19px/1.3 var(--head); margin: 0 0 12px; display: flex; gap: 10px; align-items: center; }
+.extra h3 i { color: var(--orange); }
+.extra ul { margin: 0; padding-left: 20px; }
+.extra li { margin-bottom: 8px; }
+.extra li::marker { color: var(--orange); }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.cols .extra { margin: 0; }
+code { font: 500 14px/1 ui-monospace, Consolas, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
+
+footer { padding: 48px 0 64px; color: var(--muted); font-size: 14px; }
+footer .wrap { border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+@media (max-width: 900px) {
+  .principios { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .pair.is-3 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .pair.is-3 figure:first-child { grid-column: 1 / -1; }
+  .why, .cols { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+}
+@media (max-width: 640px) {
+  .top { padding: 40px 0 28px; }
+  .principios, .pair, .pair.is-3 { grid-template-columns: minmax(0, 1fr); }
+  .pair.is-movil { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .dec, .extra { padding: 20px; border-radius: 22px; }
+  .dato { flex-direction: column; align-items: flex-start; padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <span class="eyebrow"><i class="fa-solid fa-compass-drafting" aria-hidden="true"></i> Área de Producto · 5 de noviembre de 2026</span>
+    <h1>Por qué las landings se ven así</h1>
+    <p class="lead">Rediseñamos dos landings para que conviertan más, con el mismo contenido de base y el sistema de diseño de actuaria.com. Aquí está cada decisión con su antes, su ahora y el motivo.</p>
+    <div class="ctas">
+      <a class="btn is-dark" href="../jubilacion-patronal/">Ver jubilación patronal <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      <a class="btn is-light" href="../actuaria-plus/">Ver actuaria+ <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Secciones">
+  <div class="wrap">
+    <a href="#principios">Principios</a>
+    <a href="#jubilacion">Jubilación patronal</a>
+    <a href="#plus">actuaria+</a>
+    <a href="#sistema">Sistema de diseño</a>
+    <a href="#webflow">Antes de Webflow</a>
+    <a href="#medir">Qué medir</a>
+  </div>
+</nav>
+
+<main>
+<section id="principios">
+  <div class="wrap">
+    <h2>Seis principios detrás de los cambios</h2>
+    <p class="sub">Son las reglas que se aplicaron en las dos páginas. Cada decisión de abajo sale de una de ellas.</p>
+    <div class="principios">
+      <div class="principio"><i class="fa-solid fa-bullseye" aria-hidden="true"></i><h3>Un solo objetivo por página</h3><p>Cotizar el estudio o empezar gratis. Lo que lleva a otro lado se quita o pasa a segundo plano.</p></div>
+      <div class="principio"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i><h3>La acción, a la vista</h3><p>El formulario o el botón principal están en la primera pantalla y vuelven en cada sección.</p></div>
+      <div class="principio"><i class="fa-solid fa-list-check" aria-hidden="true"></i><h3>Menos esfuerzo para empezar</h3><p>Menos campos obligatorios y preguntas de un toque primero. Lo que no hace falta para responder, va como opcional.</p></div>
+      <div class="principio"><i class="fa-solid fa-circle-question" aria-hidden="true"></i><h3>Las dudas, antes del botón</h3><p>Quién está obligado, qué se recibe, cuánto cuesta y cuánto tarda, respondidos en la misma página.</p></div>
+      <div class="principio"><i class="fa-solid fa-award" aria-hidden="true"></i><h3>Pruebas cerca de la decisión</h3><p>Clientes, cifras, certificaciones y equipo justo antes de pedir los datos.</p></div>
+      <div class="principio"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><h3>El sistema del sitio</h3><p>Componentes y clases de actuaria.com, para que llevarlas a Webflow sea armar, no rediseñar.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="jubilacion">
+  <div class="wrap">
+    <h2>Estudio actuarial de jubilación patronal</h2>
+    <p class="sub">Rediseño de <a href="https://actuaria.com/estudio-actuarial-jubilacion-patronal">actuaria.com/estudio-actuarial-jubilacion-patronal</a>. Objetivo: que la empresa pida su cotización.</p>
+    <div class="dato"><span class="cifra">5,77 %</span><p>En WordPress era <strong>la página que más convertía del sitio</strong>: 1.140 visitas al año y 54 conversiones. Por eso se rediseñó primero y con un solo objetivo.</p></div>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">01</span><h3>Menos salidas en la navbar: de 11 enlaces a 4</h3></div>
+      <div class="pair is-stack">
+        <figure><a href="img/jp-nav-antes.webp"><img width="1440" height="120" src="img/jp-nav-antes.webp" alt="Navbar actual con Soluciones, Recursos, Nosotros, Blog, idioma y Contacto" loading="lazy"></a><figcaption><span class="tag is-antes">Antes</span> 3 desplegables con 7 páginas, Blog, idioma y Contacto</figcaption></figure>
+        <figure><a href="img/jp-nav-ahora.webp"><img width="1440" height="120" src="img/jp-nav-ahora.webp" alt="Navbar de la landing con Cómo funciona, Equipo, Preguntas y Cotiza tu estudio" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> 3 anclas de la página y la acción «Cotiza tu estudio»</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>En una landing, cada enlace que no lleva al objetivo compite con él. La navbar del sitio está pensada para recorrer todo actuaria.com; quien llega a esta página ya eligió el servicio.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>Es el mismo componente, sin los desplegables, el Blog ni el idioma.</li><li>Las anclas llevan a secciones de la misma página, así que nadie sale.</li><li>El botón «Contacto» pasa a ser la acción de la landing. El logo y actuaria+ se quedan.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">02</span><h3>Un título con el resultado y el plazo, y el formulario a la vista</h3></div>
+      <div class="pair">
+        <figure><a href="img/jp-hero-antes.webp"><img width="1440" height="900" src="img/jp-hero-antes.webp" alt="Hero actual con el título Estudio actuarial de jubilación patronal conforme a la NIC 19 y la imagen del faro" loading="lazy"></a><figcaption><span class="tag is-antes">Antes</span> Describe el servicio; un botón genérico</figcaption></figure>
+        <figure><a href="img/jp-hero-ahora.webp"><img width="1440" height="900" src="img/jp-hero-ahora.webp" alt="Hero nuevo con el título listo para la auditoría del cierre y el formulario Cotiza en 2 pasos" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> Promete el resultado; el formulario en lugar de la imagen</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>Quien busca este estudio ya sabe qué es: decide por el plazo, por la norma que le aplica y por si el auditor lo va a aceptar. El título y la bajada responden eso en la primera pantalla.</p><p>Un botón que nombra lo que se obtiene («Cotiza tu estudio») dice qué pasa al hacer clic; «Solicita asesoría especializada» no lo dice.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>Título: «Tu estudio de jubilación patronal, listo para la auditoría del cierre».</li><li>El plazo de «hasta 8 días laborables», que estaba en las preguntas frecuentes, sube a la bajada, junto con la NIIF para PYMES.</li><li>El formulario ocupa el lugar de la imagen decorativa.</li><li>Botón secundario «Prueba la calculadora gratis», que baja a la calculadora de la misma página.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">03</span><h3>El formulario: de 5 campos al final de la página a 2 pasos arriba</h3></div>
+      <div class="pair is-3">
+        <figure><a href="img/jp-form-antes.webp"><img width="1440" height="776" src="img/jp-form-antes.webp" alt="Formulario actual con RUC, razón social, nombre, apellido, correo, tipo de servicio y mensaje" loading="lazy"></a><figcaption><span class="tag is-antes">Antes</span> Al final de la página, 5 campos obligatorios</figcaption></figure>
+        <figure><a href="img/jp-form-paso1.webp"><img width="538" height="564" src="img/jp-form-paso1.webp" alt="Paso 1: cuántos trabajadores tiene tu empresa y bajo qué norma reporta" loading="lazy"></a><figcaption><span class="tag is-ahora">Paso 1</span> 2 preguntas de un toque</figcaption></figure>
+        <figure><a href="img/jp-form-paso2.webp"><img width="538" height="680" src="img/jp-form-paso2.webp" alt="Paso 2: nombre y apellido, correo, empresa, teléfono y RUC opcionales y servicios complementarios" loading="lazy"></a><figcaption><span class="tag is-ahora">Paso 2</span> 3 campos obligatorios</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>Empezar con preguntas fáciles, que se responden con un toque, baja la barrera de entrada. Quien ya contestó el primer paso tiene un motivo para terminar.</p><p>El número de trabajadores y la norma son justo lo que el asesor necesita para cotizar, así que la solicitud llega calificada y la cotización sale antes.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>Antes: RUC, razón social, nombre, apellido y correo obligatorios, 4 casillas de servicio y un mensaje.</li><li>Ahora: nombre y apellido en un solo campo, correo y empresa. El teléfono y el RUC son opcionales («agiliza la cotización»).</li><li>«Tipo de servicio» sale (va oculto como estudio actuarial). Los otros servicios pasan a casillas opcionales del paso 2.</li><li>En la tarjeta, el chip «Sin compromiso»; bajo el botón, «Tus datos se tratan bajo ISO/IEC 27001».</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">04</span><h3>Responder primero si la empresa está obligada</h3></div>
+      <div class="pair is-solo">
+        <figure><a href="img/jp-obligada.webp"><img width="1440" height="599" src="img/jp-obligada.webp" alt="Sección ¿Tu empresa está obligada a tener el estudio?" loading="lazy"></a><figcaption><span class="tag is-ahora">Nueva</span> No existía en la página actual</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>Es la pregunta que viene antes de cotizar. Si la página no la responde, el visitante sale a buscar la respuesta y es probable que no vuelva.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué dice</h4><ul class="is-cambio"><li>Quién está obligado: si lleva contabilidad y tiene trabajadores bajo dependencia.</li><li>Qué revisan los auditores y el SRI en el cierre, con un enlace a las 5 revisiones más comunes del SRI.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">05</span><h3>Lo que se recibe, agrupado en bento y con un video más chico</h3></div>
+      <div class="pair">
+        <figure><a href="img/jp-productos-antes.webp"><img width="1440" height="1226" src="img/jp-productos-antes.webp" alt="Sección actual con 5 tarjetas de servicios, cada una con Solicitar servicio" loading="lazy"></a><figcaption><span class="tag is-antes">Antes</span> 5 servicios, 5 botones distintos</figcaption></figure>
+        <figure><a href="img/jp-recibes.webp"><img width="1440" height="995" src="img/jp-recibes.webp" alt="Sección nueva en bento: el video del faro y 4 tarjetas con los entregables del estudio" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> Los 4 entregables del estudio, en bento con el video</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>Ver lo que se recibe hace concreto el valor: un informe que el contador puede registrar y que el auditor acepta. Cinco servicios con su propio botón, en medio de la página, abrían cinco caminos distintos.</p><p>El bento agrupa el video y los entregables en un solo bloque, así el video acompaña en vez de dominar la sección.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>4 tarjetas: provisiones por trabajador, metodología e hipótesis, listo para registrar y sustento ante el auditor.</li><li>Grilla <code>bento_layout</code> del sitio: en escritorio, el video ocupa 2 columnas y 2 filas y las tarjetas quedan en 2 × 2 al lado.</li><li>El video baja de 928 × 508 a 505 × 553 px a 1440 de ancho: 46 % menos de ancho.</li><li>Los otros servicios no se pierden: son casillas opcionales del formulario.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">06</span><h3>La calculadora, dentro de la landing</h3></div>
+      <div class="pair is-solo">
+        <figure><a href="img/jp-calculadora.webp"><img width="1440" height="1105" src="img/jp-calculadora.webp" alt="Calculadora de jubilación patronal embebida en la página" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> La calculadora de producción, en la misma página</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>Una estimación gratis atrae a quien todavía no está listo para cotizar. Si el enlace saca al visitante a otra página, no vuelve fácil a la landing; dentro de la página, la estimación es un paso más y no una salida.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>Va al final, antes del último llamado a cotizar, en un marco Glass Base.</li><li>Calcula la pensión y el fondo global de un trabajador, no la provisión de toda la nómina. El texto lo aclara y enlaza a la cotización.</li><li>Al enviar el formulario, la pantalla de confirmación lleva a la calculadora.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">07</span><h3>En celular, el mismo orden</h3></div>
+      <div class="pair is-movil">
+        <figure><a href="img/jp-movil-antes.webp"><img width="390" height="844" src="img/jp-movil-antes.webp" alt="Página actual en celular" loading="lazy"></a><figcaption><span class="tag is-antes">Antes</span> 390 px</figcaption></figure>
+        <figure><a href="img/jp-movil-ahora.webp"><img width="390" height="844" src="img/jp-movil-ahora.webp" alt="Landing nueva en celular" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> 390 px</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>En celular, la primera pantalla tiene que decir lo mismo que en escritorio: el resultado y el plazo. El formulario viene enseguida, después de los botones.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué se conserva</h4><ul class="is-cambio"><li>La barra de contacto del celular y el WhatsApp flotante del sitio.</li><li>Revisado a 360, 390, 430, 768 y 1440 px, sin desborde ni errores de consola.</li></ul></div>
+      </div>
+    </article>
+
+    <div class="extra">
+      <h3><i class="fa-solid fa-plus" aria-hidden="true"></i> Además</h3>
+      <ul>
+        <li>7 preguntas frecuentes, con las dudas de antes de contratar: qué información hay que enviar, NIC 19 frente a la sección 28, cómo se cuidan los datos y el precio.</li>
+        <li>Los logos de clientes suben justo después del hero, con «Más de 6.500 clientes en la región».</li>
+        <li>Sale el testimonio de capital adecuado, porque no habla de este servicio, y sale el puente a otras soluciones.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="plus">
+  <div class="wrap">
+    <h2>actuaria+</h2>
+    <p class="sub">Rediseño de <a href="https://plus.actuaria.com/">plus.actuaria.com</a> como landing de actuaria.com. Objetivo: que la empresa cree su cuenta gratis; la demostración queda para las empresas grandes.</p>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">01</span><h3>El plan Free al frente y las dudas resueltas junto al botón</h3></div>
+      <div class="pair">
+        <figure><a href="img/plus-hero-antes.webp"><img width="1440" height="900" src="img/plus-hero-antes.webp" alt="Hero actual de plus.actuaria.com" loading="lazy"></a><figcaption><span class="tag is-antes">Antes</span> Comenzar gratis y Ver planes y precios</figcaption></figure>
+        <figure><a href="img/plus-hero-ahora.webp"><img width="1440" height="900" src="img/plus-hero-ahora.webp" alt="Hero nuevo con el chip Plan Free, Comenzar gratis, Ver una demostración y cifras" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> Free, demostración y cifras en la primera pantalla</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>actuaria+ se puede probar sin hablar con nadie: el camino más corto es crear la cuenta. Decir que es gratis para siempre, sin tarjeta y con usuarios ilimitados, junto al botón, responde las dudas que frenan ese clic.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>Chip «Plan Free · gratis para siempre» sobre el título.</li><li>Debajo de los botones: sin tarjeta de crédito, usuarios ilimitados, seguridad ISO/IEC 27001.</li><li>Cifras: +40 años de práctica actuarial, +5.000 empresas y +600 mil trabajadores registrados.</li><li>El panel está armado con piezas del sistema, no es una captura, así que se puede editar en Webflow.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">02</span><h3>Cada módulo con su precio y su video</h3></div>
+      <div class="pair">
+        <figure><a href="img/plus-modulos.webp"><img width="1440" height="1263" src="img/plus-modulos.webp" alt="6 tarjetas de módulos con precio desde y Ver el video, y la tarjeta de Actas" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> 6 tarjetas y las actas aparte</figcaption></figure>
+        <figure><a href="img/plus-video.webp"><img width="1440" height="900" src="img/plus-video.webp" alt="Video del módulo Estudio actuarial abierto en una ventana" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> El video se abre en una ventana</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>Quien compara módulos se pregunta qué hace cada uno y cuánto cuesta. Con el precio «desde» y un video de un minuto al lado, se responde sin salir de la página.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>Tarjetas Glass Base del sitio, cada una con su frente (Cumple, Optimiza, Compara).</li><li>Los mismos 7 videos de plus.actuaria.com. Se descargan solo al hacer clic y se detienen al cerrar.</li><li>Las actas van aparte, porque están en todos los planes y se cobran por acta emitida.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">03</span><h3>Los precios, en la misma página</h3></div>
+      <div class="pair is-solo">
+        <figure><a href="img/plus-precios.webp"><img width="1440" height="871" src="img/plus-precios.webp" alt="Planes Free gratis y Enterprise desde USD 480 al año" loading="lazy"></a><figcaption><span class="tag is-ahora">Nueva</span> Antes había que ir a /precios</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>En software para empresas, no ver el precio es un motivo frecuente para no avanzar. Mostrar el plan Free al lado de Enterprise hace evidente que empezar no cuesta nada.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué dice</h4><ul class="is-cambio"><li>Free: gratis para siempre, sin tarjeta.</li><li>Enterprise: USD 480 al año de 1 a 10 trabajadores y USD 600 de 11 a 99, más IVA.</li><li>«¿Solo necesitas el estudio actuarial? Desde USD 260 al año.» Todo sale de /precios; el tramo de 100 o más no muestra precio allí, así que aquí tampoco.</li></ul></div>
+      </div>
+    </article>
+
+    <article class="dec">
+      <div class="dec_head"><span class="num">04</span><h3>La demostración: de 6 campos obligatorios a 4</h3></div>
+      <div class="pair">
+        <figure><a href="img/plus-demo-antes.webp"><img width="1200" height="652" src="img/plus-demo-antes.webp" alt="Formulario actual de demostración con RUC, trabajadores, nombre, cargo, correo y celular" loading="lazy"></a><figcaption><span class="tag is-antes">Antes</span> 6 campos y un mensaje</figcaption></figure>
+        <figure><a href="img/plus-demo-ahora.webp"><img width="1440" height="570" src="img/plus-demo-ahora.webp" alt="Formulario nuevo de demostración con correo, nombre, RUC, trabajadores y celular opcional" loading="lazy"></a><figcaption><span class="tag is-ahora">Ahora</span> 4 obligatorios, celular opcional</figcaption></figure>
+      </div>
+      <div class="why">
+        <div><h4><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Por qué</h4><p>Cada campo que no hace falta para agendar la demostración es una razón para abandonar. El cargo y el mensaje se pueden preguntar en la llamada.</p></div>
+        <div><h4><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Qué cambió</h4><ul class="is-cambio"><li>Salen el cargo y el mensaje; el celular pasa a ser opcional.</li><li>A la izquierda, qué pasa en la demostración: recorrido por los módulos, cómo cumplir la NIC 19 y una propuesta según el número de trabajadores.</li><li>Junto al botón: respuesta en un día hábil, sin compromiso.</li></ul></div>
+      </div>
+    </article>
+
+    <div class="cols">
+      <div class="extra">
+        <h3><i class="fa-solid fa-plus" aria-hidden="true"></i> Además</h3>
+        <ul>
+          <li>De 0 a 6 preguntas frecuentes: si es un software de nómina, si se cobra por usuario, si se puede pagar mes a mes, cómo cumple las NIIF.</li>
+          <li>Cifras con el formato de Ecuador (5.000, no 5,000) y logos de clientes sin repetir.</li>
+          <li>6 enlaces del pie que no llevaban a ningún lado, reemplazados o quitados.</li>
+        </ul>
+      </div>
+      <div class="extra">
+        <h3><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Recomendado</h3>
+        <ul>
+          <li>Testimonios de usuarios de actuaria+. La página no tiene ninguno, y los de Actuaria hablan de la consultoría, por eso no se usaron.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sistema">
+  <div class="wrap">
+    <h2>Con el sistema de diseño de actuaria.com</h2>
+    <p class="sub">Las dos landings van a vivir en actuaria.com, así que están hechas con las piezas del sitio y no con un estilo propio.</p>
+    <div class="cols">
+      <div class="extra">
+        <h3><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Lo que viene del sitio</h3>
+        <ul>
+          <li>Se parte del HTML publicado de la página de jubilación patronal: su CSS de Webflow, la navbar, el pie, la barra de contacto del celular y los scripts, sin tocar.</li>
+          <li>El contenido se recompone con clases que ya existen: hero, botón navy con aro Glass CTA, tarjetas Glass Base, beneficios, proceso, equipo, testimonios, certificaciones, preguntas frecuentes y la grilla <code>bento_layout</code>.</li>
+          <li>Tipografía Lemon Milk Pro, Nunito y Prompt; íconos del Font Awesome recortado del sitio, sin emojis.</li>
+        </ul>
+      </div>
+      <div class="extra">
+        <h3><i class="fa-solid fa-cube" aria-hidden="true"></i> Lo único nuevo</h3>
+        <ul>
+          <li>Clases con prefijo <code>lp_</code>: el formulario de 2 pasos (<code>lp_quote</code>), el bento de entregables (<code>lp_bento</code>), el video fuera del hero (<code>lp_video</code>), el panel del hero de actuaria+ (<code>lp_panel</code>), los precios y la ventana de video (<code>lp_modal</code>).</li>
+          <li>Fondo 24 % más claro para leer mejor: combo <code>lp_body</code> en el body. La textura pasa de #F4F4F4 a #F7F7F7 y sus líneas, de #ECECEC a #F1F1F1.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="webflow">
+  <div class="wrap">
+    <h2>Antes de llevarlas a Webflow</h2>
+    <p class="sub">Los prototipos no envían datos. Para publicarlas hay que resolver esto.</p>
+    <div class="cols">
+      <div class="extra">
+        <h3><i class="fa-solid fa-plug" aria-hidden="true"></i> Formulario de jubilación patronal</h3>
+        <ul>
+          <li>El formulario actual llega al CRM por un webhook. Hay que sumar al mapeo los campos nuevos: trabajadores, norma, teléfono y servicios complementarios.</li>
+          <li>Hoy el RUC, el nombre y el apellido son obligatorios en el CRM. El prototipo junta nombre y apellido y deja el RUC opcional: hay que decidirlo con quien mantiene la integración.</li>
+        </ul>
+      </div>
+      <div class="extra">
+        <h3><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> Por confirmar</h3>
+        <ul>
+          <li>El tiempo de respuesta de la cotización. No se prometió ninguno en la página.</li>
+          <li>Testimonios de usuarios de actuaria+.</li>
+          <li>Cada botón lleva un <code>data-evento</code> para medir los clics por ubicación en GTM.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="medir">
+  <div class="wrap">
+    <h2>Qué medir después de publicar</h2>
+    <p class="sub">Para saber si el rediseño funciona, comparar contra la página actual con estas cifras.</p>
+    <div class="cols">
+      <div class="extra">
+        <h3><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Jubilación patronal</h3>
+        <ul>
+          <li>Tasa de conversión, frente al 5,77 % que tenía en WordPress.</li>
+          <li>Cuántos empiezan el paso 1, cuántos pasan al paso 2 y cuántos envían: dónde se abandona.</li>
+          <li>Clics por ubicación: hero, tarjeta de actuaria+, proceso y llamado final.</li>
+          <li>Uso de la calculadora y cuántos cotizan después.</li>
+        </ul>
+      </div>
+      <div class="extra">
+        <h3><i class="fa-solid fa-chart-line" aria-hidden="true"></i> actuaria+</h3>
+        <ul>
+          <li>Cuentas Free creadas desde la landing, frente a demostraciones pedidas.</li>
+          <li>Videos abiertos por módulo y cuánto se ven.</li>
+          <li>Clics en «Ver planes y precios» y en el estudio desde USD 260.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Área de Producto · Actuaria Consultores</span>
+    <a href="../">Volver a los prototipos</a>
+  </div>
+</footer>
+
+</body>
+</html>
