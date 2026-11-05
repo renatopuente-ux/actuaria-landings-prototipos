@@ -759,6 +759,9 @@ body:has(.main_hero) .credentials_section .cert_frame::before {
 .lp_bento { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
 .lp_bento .lp_video { grid-column: span 2; grid-row: span 2; }
 .lp_bento .lp_video .background-video { aspect-ratio: auto; height: 100%; min-height: 320px; }
+/* The lighthouse sits at ~64 % of the 16:9 frame: a centered crop to portrait left it on the right edge.
+   75 % puts it near the middle at every bento shape (portrait 0.9 and 0.66, and 4:3 on phones). */
+.lp_bento .lp_video .background-video > video { object-position: 75% 50%; background-position: 75% 50%; }
 @media (max-width: 1199px) {
   .lp_bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lp_bento .lp_video { grid-column: span 1; }
