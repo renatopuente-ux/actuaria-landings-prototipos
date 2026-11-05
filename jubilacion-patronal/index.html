@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="es-EC">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudio actuarial de jubilación patronal · NIC 19 | Actuaria (prototipo)</title>
+<meta name="description" content="Estudio actuarial de jubilación patronal y desahucio conforme a la NIC 19 o la sección 28 de las NIIF para PYMES. Informe auditable en hasta 8 días laborables.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+@font-face { font-family: "Lemon Milk Pro"; font-weight: 400; font-display: swap; src: url("https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20ae9d18b17fe9e2840-lemon-milk-pro-400.woff2") format("woff2"); }
+@font-face { font-family: "Lemon Milk Pro"; font-weight: 500; font-display: swap; src: url("https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20aeaadc3f75487f9b9-lemon-milk-pro-500.woff2") format("woff2"); }
+@font-face { font-family: "Lemon Milk Pro"; font-weight: 700; font-display: swap; src: url("https://webflow-files-prod.global.ssl.fastly.net/6967c96e0fba2ea4f94d3c69/fonts/6aeba20a563b6dd8d197f85f-lemon-milk-pro-700.woff2") format("woff2"); }
+:root {
+  --navy: #151f47; --navy-2: #24305e; --indigo: #4c64d9; --indigo-text: #2f5fcc; --blue: #3061aa;
+  --orange: #df5e2d; --orange-text: #a8431c; --orange-dark-bg: #ffbba1;
+  --bg: #f3f6fc; --box: #e8ecf4; --line: #d5dbe8; --muted: #4d5775; --ok-text: #1b5e20; --ok-bg: #edf7ed;
+  --f-display: "Lemon Milk Pro", Tahoma, sans-serif; --f-sub: Nunito, sans-serif; --f-body: Prompt, sans-serif;
+  --neu-out: 8px 8px 20px rgba(163, 177, 198, .55), -8px -8px 20px rgba(255, 255, 255, .9);
+  --neu-out-sm: 4px 4px 10px rgba(163, 177, 198, .5), -4px -4px 10px rgba(255, 255, 255, .9);
+  --neu-in: inset 3px 3px 8px rgba(163, 177, 198, .55), inset -3px -3px 8px rgba(255, 255, 255, .9);
+  --r: 24px; --r-sm: 14px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+body { margin: 0; background: var(--bg); color: var(--navy); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { color: var(--indigo-text); }
+button, input, select, textarea { font-family: var(--f-body); font-size: 16px; }
+.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
+h1, h2 { font-family: var(--f-display); font-weight: 700; letter-spacing: -.5px; line-height: 1.12; margin: 0; }
+h1 { font-size: clamp(30px, 4.4vw, 50px); }
+h2 { font-size: clamp(26px, 3.2vw, 38px); }
+h3 { font: 800 20px/1.3 var(--f-sub); margin: 0; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 800 13px/1 var(--f-sub); letter-spacing: .08em; text-transform: uppercase; color: var(--orange-text); }
+.eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--orange); }
+.lead { font-size: clamp(16px, 1.6vw, 19px); color: var(--muted); }
+.sec { padding: clamp(44px, 6vw, 72px) 0; }
+.sec_head { max-width: 760px; margin-bottom: 40px; }
+.sec_head p { margin: 14px 0 0; }
+.center { text-align: center; margin-inline: auto; }
+.card { background: var(--box); border-radius: var(--r); box-shadow: var(--neu-out); padding: 28px; }
+
+/* Buttons: text, then icon (house rule) */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none; font: 800 16px/1 var(--f-sub); transition: transform .15s ease, box-shadow .15s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn:focus-visible, .chip input:focus-visible + span, .field input:focus-visible, .field select:focus-visible { outline: 3px solid var(--indigo); outline-offset: 2px; }
+.btn--primary { background: var(--orange); color: #fff; box-shadow: 0 10px 24px rgba(223, 94, 45, .35); }
+.btn--primary:hover { box-shadow: 0 14px 30px rgba(223, 94, 45, .42); }
+.btn--ghost { background: var(--box); color: var(--navy); box-shadow: var(--neu-out-sm); }
+.btn--navy { background: var(--navy); color: #fff; }
+.btn--block { width: 100%; }
+
+/* Header: logo, phone/WhatsApp, one CTA — no navigation to leak visitors */
+.top { position: sticky; top: 0; z-index: 30; background: rgba(243, 246, 252, .88); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(213, 219, 232, .7); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; }
+.top_logo img { height: 30px; width: auto; }
+.top_acc { display: flex; align-items: center; gap: 18px; }
+.top_tel { font: 700 15px/1 var(--f-sub); color: var(--navy); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
+.top_tel i { color: #1e9e57; font-size: 18px; }
+.top .btn { min-height: 44px; padding: 0 20px; font-size: 15px; }
+
+/* Hero */
+.hero { padding: clamp(36px, 6vw, 72px) 0 56px; }
+.hero_grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: clamp(28px, 4vw, 56px); align-items: start; }
+.hero h1 { margin: 18px 0 18px; }
+.hero_ctas { display: flex; flex-wrap: wrap; gap: 14px; margin: 28px 0 30px; }
+.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.checks li { display: flex; gap: 12px; align-items: flex-start; }
+.checks i { color: var(--ok-text); margin-top: 5px; }
+.hero_stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 34px; }
+.stat { background: var(--box); border-radius: var(--r-sm); box-shadow: var(--neu-out-sm); padding: 16px 14px; }
+.stat b { display: block; font: 700 clamp(20px, 2.4vw, 26px)/1.1 var(--f-display); }
+.stat span { display: block; font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.35; }
+
+/* Quote form (2 steps) */
+.quote { position: relative; }
+.quote_tag { position: absolute; top: -14px; right: 24px; background: var(--navy); color: #fff; font: 800 12px/1 var(--f-sub); letter-spacing: .06em; text-transform: uppercase; padding: 9px 14px; border-radius: 999px; }
+.quote h2 { font-size: 24px; }
+.quote_sub { margin: 8px 0 18px; color: var(--muted); font-size: 15px; }
+.steps { display: flex; gap: 8px; margin-bottom: 20px; }
+.steps span { flex: 1; height: 6px; border-radius: 99px; background: var(--line); }
+.steps span.on { background: var(--orange); }
+.q { margin: 0 0 18px; border: 0; padding: 0; }
+.q legend { font: 800 15px/1.3 var(--f-sub); margin-bottom: 10px; padding: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.chip span { display: inline-flex; align-items: center; min-height: 42px; padding: 0 14px; border-radius: 12px; background: var(--box); box-shadow: var(--neu-out-sm); font: 700 14px/1 var(--f-sub); color: var(--navy); cursor: pointer; }
+.chip input:checked + span { background: var(--navy); color: #fff; box-shadow: none; }
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field label { font: 700 14px/1.2 var(--f-sub); }
+.field label small { font-weight: 600; color: var(--muted); }
+.field input, .field select { min-height: 48px; border: 0; border-radius: 12px; background: var(--box); box-shadow: var(--neu-in); padding: 0 14px; color: var(--navy); width: 100%; }
+.field input::placeholder { color: #7a839f; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.extras { display: grid; gap: 8px; margin: 4px 0 16px; }
+.extras label, .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; cursor: pointer; }
+.extras input, .consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--navy); flex: none; }
+.quote_foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.quote_foot i { color: var(--indigo-text); }
+.back { background: none; border: 0; color: var(--indigo-text); font: 700 14px/1 var(--f-sub); cursor: pointer; padding: 10px 0; display: inline-flex; gap: 8px; align-items: center; }
+.err { color: #5f2120; background: #fdeded; border-radius: 10px; padding: 10px 12px; font-size: 14px; margin: 0 0 14px; display: none; }
+.err.on { display: block; }
+.done { text-align: center; padding: 18px 4px; }
+.done_ico { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 16px; background: var(--ok-bg); color: var(--ok-text); font-size: 28px; }
+.done ol { text-align: left; margin: 16px 0 20px; padding-left: 20px; }
+[hidden] { display: none !important; }
+
+/* Logo bar */
+.logos { padding: 8px 0 40px; }
+.logos p { text-align: center; font: 800 13px/1 var(--f-sub); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
+.logos_row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 18px 40px; }
+.logos_row img { height: 34px; width: auto; filter: grayscale(1) contrast(1.1); opacity: .75; }
+
+/* Obligation */
+.oblig { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: stretch; }
+.oblig .card h3 { margin-bottom: 14px; display: flex; gap: 10px; align-items: center; }
+.oblig .card h3 i { color: var(--orange); }
+.oblig ul { margin: 0; padding-left: 20px; }
+.oblig li + li { margin-top: 8px; }
+.risk { background: var(--navy); color: #fff; border-radius: var(--r); padding: 28px; }
+.risk h3 { color: #fff; }
+.risk h3 i { color: var(--orange-dark-bg); }
+.risk a { color: var(--orange-dark-bg); }
+
+/* Benefits */
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.ico { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--box); box-shadow: var(--neu-out-sm); color: var(--indigo); font-size: 21px; margin-bottom: 18px; }
+.grid4 .card p { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
+
+/* Deliverable */
+.deliv { display: grid; grid-template-columns: .95fr 1.05fr; gap: clamp(28px, 4vw, 56px); align-items: center; }
+.report { background: var(--box); border-radius: var(--r); box-shadow: var(--neu-out); padding: 26px; }
+.report_head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.report_head b { font: 800 16px/1.3 var(--f-sub); }
+.badge { font: 800 12px/1 var(--f-sub); padding: 7px 10px; border-radius: 999px; background: var(--ok-bg); color: var(--ok-text); white-space: nowrap; }
+.report_row { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
+.report_row span:last-child { font-weight: 600; text-align: right; }
+.report_note { font-size: 12px; color: var(--muted); margin: 14px 0 0; }
+.deliv ul { list-style: none; padding: 0; margin: 24px 0 28px; display: grid; gap: 14px; }
+.deliv li { display: flex; gap: 14px; }
+.deliv li i { color: var(--indigo); margin-top: 5px; width: 18px; }
+.deliv li b { font-family: var(--f-sub); }
+
+/* Process */
+.proc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; counter-reset: p; position: relative; }
+.proc .card { position: relative; }
+.proc_n { font: 700 34px/1 var(--f-display); color: var(--orange); margin-bottom: 14px; }
+.proc p { color: var(--muted); font-size: 15px; margin: 10px 0 0; }
+.timeline { margin-top: 26px; display: flex; align-items: center; gap: 12px; justify-content: center; font: 700 15px/1.4 var(--f-sub); text-align: center; }
+.timeline i { color: var(--indigo); }
+
+/* Team */
+.team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.member { text-align: center; }
+.member img { width: 132px; height: 132px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; box-shadow: var(--neu-out-sm); background: var(--box); }
+.member p { margin: 4px 0 12px; color: var(--muted); font-size: 15px; }
+.member a { font: 700 14px/1 var(--f-sub); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
+
+/* Testimonials */
+.quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.quotes blockquote { margin: 0; display: flex; flex-direction: column; gap: 18px; }
+.quotes blockquote p { margin: 0; font-size: 15px; }
+.quotes .stars { color: var(--orange); font-size: 14px; letter-spacing: 2px; }
+.quotes footer { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--line); }
+.quotes footer img { height: 26px; width: auto; }
+.quotes footer b { display: block; font: 800 15px/1.2 var(--f-sub); }
+.quotes footer span { font-size: 13px; color: var(--muted); }
+
+/* Certifications */
+.certs { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; }
+.certs a, .certs div { background: var(--box); border-radius: var(--r-sm); box-shadow: var(--neu-out-sm); padding: 14px 18px; display: grid; place-items: center; min-height: 92px; min-width: 132px; text-decoration: none; }
+.certs img { max-height: 58px; width: auto; }
+.certs small { font: 700 12px/1 var(--f-sub); color: var(--indigo-text); margin-top: 8px; }
+
+/* FAQ */
+.faq { max-width: 860px; margin: 0 auto; display: grid; gap: 14px; }
+.faq details { background: var(--box); border-radius: var(--r-sm); box-shadow: var(--neu-out-sm); padding: 0 22px; }
+.faq summary { list-style: none; cursor: pointer; padding: 20px 0; font: 800 17px/1.35 var(--f-sub); display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary i { color: var(--indigo); transition: transform .2s ease; margin-top: 3px; }
+.faq details[open] summary i { transform: rotate(45deg); }
+.faq details p { margin: 0 0 20px; color: var(--muted); }
+
+/* Final CTA */
+.final { background: var(--navy); color: #fff; border-radius: 32px; padding: clamp(32px, 5vw, 56px); display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; align-items: center; }
+.final h2 { color: #fff; }
+.final p { color: #c7cfe0; margin: 14px 0 0; }
+.final .eyebrow { color: var(--orange-dark-bg); }
+.final .eyebrow::before { background: var(--orange-dark-bg); }
+.final_ctas { display: grid; gap: 12px; }
+.final .btn--ghost { background: rgba(255, 255, 255, .08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); }
+
+/* Footer */
+.foot { padding: 40px 0 120px; font-size: 14px; color: var(--muted); }
+.foot .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
+.foot a { color: var(--navy); }
+.proto { background: #fff4e5; color: #663c00; text-align: center; font-size: 13px; padding: 8px 16px; }
+
+/* Mobile sticky bar */
+.mbar { display: none; }
+@media (max-width: 991px) {
+  .hero_grid, .deliv, .oblig, .final { grid-template-columns: 1fr; }
+  .grid4, .proc { grid-template-columns: 1fr 1fr; }
+  .quotes, .team { grid-template-columns: 1fr; }
+  .team { max-width: 420px; margin-inline: auto; }
+  .top_tel span { display: none; }
+}
+@media (max-width: 767px) {
+  .top .btn { display: none; }
+  .grid4, .proc { grid-template-columns: 1fr; }
+  .hero_stats { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .stat { padding: 12px 10px; }
+  .two { grid-template-columns: 1fr; gap: 0; }
+  .mbar { display: grid; grid-template-columns: 1fr auto; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(243, 246, 252, .95); backdrop-filter: blur(10px); border-top: 1px solid var(--line); transform: translateY(110%); transition: transform .25s ease; }
+  .mbar.on { transform: none; }
+  .mbar .btn { min-height: 48px; }
+  .mbar .wa { width: 48px; padding: 0; background: #1e9e57; color: #fff; }
+  .card, .report, .risk { padding: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="proto">Prototipo de rediseño · el formulario no envía datos</div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="top_logo" href="https://actuaria.com/" aria-label="Actuaria, ir al inicio"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a70bbec17f7fc765c2ea5d9_logo-actuaria.svg" alt="Actuaria" width="146" height="30"></a>
+    <div class="top_acc">
+      <a class="top_tel" href="https://wa.me/593979133351?text=Hola%2C%20quiero%20cotizar%20un%20estudio%20actuarial%20de%20jubilaci%C3%B3n%20patronal" data-evento="whatsapp_cabecera"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>(+593-9) 7913-3351</span></a>
+      <a class="btn btn--primary" href="#cotizar" data-evento="cta_cabecera">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Hero: outcome + deadline in the H1, the first step of the quote above the fold -->
+  <section class="hero">
+    <div class="wrap hero_grid">
+      <div>
+        <p class="eyebrow">Estudio actuarial · NIC 19 y NIIF PYMES</p>
+        <h1>Tu estudio de jubilación patronal, listo para la auditoría del cierre</h1>
+        <p class="lead">Calculamos tus provisiones de jubilación patronal y desahucio conforme a la NIC 19 o la sección 28 de las NIIF para PYMES. Recibes un informe auditable en hasta 8 días laborables y, si el auditor pregunta, nuestros actuarios lo sustentan.</p>
+        <div class="hero_ctas">
+          <a class="btn btn--primary" href="#cotizar" data-evento="cta_hero">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
+          <a class="btn btn--ghost" href="https://actuaria.com/calculadoras/jubilacion-patronal" data-evento="calculadora_hero">Calcula una estimación gratis <i class="fa-solid fa-calculator" aria-hidden="true"></i></a>
+        </div>
+        <ul class="checks">
+          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Jubilación patronal y bonificación por desahucio en un solo informe</span></li>
+          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Hipótesis y metodología documentadas, listas para revisión externa</span></li>
+          <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Acompañamiento de nuestros actuarios durante la auditoría</span></li>
+        </ul>
+        <div class="hero_stats">
+          <div class="stat"><b>+40</b><span>años de experiencia actuarial</span></div>
+          <div class="stat"><b>+6.500</b><span>clientes en la región</span></div>
+          <div class="stat"><b>8 días</b><span>laborables como máximo para tu informe</span></div>
+        </div>
+      </div>
+
+      <div class="card quote" id="cotizar">
+        <span class="quote_tag">Sin compromiso</span>
+        <form id="form-cotizar" novalidate>
+          <input type="hidden" name="Tipo de servicio" value="Estudio-Actuarial">
+          <div data-paso="1">
+            <h2>Cotiza en 2 pasos</h2>
+            <p class="quote_sub">Dos preguntas para preparar tu cotización.</p>
+            <div class="steps" aria-hidden="true"><span class="on"></span><span></span></div>
+            <fieldset class="q">
+              <legend>¿Cuántos trabajadores tiene tu empresa?</legend>
+              <div class="chips">
+                <label class="chip"><input type="radio" name="Trabajadores" value="1-10" required><span>1 a 10</span></label>
+                <label class="chip"><input type="radio" name="Trabajadores" value="11-50"><span>11 a 50</span></label>
+                <label class="chip"><input type="radio" name="Trabajadores" value="51-200"><span>51 a 200</span></label>
+                <label class="chip"><input type="radio" name="Trabajadores" value="201-500"><span>201 a 500</span></label>
+                <label class="chip"><input type="radio" name="Trabajadores" value="500+"><span>Más de 500</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="q">
+              <legend>¿Bajo qué norma reporta tu empresa?</legend>
+              <div class="chips">
+                <label class="chip"><input type="radio" name="Norma" value="NIC 19" required><span>NIIF completas (NIC 19)</span></label>
+                <label class="chip"><input type="radio" name="Norma" value="NIIF PYMES s.28"><span>NIIF para PYMES</span></label>
+                <label class="chip"><input type="radio" name="Norma" value="No sé"><span>No estoy seguro</span></label>
+              </div>
+            </fieldset>
+            <p class="err" role="alert" data-err="1">Elige una opción en cada pregunta para continuar.</p>
+            <button type="button" class="btn btn--primary btn--block" data-sig>Continuar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+            <p class="quote_foot"><i class="fa-solid fa-lock" aria-hidden="true"></i>Tus datos se tratan bajo ISO/IEC 27001.</p>
+          </div>
+
+          <div data-paso="2" hidden>
+            <h2>¿A quién enviamos la cotización?</h2>
+            <p class="quote_sub">Un asesor de Actuaria te contacta con la propuesta.</p>
+            <div class="steps" aria-hidden="true"><span class="on"></span><span class="on"></span></div>
+            <div class="two">
+              <div class="field"><label for="f-nombre">Nombre y apellido</label><input id="f-nombre" name="Nombre" autocomplete="name" required placeholder="Ej.: María Pérez"></div>
+              <div class="field"><label for="f-correo">Correo de trabajo</label><input id="f-correo" name="Correo" type="email" autocomplete="email" required placeholder="nombre@empresa.com"></div>
+            </div>
+            <div class="two">
+              <div class="field"><label for="f-empresa">Empresa</label><input id="f-empresa" name="Razon social" autocomplete="organization" required placeholder="Razón social"></div>
+              <div class="field"><label for="f-tel">Teléfono o WhatsApp <small>(opcional)</small></label><input id="f-tel" name="Telefono" type="tel" autocomplete="tel" placeholder="09 1234 5678"></div>
+            </div>
+            <div class="field"><label for="f-ruc">RUC <small>(opcional, agiliza la cotización)</small></label><input id="f-ruc" name="RUC" inputmode="numeric" maxlength="13" pattern="\d{13}" placeholder="13 dígitos"></div>
+            <p class="q" style="margin:4px 0 8px"><b style="font:800 15px/1.3 var(--f-sub)">¿Te interesa también…?</b> <small style="color:var(--muted)">(opcional)</small></p>
+            <div class="extras">
+              <label><input type="checkbox" name="Extra" value="Actas de jubilación patronal">Actas de jubilación patronal para quienes se jubilan</label>
+              <label><input type="checkbox" name="Extra" value="Impuestos diferidos">Informe de impuestos diferidos de las provisiones</label>
+              <label><input type="checkbox" name="Extra" value="Control tributario">Control tributario de provisiones (Kardex)</label>
+            </div>
+            <label class="consent"><input type="checkbox" name="Legal" required>Acepto la <a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df6459360730d2f79e4_politica-privacidad-proteccion-datos.pdf" target="_blank" rel="noopener">Política de Protección de Datos Personales</a> de Actuaria Consultores S.A.</label>
+            <p class="err" role="alert" data-err="2" style="margin-top:14px">Revisa tu nombre, correo, empresa y la aceptación de la política.</p>
+            <button type="submit" class="btn btn--primary btn--block" style="margin-top:16px">Recibir mi cotización <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+            <button type="button" class="back" data-atras><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Volver</button>
+          </div>
+
+          <div class="done" data-paso="3" hidden aria-live="polite">
+            <div class="done_ico"><i class="fa-solid fa-check" aria-hidden="true"></i></div>
+            <h2>¡Listo! Recibimos tu solicitud</h2>
+            <ol>
+              <li>Un asesor revisa los datos de tu empresa.</li>
+              <li>Te contacta con la cotización y la lista de información que necesitamos.</li>
+              <li>Con tu información completa, el informe sale en hasta 8 días laborables.</li>
+            </ol>
+            <a class="btn btn--ghost btn--block" href="https://actuaria.com/calculadoras/jubilacion-patronal">Mientras tanto, calcula una estimación <i class="fa-solid fa-calculator" aria-hidden="true"></i></a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="logos" aria-label="Clientes">
+    <div class="wrap">
+      <p>Empresas que confían en Actuaria</p>
+      <div class="logos_row">
+        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a030590_testimonio-logo-bmi.png" alt="BMI Compañía de Seguros" loading="lazy">
+        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234d7fe7095f8b80564_testimonio-logo-aig.png" alt="AIG" loading="lazy">
+        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a0305d6_testimonio-logo-plan-vital.png" alt="Plan Vital" loading="lazy">
+        <img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace42343ed6e1306ad177f0_testimonio-logo-palig.png" alt="Pan-American Life Insurance Group" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- Qualify the visitor and name the risk of not doing it -->
+  <section class="sec" style="padding-top:24px">
+    <div class="wrap">
+      <div class="sec_head">
+        <p class="eyebrow">¿Lo necesitas?</p>
+        <h2>¿Tu empresa está obligada a tener el estudio?</h2>
+      </div>
+      <div class="oblig">
+        <div class="card">
+          <h3><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>Sí, si tu empresa:</h3>
+          <ul>
+            <li>está obligada a llevar contabilidad en Ecuador, y</li>
+            <li>tiene uno o más trabajadores bajo relación de dependencia.</li>
+          </ul>
+          <p style="margin:16px 0 0;color:var(--muted)">El estudio determina las provisiones de jubilación patronal y desahucio que se registran en los estados financieros, según la NIC 19 o la sección 28 de las NIIF para PYMES.</p>
+        </div>
+        <div class="risk">
+          <h3 style="margin-bottom:14px;display:flex;gap:10px;align-items:center"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Lo que revisan en el cierre</h3>
+          <p style="margin:0">Auditores y el SRI comparan las provisiones registradas con el respaldo actuarial. Un estudio sin hipótesis documentadas o fuera de norma termina en observaciones y ajustes de último momento.</p>
+          <p style="margin:16px 0 0"><a href="https://actuaria.com/post/jubilacion-patronal-y-conciliacion-tributaria-las-cinco-revisiones-comunes-que-realiza-el-sri">Las 5 revisiones más comunes del SRI <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec_head">
+        <p class="eyebrow">Beneficios</p>
+        <h2>Cierra el año con tus provisiones respaldadas</h2>
+        <p class="lead">Información clara para decidir y un respaldo técnico que resiste la revisión externa.</p>
+      </div>
+      <div class="grid4">
+        <div class="card"><div class="ico"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i></div><h3>Cumplimiento normativo</h3><p>Conforme a la NIC 19, la sección 28 de las NIIF para PYMES y el Código del Trabajo.</p></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div><h3>Optimización financiera</h3><p>Detecta oportunidades de ahorro en provisiones y mejora la planificación del flujo de caja.</p></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-magnifying-glass-chart" aria-hidden="true"></i></div><h3>Trazabilidad total</h3><p>Hipótesis y metodología documentadas, listas para la revisión de auditores.</p></div>
+        <div class="card"><div class="ico"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></div><h3>Actuarios a tu lado</h3><p>Soporte técnico de nuestros actuarios durante auditorías y cierres contables.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Show the deliverable: what the money buys -->
+  <section class="sec">
+    <div class="wrap deliv">
+      <div class="report" aria-label="Ejemplo de la estructura del informe">
+        <div class="report_head"><b>Informe actuarial · Jubilación patronal y desahucio</b><span class="badge"><i class="fa-solid fa-check" aria-hidden="true"></i> NIC 19</span></div>
+        <div class="report_row"><span>Obligación por jubilación patronal</span><span>Provisión al cierre</span></div>
+        <div class="report_row"><span>Bonificación por desahucio</span><span>Provisión al cierre</span></div>
+        <div class="report_row"><span>Costo del período e intereses</span><span>Para resultados</span></div>
+        <div class="report_row"><span>Ganancias y pérdidas actuariales</span><span>Para ORI</span></div>
+        <div class="report_row"><span>Hipótesis financieras y demográficas</span><span>Documentadas</span></div>
+        <div class="report_row" style="border-bottom:0"><span>Análisis de sensibilidad</span><span>Incluido</span></div>
+        <p class="report_note">Esquema ilustrativo del contenido. Cada informe se adapta a la norma y a la nómina de la empresa.</p>
+      </div>
+      <div>
+        <p class="eyebrow">Qué recibes</p>
+        <h2>Un informe que tu contador y tu auditor entienden</h2>
+        <ul>
+          <li><i class="fa-solid fa-file-lines" aria-hidden="true"></i><div><b>Provisiones calculadas por trabajador</b><br>Jubilación patronal y bonificación por desahucio, en los formatos técnicos de las NIIF.</div></li>
+          <li><i class="fa-solid fa-book-open" aria-hidden="true"></i><div><b>Metodología e hipótesis explicadas</b><br>Traducimos la complejidad actuarial en respaldos claros, listos para su aprobación.</div></li>
+          <li><i class="fa-solid fa-laptop" aria-hidden="true"></i><div><b>Todo en <a href="https://plus.actuaria.com/auth/login">actuaria+</a></b><br>Envías la información y consultas tus resultados en nuestra plataforma, con tus datos protegidos.</div></li>
+          <li><i class="fa-solid fa-headset" aria-hidden="true"></i><div><b>Sustento ante auditoría</b><br>Nuestros especialistas explican la metodología, las hipótesis y las conclusiones a tu equipo y a tus auditores.</div></li>
+        </ul>
+        <a class="btn btn--primary" href="#cotizar" data-evento="cta_entregable">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec_head center">
+        <p class="eyebrow">Cómo funciona</p>
+        <h2>De tu nómina al informe, en 4 pasos</h2>
+      </div>
+      <div class="proc">
+        <div class="card"><div class="proc_n">01</div><h3>Envías la información</h3><p>La nómina y los parámetros contables, por nuestra plataforma y con total confidencialidad.</p></div>
+        <div class="card"><div class="proc_n">02</div><h3>Analizamos y calculamos</h3><p>Aplicamos el Código del Trabajo y la metodología actuarial de la NIC 19 o la sección 28 de las NIIF para PYMES.</p></div>
+        <div class="card"><div class="proc_n">03</div><h3>Recibes el informe</h3><p>Las provisiones consolidadas en los formatos técnicos de las NIIF, listas para su aprobación.</p></div>
+        <div class="card"><div class="proc_n">04</div><h3>Te acompañamos</h3><p>Sustentamos la metodología, las hipótesis y las conclusiones ante tus auditores.</p></div>
+      </div>
+      <p class="timeline"><i class="fa-regular fa-clock" aria-hidden="true"></i>Hasta 8 días laborables desde que recibimos la información completa</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec_head center">
+        <p class="eyebrow">Tu equipo</p>
+        <h2>Los actuarios detrás de tu informe</h2>
+        <p class="lead">Actuarios que sustentan la metodología, las hipótesis y las conclusiones de tu estudio ante cualquier auditoría.</p>
+      </div>
+      <div class="team">
+        <div class="card member"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6abc0af3a9759349a92f9f38_Esteban%20Vargas.png" alt="Esteban Vargas" loading="lazy" width="132" height="132"><h3>Esteban Vargas</h3><p>Chief Actuarial Officer</p><a href="https://www.linkedin.com/in/estebanvargas90/" target="_blank" rel="noopener">Ver perfil <i class="fa-brands fa-linkedin" aria-hidden="true"></i></a></div>
+        <div class="card member"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6a9f28d052b37339030ebd47_Ivan%20Ramirez.jpg" alt="Iván Ramírez" loading="lazy" width="132" height="132"><h3>Iván Ramírez</h3><p>Head of Employment Benefits</p><a href="https://www.linkedin.com/in/ivan-ramirez-actuaria-56556555/" target="_blank" rel="noopener">Ver perfil <i class="fa-brands fa-linkedin" aria-hidden="true"></i></a></div>
+        <div class="card member"><img src="https://cdn.prod.website-files.com/6a2b155906bcd374b42bedee/6aa97a673f6ddb01ec4823d0_Jos%C3%A9%20Luis%20Bed%C3%B3n.png" alt="José Luis Bedón" loading="lazy" width="132" height="132"><h3>José Luis Bedón</h3><p>Senior Consultant</p><a href="https://www.linkedin.com/in/jos%C3%A9-luis-bed%C3%B3n-jaramillo-0234216b/" target="_blank" rel="noopener">Ver perfil <i class="fa-brands fa-linkedin" aria-hidden="true"></i></a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec_head center">
+        <p class="eyebrow">Clientes</p>
+        <h2>Precisión que genera confianza</h2>
+      </div>
+      <div class="quotes">
+        <blockquote class="card"><span class="stars" aria-label="5 de 5">★★★★★</span><p>«Trabajar con Actuaria nos genera confianza. Su equipo ha demostrado un alto nivel de profesionalismo y conocimiento. Hemos obtenido soluciones personalizadas que se adaptan a nuestras necesidades.»</p><footer><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a030590_testimonio-logo-bmi.png" alt="BMI" loading="lazy"><div><b>Paúl Villagomez</b><span>Gerente Técnico y de Riesgos, BMI Ecuador</span></div></footer></blockquote>
+        <blockquote class="card"><span class="stars" aria-label="5 de 5">★★★★★</span><p>«El equipo de Actuaria Consultores ofrece un servicio actuarial excepcional. Su precisión, profesionalismo y atención al detalle han superado nuestras expectativas.»</p><footer><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234d7fe7095f8b80564_testimonio-logo-aig.png" alt="AIG" loading="lazy"><div><b>David Vega</b><span>Actuary I, AIG Ecuador</span></div></footer></blockquote>
+        <blockquote class="card"><span class="stars" aria-label="5 de 5">★★★★★</span><p>«No solo realizan cálculos matemáticos y actuariales, sino que son verdaderos asesores que se involucran en el crecimiento y desarrollo de la compañía.»</p><footer><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ace4234c40304591a0305d6_testimonio-logo-plan-vital.png" alt="Plan Vital" loading="lazy"><div><b>Julio Tarré</b><span>Gerente General, Plan Vital</span></div></footer></blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:8px">
+    <div class="wrap">
+      <div class="sec_head center">
+        <p class="eyebrow">Respaldo</p>
+        <h2>Certificados y calificados</h2>
+        <p class="lead">Operamos bajo normas nacionales e internacionales que garantizan la precisión, la seguridad y la confidencialidad de tu información.</p>
+      </div>
+      <div class="certs">
+        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d488c10f86bbf0592a5_cert-supercias.png" alt="Superintendencia de Compañías, Valores y Seguros del Ecuador" loading="lazy"></div>
+        <a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6aa18df8abae1f93dd1f54ed_certificacion-iso-9001-2015.pdf" target="_blank" rel="noopener"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d484378fbb4caf1022a_cert-iso-9001-imq.png" alt="Certificación IMQ ISO 9001:2015" loading="lazy"><small>Ver credencial</small></a>
+        <a href="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6ac7cff3be23c6396ed1219a_certificacion-iso-iec-27001-2022.pdf" target="_blank" rel="noopener"><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d48bdf88084c6799bc6_cert-iso-27001-imq.svg" alt="Certificación IMQ ISO/IEC 27001:2022" loading="lazy"><small>Ver credencial</small></a>
+        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22cca_cert-iaa.png" alt="International Actuarial Association" loading="lazy"></div>
+        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f7f731ec4e22d19_cert-superbancos.png" alt="Superintendencia de Bancos del Ecuador" loading="lazy"></div>
+        <div><img src="https://cdn.prod.website-files.com/6967c96e0fba2ea4f94d3c69/6a876d481f11beeb8c078e46_cert-sello-actuarial.png" alt="Sello Actuarial" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Objections: what, who, how long, what to send, which norm, data safety, price -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec_head center">
+        <p class="eyebrow">Preguntas frecuentes</p>
+        <h2>Lo que nos preguntan antes de contratar</h2>
+      </div>
+      <div class="faq">
+        <details open><summary>¿Qué es un estudio actuarial de jubilación patronal?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Es el cálculo que determina las provisiones por jubilación patronal y bonificación por desahucio que tu empresa debe registrar en sus estados financieros, conforme a la NIC 19 o la sección 28 de las NIIF para PYMES.</p></details>
+        <details><summary>¿Quién está obligado a hacerlo en Ecuador?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Todas las entidades obligadas a llevar contabilidad que tienen uno o más trabajadores bajo relación de dependencia.</p></details>
+        <details><summary>¿Cuánto tiempo toma?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Depende del tamaño de tu nómina y de la disponibilidad de la información. Con la información completa, puede tomar hasta 8 días laborables.</p></details>
+        <details><summary>¿Qué información tengo que enviar?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>La información de la nómina y los parámetros contables de la empresa. Al cotizar te enviamos la lista exacta y la plantilla para cargarla en nuestra plataforma.</p></details>
+        <details><summary>¿NIC 19 o sección 28 de las NIIF para PYMES?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>La NIC 19 aplica a las empresas que reportan con NIIF completas; la sección 28, a las que reportan con NIIF para PYMES. Si no sabes cuál usa tu empresa, elige «No estoy seguro» en la cotización y lo revisamos contigo.</p></details>
+        <details><summary>¿Mis datos están protegidos?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>Sí. Actuaria está certificada en ISO/IEC 27001:2022 de seguridad de la información, y los datos de tu nómina se envían y se consultan por nuestra plataforma, con total confidencialidad.</p></details>
+        <details><summary>¿Cuánto cuesta?<i class="fa-solid fa-plus" aria-hidden="true"></i></summary><p>El valor depende del número de trabajadores y de la norma que aplica tu empresa. Completa los 2 pasos de la cotización y un asesor te envía la propuesta, sin compromiso.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:8px">
+    <div class="wrap">
+      <div class="final">
+        <div>
+          <p class="eyebrow">Cierre contable</p>
+          <h2>Ten tus provisiones listas antes del cierre</h2>
+          <p>Mientras antes nos envíes la información, antes tendrás el informe para tu contador y tu auditor.</p>
+        </div>
+        <div class="final_ctas">
+          <a class="btn btn--primary" href="#cotizar" data-evento="cta_final">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
+          <a class="btn btn--ghost" href="https://wa.me/593979133351?text=Hola%2C%20quiero%20cotizar%20un%20estudio%20actuarial%20de%20jubilaci%C3%B3n%20patronal" data-evento="whatsapp_final">Escríbenos por WhatsApp <i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>© 2026 Actuaria Consultores S.A. · Quito, Ecuador · (+593-2) 392-3400</span>
+    <span><a href="https://actuaria.com/">actuaria.com</a> · <a href="https://actuaria.com/contacto">Contacto</a></span>
+  </div>
+</footer>
+
+<div class="mbar" id="mbar">
+  <a class="btn btn--primary" href="#cotizar" data-evento="cta_barra_movil">Cotiza tu estudio <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></a>
+  <a class="btn wa" href="https://wa.me/593979133351?text=Hola%2C%20quiero%20cotizar%20un%20estudio%20actuarial%20de%20jubilaci%C3%B3n%20patronal" aria-label="Escríbenos por WhatsApp" data-evento="whatsapp_barra_movil"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
+</div>
+
+<script>
+(function () {
+  var form = document.getElementById('form-cotizar');
+  var pasos = form.querySelectorAll('[data-paso]');
+  function ir(n) {
+    pasos.forEach(function (p) { p.hidden = p.getAttribute('data-paso') !== String(n); });
+    var foco = form.querySelector('[data-paso="' + n + '"] h2');
+    if (foco) { foco.setAttribute('tabindex', '-1'); foco.focus({ preventScroll: true }); }
+  }
+  form.querySelector('[data-sig]').addEventListener('click', function () {
+    var ok = form.querySelector('[name="Trabajadores"]:checked') && form.querySelector('[name="Norma"]:checked');
+    form.querySelector('[data-err="1"]').classList.toggle('on', !ok);
+    if (ok) ir(2);
+  });
+  form.querySelector('[data-atras]').addEventListener('click', function () { ir(1); });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var req = ['Nombre', 'Correo', 'Razon social'].every(function (n) { return form.elements[n].value.trim(); });
+    var correo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.elements.Correo.value.trim());
+    var ruc = form.elements.RUC.value.trim();
+    var ok = req && correo && form.elements.Legal.checked && (!ruc || /^\d{13}$/.test(ruc));
+    form.querySelector('[data-err="2"]').classList.toggle('on', !ok);
+    if (ok) ir(3);
+  });
+  // Mobile bar appears once the hero form is out of view, and hides while the form is on screen
+  var bar = document.getElementById('mbar'), quote = document.getElementById('cotizar');
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { bar.classList.toggle('on', !es[0].isIntersecting && scrollY > 200); }).observe(quote);
+  }
+})();
+</script>
+</body>
+</html>
